@@ -1,38 +1,51 @@
-import { Users, Award, TrendingUp, Zap } from "lucide-react";
+import { Users, Award, TrendingUp, Zap, Heart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const initiatives = [
   {
     title: "Peer Tutoring Program",
-    role: "Founder",
-    description: "Created and scaled a peer-to-peer tutoring initiative across 7 campuses, recognized by the Ministry of Education for impact.",
-    impact: "500+ students helped",
+    role: "Co-Founder",
+    period: "Jun 2025 – Present",
+    description: "Built a peer-to-peer tutoring model scaled across seven campuses of NIS, recognized by Egypt's Minister of Education for educational impact.",
+    impact: "7 campuses reached",
     icon: Users,
     color: "text-primary"
   },
   {
     title: "Computer Science Club",
     role: "President",
-    description: "Led workshops, coding events, and hackathons to foster programming skills and tech entrepreneurship among students.",
-    impact: "300+ participants",
+    period: "2024 – Present",
+    description: "Led workshops, hackathons, AI coding sessions, and collaborative learning initiatives. Organized 8-week digital entrepreneurship workshop for 15 students.",
+    impact: "300+ students engaged",
     icon: Award,
     color: "text-accent"
   },
   {
     title: "Launchpad Incubator",
-    role: "Financial Head",
-    description: "Managed finances and supported student entrepreneurs in developing and launching their startup ideas.",
+    role: "Financial Head & Workshop Leader",
+    period: "2024 – Present",
+    description: "Co-led schoolwide entrepreneurship initiative, managing finances and teaching coding fundamentals, entrepreneurship, and project review across grade levels.",
     impact: "15+ startups supported",
     icon: TrendingUp,
     color: "text-primary"
   },
   {
-    title: "AI Lab",
-    role: "Creator",
-    description: "Short-form AI education content on Instagram and TikTok, making complex concepts accessible to young learners.",
-    impact: "10K+ reach",
+    title: "AI Lab Initiative",
+    role: "Founder & Creator",
+    period: "2025 – Present",
+    description: "Educational media platform on Instagram & TikTok simplifying AI concepts for Arab teens through short-form explainers on real-world applications.",
+    impact: "Launching soon",
     icon: Zap,
     color: "text-accent"
+  },
+  {
+    title: "Childhood Cancer Day",
+    role: "Co-Organizer",
+    period: "Feb 2025",
+    description: "Co-organized event at El-Nasr Hospital for ~50 patients and families (~100 attendees), securing donations and coordinating special guest Rami Radwan.",
+    impact: "100+ attendees",
+    icon: Heart,
+    color: "text-primary"
   }
 ];
 
@@ -41,7 +54,7 @@ const Initiatives = () => {
     <section id="initiatives" className="py-20 relative">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Initiatives
+          Leadership & Initiatives
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
@@ -63,6 +76,7 @@ const Initiatives = () => {
                         {initiative.title}
                       </CardTitle>
                       <p className="text-sm text-accent font-semibold">{initiative.role}</p>
+                      <p className="text-xs text-muted-foreground">{initiative.period}</p>
                     </div>
                   </div>
                   <CardDescription className="text-base">

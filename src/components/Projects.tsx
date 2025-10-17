@@ -5,34 +5,34 @@ import { Badge } from "@/components/ui/badge";
 
 const projects = [
   {
-    title: "Flousy",
-    description: "AI-powered financial planning app helping families track expenses, set budgets, and achieve financial goals. Supports both English and Arabic.",
-    tech: ["Flutter", "Firebase", "AI/ML", "Dart"],
-    year: "2024",
+    title: "Flousy — AI Financial Planner",
+    description: "AI-powered financial planning app helping Egyptian families navigate inflation. Features expense tracking, category budgets, goal setting, bill reminders, and bilingual (AR/EN) UI. Publishing soon on Play Store.",
+    tech: ["Flutter", "Firebase Auth", "AI/ML", "Git", "Dart"],
+    period: "Jan 2025 – Present",
     link: "#",
-    type: "App"
+    type: "Mobile App"
   },
   {
     title: "AI VAR for Squash",
-    description: "Computer vision-based officiating tool using machine learning to detect lets and strokes in squash matches with high accuracy.",
-    tech: ["Python", "OpenCV", "Machine Learning", "CV"],
-    year: "2024",
+    description: "Computer vision-based officiating system detecting 'in' vs 'out' shots on front and side walls, tracking ball bounces and player movement. Research paper in progress for sports-technology journal.",
+    tech: ["Python", "OpenCV", "ML/CV", "Video Analysis"],
+    period: "Aug 2025 – Present",
     link: "#",
-    type: "In Progress"
+    type: "Research"
   },
   {
     title: "Solar Share",
-    description: "Peer-to-peer solar energy marketplace enabling homeowners to share excess renewable energy. Winner of Best Idea at Ignited Hackathon.",
-    tech: ["React", "Firebase", "Maps API", "Web3"],
-    year: "2024",
+    description: "Peer-to-peer solar energy marketplace enabling households to share surplus renewable power. Won Best Idea at Ignited Hackathon with +2M virtual funding. Promotes community sustainability.",
+    tech: ["JavaScript", "Firebase", "Prototype", "Maps API"],
+    period: "Sep 2024 – May 2025",
     link: "#",
     type: "Platform"
   },
   {
     title: "Flood Lens",
-    description: "NASA Space Apps Challenge winner - web application using satellite data to detect and predict flood risks in vulnerable regions.",
-    tech: ["JavaScript", "NASA API", "Data Viz", "Python"],
-    year: "2024",
+    description: "NASA Space Apps Challenge 1st Place (Port Said) & Global Nominee. Web app integrating NASA's real-time satellite data (IMERG, OPERA SAR, DEM) to detect and visualize flood risk globally.",
+    tech: ["JavaScript", "NASA APIs", "Data Viz", "Satellite Data"],
+    period: "Oct 2024",
     link: "#",
     type: "Web App"
   }
@@ -58,7 +58,7 @@ const Projects = () => {
                   <Badge variant="secondary" className="mb-2">
                     {project.type}
                   </Badge>
-                  <span className="text-sm text-muted-foreground">{project.year}</span>
+                  <span className="text-sm text-muted-foreground">{project.period}</span>
                 </div>
                 <CardTitle className="text-2xl group-hover:text-primary transition-colors">
                   {project.title}

@@ -1,41 +1,55 @@
-import { Trophy, Medal, Target } from "lucide-react";
+import { Trophy, Medal, Target, Star, Award as AwardIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const awards = [
   {
     title: "1st Place - NASA Space Apps Challenge",
-    location: "Port Said",
-    description: "Global Nominee for Flood Lens project",
+    location: "Port Said Local Event",
+    description: "Global Nominee for Flood Lens project using NASA satellite data",
     icon: Trophy,
     year: "2024"
   },
   {
-    title: "Best Idea Award",
+    title: "Best Idea Award + 2M Virtual Funding",
     location: "Ignited Hackathon",
     description: "Solar Share - P2P renewable energy platform",
     icon: Medal,
-    year: "2024"
-  },
-  {
-    title: "Top 50 - Egypt U17 Squash",
-    location: "National Rankings",
-    description: "Competitive sports achievement",
-    icon: Target,
-    year: "2023"
+    year: "May 2025"
   },
   {
     title: "1st Place - NIS Speech Competition",
-    location: "Special Category",
-    description: "Public speaking excellence",
-    icon: Trophy,
-    year: "2023"
+    location: "Special Awards Category (7 Campuses)",
+    description: "Recognized for originality, delivery, and leadership message",
+    icon: Star,
+    year: "Apr 2025"
   },
   {
-    title: "National Percussion Duet Winner",
-    location: "Music Competition",
-    description: "Artistic achievement in music",
+    title: "2nd Place - Delta-Region Math Olympiad",
+    location: "Alabakera Schools League Season 7",
+    description: "Arab Academy for Science, Technology & Maritime Transport",
+    icon: AwardIcon,
+    year: "Feb 2025"
+  },
+  {
+    title: "Top 50 - Egypt U17 Squash Rankings",
+    location: "Egyptian Squash Federation",
+    description: "Competed in 10+ national tournaments",
+    icon: Target,
+    year: "2024"
+  },
+  {
+    title: "Cognia Math - 99th Percentile",
+    location: "Certificate of Excellence",
+    description: "Advanced Level with full exam exemption",
     icon: Medal,
     year: "2022"
+  },
+  {
+    title: "1st Place - National Percussion Duet",
+    location: "Conservatory of Music",
+    description: "Award-winning performance before Minister of Music",
+    icon: Trophy,
+    year: "2018"
   }
 ];
 

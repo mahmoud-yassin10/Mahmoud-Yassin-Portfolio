@@ -27,7 +27,7 @@ const Hero = () => {
               Software Engineer & Student Founder
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Building impactful tech — from AI to financial empowerment
+              Building impactful apps from Port Said, Egypt — combining AI, Flutter development, and leadership to create solutions that matter
             </p>
           </div>
 

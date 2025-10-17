@@ -10,28 +10,30 @@ const About = () => {
           <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-border animate-fade-in">
             <div className="space-y-6 text-lg text-card-foreground leading-relaxed">
               <p>
-                I'm a <span className="text-primary font-semibold">4.0 GPA valedictorian</span> and passionate software engineer 
-                who thrives at the intersection of technology and social impact. My journey spans from developing 
-                AI-powered applications to founding student-led initiatives that have reached thousands.
+                I'm a <span className="text-primary font-semibold">predicted valedictorian</span> with a 4.0 GPA from Port Said, Egypt, 
+                passionate about using technology to solve real-world problems. As a software engineer and student founder, 
+                I've built AI-powered applications and led initiatives that have impacted thousands of students across Egypt.
               </p>
               
               <p>
-                With expertise in <span className="text-accent font-semibold">Flutter, Firebase, Python, and AI/ML</span>, 
-                I've built solutions ranging from financial literacy apps to computer vision systems for sports officiating. 
-                My technical foundation is strengthened by completing Harvard's CS50 and MIT's Machine Learning courses, 
-                demonstrating my commitment to continuous learning.
+                With expertise in <span className="text-accent font-semibold">Flutter/Dart, Python, JavaScript, and Firebase</span>, 
+                I've created solutions ranging from Flousy (an AI financial planner helping Egyptian families navigate inflation) 
+                to an AI VAR system for Squash using computer vision. My technical foundation is strengthened by Harvard's CS50 series, 
+                MIT's Machine Learning course, and hands-on project experience with real users.
               </p>
               
               <p>
-                Beyond coding, I'm a <span className="text-primary font-semibold">Junior Presidential Leadership Program graduate</span> (top 
-                1.37% of 7,000+ applicants) and have led transformative initiatives including a peer tutoring program spanning 
-                7 campuses and a Computer Science Club that has empowered hundreds of students through workshops and hackathons.
+                I'm a <span className="text-primary font-semibold">Junior Presidential Leadership Program graduate</span> — selected from 
+                7,315 applicants (top 1.37%) for intensive leadership training by Egypt's National Training Academy. This experience, 
+                combined with my role as Computer Science Club President and Financial Head of Launchpad, has taught me how to 
+                lead teams, manage resources, and turn ideas into reality.
               </p>
               
               <p>
-                I believe technology should democratize access to opportunities. Whether it's helping families manage finances 
-                through Flousy or enabling communities to share renewable energy via Solar Share, I'm driven by creating 
-                solutions that make a real difference in people's lives.
+                Beyond tech, I'm a Top-50 U17 Squash player in Egypt, Karate Black Belt (First Dan), and award-winning percussionist. 
+                These experiences taught me resilience, discipline, and the importance of continuous improvement — values I bring to 
+                every project I build. I believe technology should empower communities, and I'm committed to creating impactful solutions 
+                that make a difference.
               </p>
             </div>
           </div>

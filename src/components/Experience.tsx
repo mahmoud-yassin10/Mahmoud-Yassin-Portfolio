@@ -2,36 +2,42 @@ import { Briefcase } from "lucide-react";
 
 const experiences = [
   {
-    role: "Freelance Developer",
-    organization: "Self-Employed",
-    period: "2023 - Present",
-    description: "Developed custom websites and mobile applications for local businesses, delivering end-to-end solutions from design to deployment.",
-    achievements: [
-      "Built 10+ responsive websites using React and Flutter",
-      "Implemented e-commerce solutions with payment integrations",
-      "Maintained 100% client satisfaction rate"
-    ]
-  },
-  {
     role: "Software Development Intern",
     organization: "Dr. Nermien Ismail Schools",
-    period: "Summer 2024",
-    description: "Contributed to quality assurance and debugging processes for educational software systems.",
+    location: "Remote",
+    period: "May 2025 – Present",
+    description: "Contributing to the NIS Parents app with feature updates and stability improvements.",
     achievements: [
-      "Identified and documented 50+ bugs in production systems",
-      "Collaborated with development team on bug fixes",
-      "Improved QA testing procedures and documentation"
+      "Collaborated on small feature updates and bug fixes for production app",
+      "Reproduced and resolved issues efficiently with clear step-by-step documentation",
+      "Tested new builds end-to-end and filed detailed bug reports with evidence",
+      "Applied version control (Git) and issue triage best practices"
     ]
   },
   {
-    role: "Robotics & Coding Instructor",
-    organization: "Various Educational Programs",
-    period: "2022 - Present",
-    description: "Taught robotics and programming fundamentals to students aged 6-18, fostering early interest in STEM.",
+    role: "Freelance Developer",
+    organization: "Self-Employed",
+    location: "Port Said, Egypt",
+    period: "May 2023 – Present",
+    description: "Delivered custom websites and mobile applications for local businesses using modern technologies.",
     achievements: [
-      "Instructed 100+ students in Python, Scratch, and robotics",
-      "Designed curriculum for multiple age groups",
-      "Mentored students in competition preparation"
+      "Built responsive websites using HTML, CSS, JavaScript, and PHP",
+      "Developed cross-platform mobile apps with Flutter/Dart",
+      "Managed full project lifecycle from requirements to deployment",
+      "Maintained strong client relationships and 100% project delivery rate"
+    ]
+  },
+  {
+    role: "Local Coding & Robotics Instructor",
+    organization: "Community Education",
+    location: "Port Said, Egypt",
+    period: "Jun 2025 – Present",
+    description: "Teaching coding and robotics fundamentals to children ages 6-18, inspiring the next generation of innovators.",
+    achievements: [
+      "Created engaging curriculum for Scratch, Python, and Arduino",
+      "Instructed students across multiple age groups and skill levels",
+      "Fostered creativity and problem-solving skills through hands-on projects",
+      "Built strong rapport with students and parents in the community"
     ]
   }
 ];
@@ -62,7 +68,7 @@ const Experience = () => {
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-foreground">{exp.role}</h3>
                     <p className="text-primary font-semibold">{exp.organization}</p>
-                    <p className="text-sm text-muted-foreground">{exp.period}</p>
+                    <p className="text-sm text-muted-foreground">{exp.location} • {exp.period}</p>
                   </div>
                 </div>
                 

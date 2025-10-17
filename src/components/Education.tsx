@@ -4,39 +4,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 const education = [
   {
     title: "High School Diploma",
-    institution: "Narmer International School",
-    details: "GPA: 4.0 (Valedictorian)",
-    year: "2025",
+    institution: "Dr. Nermien Ismail Schools (NIS)",
+    location: "Port Said, Egypt",
+    details: "GPA: 4.0 (Predicted Valedictorian)",
+    period: "Sep 2022 – May 2026",
     icon: GraduationCap,
     achievements: [
       "Perfect 4.0 GPA across all subjects",
-      "School Valedictorian",
-      "Leadership in multiple student organizations"
+      "Predicted Valedictorian of graduating class",
+      "SAT: 1500 (780 Math, 720 English)",
+      "IELTS: Registered for November (Target 8.0+)",
+      "Class President – Grade 12"
     ]
   },
   {
-    title: "Junior Presidential Leadership Program",
-    institution: "Egyptian Government",
-    details: "Top 1.37% of 7,000+ applicants",
-    year: "2024",
+    title: "Junior Presidential Leadership Program (JPLP)",
+    institution: "National Training Academy (NTA)",
+    location: "Cairo, Egypt",
+    details: "Top 1.37% of 7,315 applicants",
+    period: "Aug 2025 – Sep 2025",
     icon: Award,
     achievements: [
-      "Selected from competitive national pool",
-      "Leadership development and civic engagement",
-      "National recognition for excellence"
+      "Selected as 1 of 100 students nationwide from 7,315+ applicants",
+      "21-day intensive leadership curriculum",
+      "Training in critical thinking, strategic planning, innovation, entrepreneurship",
+      "Developed skills in teamwork, emotional intelligence, and work-readiness",
+      "Selected as 1 of 5 role models for televised ONTV interview"
     ]
   },
   {
     title: "Online Courses & Certifications",
-    institution: "Harvard, MIT, Stanford",
+    institution: "Harvard edX, MITx, and more",
+    location: "Online",
     details: "Self-directed technical education",
-    year: "2022-2024",
+    period: "2024 – Present",
     icon: BookOpen,
     achievements: [
-      "CS50's Introduction to Computer Science (Harvard)",
-      "CS50's Introduction to Artificial Intelligence (Harvard)",
-      "Machine Learning with Python (MITx)",
-      "Data Science Fundamentals (Harvard edX)"
+      "CS50's Introduction to Programming with Python (Harvard edX, Nov 2024 – Jan 2025)",
+      "CS50's Introduction to Computer Science (Harvard edX, Sep 2024 – Nov 2024)",
+      "CS50's Introduction to AI with Python (Harvard edX, Jan 2025 – Mar 2025)",
+      "Data Science Series: R Basics, Visualization, Probability, Inference, ML (Harvard edX, 2025)",
+      "Machine Learning with Python (MITx, Sep 2025 – Dec 2025)",
+      "iSchool Full Software & AI Curriculum",
+      "CLS Python Course – Intensive Training"
     ]
   }
 ];
@@ -64,16 +74,17 @@ const Education = () => {
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
                         <CardTitle className="text-2xl group-hover:text-primary transition-colors">
                           {edu.title}
                         </CardTitle>
                         <span className="text-sm text-muted-foreground font-semibold">
-                          {edu.year}
+                          {edu.period}
                         </span>
                       </div>
                       <CardDescription className="text-base">
                         <span className="text-accent font-semibold">{edu.institution}</span>
+                        {edu.location && <span> • {edu.location}</span>}
                         <br />
                         {edu.details}
                       </CardDescription>
