@@ -40,7 +40,7 @@ const awards = [
   {
     title: "Cognia Math - 99th Percentile",
     location: "Certificate of Excellence",
-    description: "Advanced Level with full exam exemption",
+    description: "Scored in the 99th percentile over 25 million people in ovoer 85 countries and awarded full exemption from my math term exam",
     icon: Medal,
     year: "2022"
   },

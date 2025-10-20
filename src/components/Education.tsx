@@ -13,7 +13,7 @@ const education = [
       "Perfect 4.0 GPA across all subjects",
       "Predicted Valedictorian of graduating class",
       "SAT: 1500 (780 Math, 720 English)",
-      "IELTS: Registered for November (Target 8.0+)",
+      "IELTS: Registered for December (Target 8.0+)",
       "Class President – Grade 12"
     ]
   },
@@ -40,8 +40,8 @@ const education = [
     period: "2024 – Present",
     icon: BookOpen,
     achievements: [
-      "CS50's Introduction to Programming with Python (Harvard edX, Nov 2024 – Jan 2025)",
       "CS50's Introduction to Computer Science (Harvard edX, Sep 2024 – Nov 2024)",
+      "CS50's Introduction to Programming with Python (Harvard edX, Nov 2024 – Jan 2025)",
       "CS50's Introduction to AI with Python (Harvard edX, Jan 2025 – Mar 2025)",
       "Data Science Series: R Basics, Visualization, Probability, Inference, ML (Harvard edX, 2025)",
       "Machine Learning with Python (MITx, Sep 2025 – Dec 2025)",
