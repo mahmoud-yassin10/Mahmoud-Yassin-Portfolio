@@ -71,3 +71,27 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+
+## Local Development
+1. Install Node.js 18+ and pnpm/npm.
+2. Install deps: `npm install`
+3. Run locally: `npm run dev` then open http://localhost:8080/
+
+## Deploying to GitHub Pages
+This repo is configured for GitHub Pages under the path `/Mahmoud-Yassin-Portfolio/`.
+
+1. In `vite.config.ts`, ensure `REPO_NAME` matches your repository name.
+2. Ensure Router uses `basename={import.meta.env.BASE_URL}` (already set in `src/App.tsx`).
+3. A `404.html` is included to handle SPA refresh routing on GitHub Pages.
+4. Build: `npm run build` (outputs to `dist/`).
+5. Deploy `dist/` to the `gh-pages` branch (e.g., via `gh-pages` npm package or Actions).
+
+### One-time gh-pages setup (optional)
+- `npm i -D gh-pages`
+- Add scripts to package.json:
+  ```json
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+  ```
+- Run `npm run deploy`.
