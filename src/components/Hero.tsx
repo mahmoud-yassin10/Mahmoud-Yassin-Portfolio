@@ -15,7 +15,8 @@ const Hero = () => {
       className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20"
     >
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/5 to-background animate-gradient-shift bg-[length:200%_200%]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10 animate-gradient-shift bg-[length:200%_200%]" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-primary/15 animate-gradient-shift bg-[length:200%_200%]" style={{ animationDelay: '2s' }} />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">

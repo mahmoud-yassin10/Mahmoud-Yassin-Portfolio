@@ -22,13 +22,13 @@ const AnimatedBackground = () => {
     }> = [];
 
     // Create particles
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 80; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        radius: Math.random() * 2.5 + 1,
       });
     }
 
@@ -51,9 +51,15 @@ const AnimatedBackground = () => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
         ctx.fillStyle = isDark
-          ? `rgba(59, 130, 246, ${0.3 + Math.random() * 0.3})`
-          : `rgba(37, 99, 235, ${0.2 + Math.random() * 0.2})`;
+          ? `rgba(59, 130, 246, ${0.5 + Math.random() * 0.4})`
+          : `rgba(37, 99, 235, ${0.4 + Math.random() * 0.3})`;
         ctx.fill();
+        
+        // Add glow effect
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = isDark ? 'rgba(59, 130, 246, 0.6)' : 'rgba(37, 99, 235, 0.5)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
 
         // Draw connections
         particles.slice(i + 1).forEach((otherParticle) => {
@@ -65,11 +71,11 @@ const AnimatedBackground = () => {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            const opacity = (1 - distance / 150) * 0.2;
+            const opacity = (1 - distance / 150) * 0.35;
             ctx.strokeStyle = isDark
               ? `rgba(59, 130, 246, ${opacity})`
               : `rgba(37, 99, 235, ${opacity})`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.5;
             ctx.stroke();
           }
         });
@@ -95,7 +101,7 @@ const AnimatedBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none opacity-30"
+      className="fixed inset-0 pointer-events-none opacity-60"
       style={{ zIndex: 0 }}
     />
   );
