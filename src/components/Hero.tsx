@@ -9,6 +9,10 @@ const Hero = () => {
     }
   };
 
+  // ✅ Works on localhost ("/") and GitHub Pages ("/<repo>/")
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+  const cvHref = `${base}/Mahmoud-Yassin-CV.pdf`;
+
   return (
     <section
       id="hero"
@@ -37,7 +41,7 @@ const Hero = () => {
               className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
               asChild
             >
-              <a href="#" download>
+              <a href={cvHref} download="Mahmoud-Yassin-CV.pdf">
                 <Download className="mr-2 h-5 w-5" />
                 Download CV
               </a>
