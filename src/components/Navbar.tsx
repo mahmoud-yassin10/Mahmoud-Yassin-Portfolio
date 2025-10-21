@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { smoothScrollToId } from "@/lib/scroll";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
@@ -31,11 +32,8 @@ const Navbar = () => {
   };
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsMobileMenuOpen(false);
-    }
+    smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });
+    setIsMobileMenuOpen(false);
   };
 
   const navLinks = [

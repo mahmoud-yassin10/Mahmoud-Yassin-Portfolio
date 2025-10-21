@@ -1,11 +1,10 @@
+import { smoothScrollToId } from "@/lib/scroll";
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });
   };
 
   const footerLinks = [
