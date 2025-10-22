@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+const BLEED = 96; // extend canvas beyond viewport to hide edge artifacts
 const AnimatedBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -12,12 +13,17 @@ const AnimatedBackground = () => {
 
     const setCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1;
-      // Ensure the canvas visually fills the viewport
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
+      // Make canvas slightly larger than viewport to avoid clipped glow at edges
+      canvas.style.position = 'fixed';
+      canvas.style.top = `-${BLEED}px`;
+      canvas.style.left = `-${BLEED}px`;
+      canvas.style.width = `calc(100% + ${BLEED * 2}px)`;
+      canvas.style.height = `calc(100% + ${BLEED * 2}px)`;
+      canvas.style.pointerEvents = 'none';
 
-      const displayWidth = canvas.clientWidth;
-      const displayHeight = canvas.clientHeight;
+      const rect = canvas.getBoundingClientRect();
+      const displayWidth = rect.width;
+      const displayHeight = rect.height;
 
       // Backing store size for crisp rendering on zoom/high-DPI
       canvas.width = Math.round(displayWidth * dpr);
@@ -30,8 +36,8 @@ const AnimatedBackground = () => {
 
     // Initialize size before creating particles
     setCanvasSize();
-    let prevDisplayWidth = canvas.clientWidth;
-    let prevDisplayHeight = canvas.clientHeight;
+    let prevDisplayWidth = canvas.getBoundingClientRect().width;
+    let prevDisplayHeight = canvas.getBoundingClientRect().height;
 
     // Observers and listeners for robust zoom/resize handling
     let ro: ResizeObserver | null = null;
@@ -47,10 +53,11 @@ const AnimatedBackground = () => {
     }> = [];
 
     // Create particles
+    const initRect = canvas.getBoundingClientRect();
     for (let i = 0; i < 80; i++) {
       particles.push({
-        x: Math.random() * canvas.clientWidth,
-        y: Math.random() * canvas.clientHeight,
+        x: Math.random() * initRect.width,
+        y: Math.random() * initRect.height,
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         radius: Math.random() * 2.5 + 1,
@@ -60,8 +67,9 @@ const AnimatedBackground = () => {
     let rafId = 0;
 
     const animate = () => {
-      const widthCss = canvas.clientWidth;
-      const heightCss = canvas.clientHeight;
+      const rect = canvas.getBoundingClientRect();
+      const widthCss = rect.width;
+      const heightCss = rect.height;
 
       // Ensure backing store and transform stay in sync with zoom/resize
       const dprNow = window.devicePixelRatio || 1;
@@ -74,8 +82,8 @@ const AnimatedBackground = () => {
         const oldH = prevDisplayHeight;
 
         setCanvasSize();
-        prevDisplayWidth = canvas.clientWidth;
-        prevDisplayHeight = canvas.clientHeight;
+        prevDisplayWidth = canvas.getBoundingClientRect().width;
+        prevDisplayHeight = canvas.getBoundingClientRect().height;
 
         const scaleX = oldW ? prevDisplayWidth / oldW : 1;
         const scaleY = oldH ? prevDisplayHeight / oldH : 1;
@@ -150,8 +158,9 @@ const AnimatedBackground = () => {
         const oldH = prevDisplayHeight;
 
         setCanvasSize();
-        prevDisplayWidth = canvas.clientWidth;
-        prevDisplayHeight = canvas.clientHeight;
+         const rectNow = canvas.getBoundingClientRect();
+         prevDisplayWidth = rectNow.width;
+         prevDisplayHeight = rectNow.height;
 
         const scaleX = oldW ? prevDisplayWidth / oldW : 1;
         const scaleY = oldH ? prevDisplayHeight / oldH : 1;
@@ -204,7 +213,7 @@ const AnimatedBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none opacity-60"
+      className="fixed pointer-events-none opacity-60"
       style={{ zIndex: 0 }}
     />
   );
