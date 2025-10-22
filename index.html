@@ -10,27 +10,28 @@
     <meta name="theme-color" content="#1450C8" />
     <meta name="color-scheme" content="light dark" />
 
-    <!-- Icons / PWA -->
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/icon-180.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <!-- Icons / PWA (RELATIVE paths so they work under /Mahmoud-Yassin-Portfolio/) -->
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="icon-180.png" />
+    <link rel="manifest" href="site.webmanifest" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Mahmoud Yassin - Software Engineer & Student Founder" />
     <meta property="og:description" content="Building impactful tech — from AI to financial empowerment. Explore my portfolio of innovative projects." />
-    <meta property="og:image" content="/og.png" />
+    <meta property="og:image" content="og.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Mahmoud Yassin - Software Engineer & Student Founder" />
     <meta name="twitter:description" content="Building impactful tech — from AI to financial empowerment. Explore my portfolio of innovative projects." />
-    <meta name="twitter:image" content="/og.png" />
+    <meta name="twitter:image" content="og.png" />
   </head>
 
   <body>
     <div id="root"></div>
+    <!-- Keep this; Vite rewrites it on build to /Mahmoud-Yassin-Portfolio/assets/*.js -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
