@@ -87,14 +87,36 @@ const AnimatedBackground = () => {
     animate();
 
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+      
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      
+      // Reset particles to fill new canvas size
+      particles.forEach(particle => {
+        if (particle.x > newWidth) particle.x = Math.random() * newWidth;
+        if (particle.y > newHeight) particle.y = Math.random() * newHeight;
+      });
     };
 
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    
+    // Handle zoom events
+    let resizeTimeout: number;
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(handleResize, 100);
+    };
+    
+    window.addEventListener("resize", debouncedResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+      window.removeEventListener("resize", debouncedResize);
+      clearTimeout(resizeTimeout);
     };
   }, []);
 
