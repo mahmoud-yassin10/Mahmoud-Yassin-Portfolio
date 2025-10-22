@@ -10,8 +10,28 @@ const AnimatedBackground = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const setCanvasSize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      // Ensure the canvas visually fills the viewport
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+
+      const displayWidth = canvas.clientWidth;
+      const displayHeight = canvas.clientHeight;
+
+      // Backing store size for crisp rendering on zoom/high-DPI
+      canvas.width = Math.round(displayWidth * dpr);
+      canvas.height = Math.round(displayHeight * dpr);
+
+      // Use CSS pixel coordinates for drawing
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    };
+
+    // Initialize size before creating particles
+    setCanvasSize();
+    let prevDisplayWidth = canvas.clientWidth;
+    let prevDisplayHeight = canvas.clientHeight;
 
     const particles: Array<{
       x: number;
@@ -24,8 +44,8 @@ const AnimatedBackground = () => {
     // Create particles
     for (let i = 0; i < 80; i++) {
       particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
+        x: Math.random() * canvas.clientWidth,
+        y: Math.random() * canvas.clientHeight,
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         radius: Math.random() * 2.5 + 1,
@@ -33,18 +53,20 @@ const AnimatedBackground = () => {
     }
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const widthCss = canvas.clientWidth;
+      const heightCss = canvas.clientHeight;
+      ctx.clearRect(0, 0, widthCss, heightCss);
 
       // Update and draw particles
       particles.forEach((particle, i) => {
         particle.x += particle.vx;
         particle.y += particle.vy;
 
-        // Wrap around edges
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        if (particle.y > canvas.height) particle.y = 0;
+        // Wrap around edges in CSS pixel space
+        if (particle.x < 0) particle.x = widthCss;
+        if (particle.x > widthCss) particle.x = 0;
+        if (particle.y < 0) particle.y = heightCss;
+        if (particle.y > heightCss) particle.y = 0;
 
         // Draw particle
         const isDark = document.documentElement.classList.contains("dark");
@@ -90,24 +112,29 @@ const AnimatedBackground = () => {
     const handleResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(() => {
-        const newWidth = window.innerWidth;
-        const newHeight = window.innerHeight;
-        
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        
-        // Reposition particles that are outside the new bounds
-        particles.forEach(particle => {
-          if (particle.x > newWidth) particle.x = Math.random() * newWidth;
-          if (particle.y > newHeight) particle.y = Math.random() * newHeight;
+        const oldW = prevDisplayWidth;
+        const oldH = prevDisplayHeight;
+
+        setCanvasSize();
+        prevDisplayWidth = canvas.clientWidth;
+        prevDisplayHeight = canvas.clientHeight;
+
+        const scaleX = oldW ? prevDisplayWidth / oldW : 1;
+        const scaleY = oldH ? prevDisplayHeight / oldH : 1;
+        // Keep particle distribution proportional to new size
+        particles.forEach((p) => {
+          p.x *= scaleX;
+          p.y *= scaleY;
         });
       }, 100);
     };
 
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
       clearTimeout(resizeTimeout);
     };
   }, []);
