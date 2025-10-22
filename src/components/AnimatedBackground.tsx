@@ -33,6 +33,11 @@ const AnimatedBackground = () => {
     let prevDisplayWidth = canvas.clientWidth;
     let prevDisplayHeight = canvas.clientHeight;
 
+    // Observers and listeners for robust zoom/resize handling
+    let ro: ResizeObserver | null = null;
+    const vv = (window as any).visualViewport as VisualViewport | undefined;
+    let dprInterval: number | null = null;
+
     const particles: Array<{
       x: number;
       y: number;
@@ -51,6 +56,8 @@ const AnimatedBackground = () => {
         radius: Math.random() * 2.5 + 1,
       });
     }
+
+    let rafId = 0;
 
     const animate = () => {
       const widthCss = canvas.clientWidth;
@@ -103,7 +110,7 @@ const AnimatedBackground = () => {
         });
       });
 
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     };
 
     animate();
@@ -129,13 +136,41 @@ const AnimatedBackground = () => {
       }, 100);
     };
 
+    // Window resize and orientation
     window.addEventListener("resize", handleResize);
     window.addEventListener("orientationchange", handleResize);
+
+    // VisualViewport resize/zoom events
+    if (vv) {
+      vv.addEventListener("resize", handleResize);
+      vv.addEventListener("scroll", handleResize);
+    }
+
+    // ResizeObserver on canvas size
+    ro = new ResizeObserver(() => handleResize());
+    ro.observe(canvas);
+
+    // Watch devicePixelRatio changes
+    let lastDPR = window.devicePixelRatio;
+    dprInterval = window.setInterval(() => {
+      if (window.devicePixelRatio !== lastDPR) {
+        lastDPR = window.devicePixelRatio;
+        handleResize();
+      }
+    }, 200);
+
 
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("orientationchange", handleResize);
+      if (vv) {
+        vv.removeEventListener("resize", handleResize);
+        vv.removeEventListener("scroll", handleResize);
+      }
+      if (ro) ro.disconnect();
+      if (dprInterval) clearInterval(dprInterval);
       clearTimeout(resizeTimeout);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
