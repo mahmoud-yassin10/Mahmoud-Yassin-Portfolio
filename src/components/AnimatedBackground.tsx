@@ -62,7 +62,34 @@ const AnimatedBackground = () => {
     const animate = () => {
       const widthCss = canvas.clientWidth;
       const heightCss = canvas.clientHeight;
-      ctx.clearRect(0, 0, widthCss, heightCss);
+
+      // Ensure backing store and transform stay in sync with zoom/resize
+      const dprNow = window.devicePixelRatio || 1;
+      const needResize =
+        Math.round(widthCss * dprNow) !== canvas.width ||
+        Math.round(heightCss * dprNow) !== canvas.height;
+
+      if (needResize) {
+        const oldW = prevDisplayWidth;
+        const oldH = prevDisplayHeight;
+
+        setCanvasSize();
+        prevDisplayWidth = canvas.clientWidth;
+        prevDisplayHeight = canvas.clientHeight;
+
+        const scaleX = oldW ? prevDisplayWidth / oldW : 1;
+        const scaleY = oldH ? prevDisplayHeight / oldH : 1;
+        particles.forEach((p) => {
+          p.x *= scaleX;
+          p.y *= scaleY;
+        });
+      }
+
+      // Clear the full canvas in device pixels to avoid edge boxes
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
 
       // Update and draw particles
       particles.forEach((particle, i) => {
