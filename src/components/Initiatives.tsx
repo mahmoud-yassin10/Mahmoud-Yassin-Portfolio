@@ -14,7 +14,7 @@ const initiatives = [
   {
     title: "Computer Science Club",
     role: "President",
-    period: "2024 – Present",
+    period: "2022 – Present",
     description: "Led workshops, hackathons, AI coding sessions, and collaborative learning initiatives. Organized 8-week digital entrepreneurship workshop for 15 students.",
     impact: "300+ students engaged",
     icon: Award,
