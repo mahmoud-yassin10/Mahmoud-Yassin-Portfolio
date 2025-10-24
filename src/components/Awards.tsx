@@ -7,7 +7,7 @@ const awards = [
     location: "Port Said Local Event",
     description: "Global Nominee for Flood Lens project using NASA satellite data",
     icon: Trophy,
-    year: "2024"
+    year: "2025"
   },
   {
     title: "Best Idea Award + 2M Virtual Funding",
