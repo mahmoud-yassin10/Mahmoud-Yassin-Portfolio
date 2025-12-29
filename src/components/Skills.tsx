@@ -29,7 +29,7 @@ const skillCategories = [
   {
     title: "Languages",
     icon: Globe,
-    skills: ["Arabic (Native)", "English (C1, IELTS 8.0 target)", "German (A2)", "French (A1)", "Spanish (A1)"]
+    skills: ["Arabic (Native)", "English (C2, IELTS 8.5 )", "German (A2)", "French (A1)", "Spanish (A1)"]
   }
 ];
 

@@ -13,7 +13,7 @@ const education = [
       "Perfect 4.0 GPA across all subjects",
       "Predicted Valedictorian of graduating class",
       "SAT: 1500 (780 Math, 720 English)",
-      "IELTS: Registered for December (Target 8.0+)",
+      "IELTS: 8.5, C2",
       "Class President – Grade 12"
     ]
   },
