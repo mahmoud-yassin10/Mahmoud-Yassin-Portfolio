@@ -33,7 +33,7 @@ const projects = [
     description: "NASA Space Apps Challenge 1st Place (Port Said) & Global Nominee. Web app integrating NASA's real-time satellite data (IMERG, OPERA SAR, DEM) to detect and visualize flood risk globally.",
     tech: ["JavaScript", "NASA APIs", "Data Viz", "Satellite Data"],
     period: "Oct 2025",
-    link: "#",
+    link: "https://mahmoud-yassin10.github.io/flood-lens-nasa/",
     type: "Web App"
   }
 ];
