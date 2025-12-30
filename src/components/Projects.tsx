@@ -76,12 +76,12 @@ const Projects = () => {
                     </Badge>
                   ))}
                 </div>
-                <Button 
-                  variant="default" 
+                <Button
+                  variant="default"
                   className="w-full group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent transition-all"
                   asChild
                 >
-                  <a href={project.link}>
+                  <a href={project.link} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     View Project
                   </a>
