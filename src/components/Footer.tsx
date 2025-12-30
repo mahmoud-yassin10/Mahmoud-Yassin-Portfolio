@@ -12,7 +12,9 @@ const Footer = () => {
     { name: "Projects", id: "projects" },
     { name: "Experience", id: "experience" },
     { name: "Initiatives", id: "initiatives" },
+    { name: "Awards", id: "awards" },
     { name: "Education", id: "education" },
+    { name: "Skills", id: "skills" },
     { name: "Contact", id: "contact" },
   ];
 
