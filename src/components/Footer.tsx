@@ -2,6 +2,7 @@ import { smoothScrollToId } from "@/lib/scroll";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const lastUpdated = "Jan 2026";
 
   const scrollToSection = (id: string) => {
     smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });
@@ -46,8 +47,10 @@ const Footer = () => {
           </p>
           
           <p className="text-xs text-muted-foreground">
-            Built with passion using React, TypeScript, and Tailwind CSS
+            Last updated: {lastUpdated}
           </p>
+
+
         </div>
       </div>
     </footer>

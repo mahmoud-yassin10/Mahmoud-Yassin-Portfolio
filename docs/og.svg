@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Mahmoud Yassin Portfolio</title>
+  <desc id="desc">Software Engineer & Student Founder from Port Said, Egypt.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1450C8"/>
+      <stop offset="50%" stop-color="#1f9de0"/>
+      <stop offset="100%" stop-color="#0f265a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g fill="white">
+    <text x="80" y="200" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="54" font-weight="700">Mahmoud Yassin</text>
+    <text x="80" y="260" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="500">Software Engineer &amp; Student Founder</text>
+    <text x="80" y="330" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="400" opacity="0.9">
+      Building impactful apps with AI, Flutter, and leadership.
+    </text>
+  </g>
+  <circle cx="1050" cy="140" r="120" fill="rgba(255,255,255,0.18)"/>
+  <circle cx="980" cy="400" r="140" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="240" cy="520" r="120" fill="rgba(255,255,255,0.08)"/>
+</svg>

@@ -1,18 +1,17 @@
 import { Download, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { smoothScrollToId } from "@/lib/scroll";
 
 const Hero = () => {
   const scrollToContact = () => {
-    const element = document.getElementById("contact");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    smoothScrollToId("contact", { offset: 80, duration: 700, easing: "easeInOutCubic" });
   };
 
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
   const cvHref = `${base}/Mahmoud-Yassin-CV.pdf`;
-  const photoSrc = encodeURI(`${base}/ME NTA.jpg`);
+  const photoSrcWebp = encodeURI(`${base}/ME-NTA.webp`);
+  const photoSrcJpg = encodeURI(`${base}/ME NTA.jpg`);
 
   return (
     <section
@@ -67,12 +66,16 @@ const Hero = () => {
           <div className="relative">
             <div className="absolute -inset-6 bg-gradient-to-tr from-primary/30 via-accent/20 to-primary/10 blur-3xl opacity-70 animate-pulse-glow" />
             <div className="relative overflow-hidden rounded-3xl border border-border shadow-2xl bg-card/60 backdrop-blur-sm">
-              <img
-                src={photoSrc}
-                alt="Mahmoud Yassin portrait"
-                className="w-full h-full object-cover aspect-[1280/853]"
-                loading="eager"
-              />
+              <picture>
+                <source srcSet={photoSrcWebp} type="image/webp" />
+                <img
+                  src={photoSrcJpg}
+                  alt="Mahmoud Yassin portrait"
+                  className="w-full h-full object-cover aspect-[1280/853]"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </div>
           </div>
         </div>

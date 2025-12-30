@@ -11,10 +11,16 @@ const Contact = () => {
     email: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [botField, setBotField] = useState("");
+  const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot for bots
+    if (botField) return;
     
     // Basic validation
     if (!formData.name || !formData.email || !formData.message) {
@@ -26,22 +32,59 @@ const Contact = () => {
       return;
     }
 
-    // Simulate form submission
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
+    if (!accessKey) {
+      toast({
+        title: "Form not configured",
+        description: "Please set VITE_WEB3FORMS_KEY to enable sending.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    // Reset form
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      setIsSubmitting(true);
+      const payload = new FormData();
+      payload.append("access_key", accessKey);
+      payload.append("name", formData.name);
+      payload.append("email", formData.email);
+      payload.append("message", formData.message);
+      payload.append("botcheck", botField);
+
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: payload
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Message sent!",
+          description: "Thank you for reaching out. I'll get back to you soon."
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        throw new Error(data.message || "Submission failed");
+      }
+    } catch (err) {
+      toast({
+        title: "Submission failed",
+        description: err instanceof Error ? err.message : "Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  const emailUser = "mahmoudyassin.dev";
+  const emailDomain = "gmail.com";
+  const assembledEmail = `${emailUser}@${emailDomain}`;
   const contactInfo = [
     {
       icon: Mail,
       label: "Email",
-      value: "mahmoudyassin.dev@gmail.com",
-      href: "mailto:mahmoudyassin.dev@gmail.com"
+      value: assembledEmail,
+      href: `mailto:${assembledEmail}`
     },
     {
       icon: Phone,
@@ -99,6 +142,19 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <form onSubmit={handleSubmit} className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 border border-border space-y-6">
+              <div className="hidden">
+                <label htmlFor="website">Leave this empty</label>
+                <input
+                  id="website"
+                  name="website"
+                  type="text"
+                  value={botField}
+                  onChange={(e) => setBotField(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2 text-foreground">
                   Name
@@ -145,9 +201,10 @@ const Contact = () => {
                 type="submit"
                 className="w-full bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                 size="lg"
+                disabled={isSubmitting}
               >
                 <Send className="mr-2 h-5 w-5" />
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </div>
