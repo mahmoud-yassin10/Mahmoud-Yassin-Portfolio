@@ -11,6 +11,7 @@ const Contact = () => {
     email: "",
     message: ""
   });
+  const [emailRevealed, setEmailRevealed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [botField, setBotField] = useState("");
   const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
@@ -81,12 +82,6 @@ const Contact = () => {
   const assembledEmail = `${emailUser}@${emailDomain}`;
   const contactInfo = [
     {
-      icon: Mail,
-      label: "Email",
-      value: assembledEmail,
-      href: `mailto:${assembledEmail}`
-    },
-    {
       icon: Phone,
       label: "Phone",
       value: "+20 112 214 4543",
@@ -99,6 +94,12 @@ const Contact = () => {
       href: "https://linkedin.com/in/mahmoud--yassin"
     }
   ];
+
+  const handleRevealEmail = () => {
+    if (!emailRevealed) {
+      setEmailRevealed(true);
+    }
+  };
 
   return (
     <section id="contact" className="py-20 relative">
@@ -113,6 +114,35 @@ const Contact = () => {
             <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 border border-border">
               <h3 className="text-2xl font-bold mb-6 text-foreground">Contact Information</h3>
               <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-border">
+                  <div className="p-3 bg-primary/10 rounded-xl">
+                    <Mail className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    {emailRevealed ? (
+                      <a
+                        href={`mailto:${assembledEmail}`}
+                        className="text-foreground font-medium underline-offset-2 hover:underline"
+                      >
+                        {assembledEmail}
+                      </a>
+                    ) : (
+                      <p className="text-foreground font-medium">Click reveal to view</p>
+                    )}
+                  </div>
+                  {!emailRevealed && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleRevealEmail}
+                      className="whitespace-nowrap"
+                    >
+                      Reveal email
+                    </Button>
+                  )}
+                </div>
+
                 {contactInfo.map((info, index) => {
                   const Icon = info.icon;
                   return (
