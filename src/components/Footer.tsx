@@ -2,7 +2,7 @@ import { smoothScrollToId } from "@/lib/scroll";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const lastUpdated = "Jan 2026";
+  const lastUpdated = new Date().toLocaleDateString(undefined, { year: "numeric", month: "short" });
 
   const scrollToSection = (id: string) => {
     smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Phone, Linkedin, Send } from "lucide-react";
+import { Mail, Phone, Linkedin, Send, Clipboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,6 +101,22 @@ const Contact = () => {
     }
   };
 
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(assembledEmail);
+      toast({
+        title: "Email copied",
+        description: "Address is ready to paste.",
+      });
+    } catch (err) {
+      toast({
+        title: "Copy failed",
+        description: "Could not copy email. Please try manually.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <section id="contact" className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -131,6 +147,18 @@ const Contact = () => {
                       <p className="text-foreground font-medium">Click reveal to view</p>
                     )}
                   </div>
+                  {emailRevealed && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyEmail}
+                      className="rounded-full"
+                      aria-label="Copy email address"
+                      title="Copy email"
+                    >
+                      <Clipboard className="w-4 h-4" />
+                    </Button>
+                  )}
                   {!emailRevealed && (
                     <Button
                       size="sm"
@@ -162,11 +190,11 @@ const Contact = () => {
                           {info.value}
                         </p>
                       </div>
-                    </a>
-                  );
-                })}
-              </div>
+                  </a>
+                );
+              })}
             </div>
+          </div>
           </div>
 
           {/* Contact Form */}
@@ -196,6 +224,8 @@ const Contact = () => {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Your name"
                   className="w-full"
+                  required
+                  minLength={2}
                 />
               </div>
 
@@ -210,6 +240,8 @@ const Contact = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="your.email@example.com"
                   className="w-full"
+                  required
+                  inputMode="email"
                 />
               </div>
 
@@ -224,6 +256,8 @@ const Contact = () => {
                   placeholder="Your message..."
                   rows={5}
                   className="w-full"
+                  required
+                  minLength={10}
                 />
               </div>
 
