@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { smoothScrollToId } from "@/lib/scroll";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
@@ -31,20 +31,11 @@ const Navbar = () => {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
-  const scrollToSection = (id: string) => {
-    smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });
-    setIsMobileMenuOpen(false);
-  };
-
   const navLinks = [
-    { name: "About", id: "about" },
-    { name: "Projects", id: "projects" },
-    { name: "Experience", id: "experience" },
-    { name: "Initiatives", id: "initiatives" },
-    { name: "Awards", id: "awards" },
-    { name: "Education", id: "education" },
-    { name: "Skills", id: "skills" },
-    { name: "Contact", id: "contact" },
+    { name: "Services", to: "/services" },
+    { name: "Work", to: "/work" },
+    { name: "Portfolio", to: "/portfolio" },
+    { name: "Contact", to: "/contact" },
   ];
 
   return (
@@ -65,24 +56,24 @@ const Navbar = () => {
       >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => scrollToSection("hero")}
+            <Link
+              to="/"
               className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:opacity-80 transition-opacity"
             >
               MY
-            </button>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
+                <Link
+                  key={link.to}
+                  to={link.to}
                   className="text-foreground hover:text-primary transition-colors font-medium"
                   aria-label={`Go to ${link.name} section`}
                 >
                   {link.name}
-                </button>
+                </Link>
               ))}
               <Button
                 variant="ghost"
@@ -124,14 +115,15 @@ const Navbar = () => {
             <div className="md:hidden mt-4 pb-4 animate-fade-in">
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
-                  <button
-                    key={link.id}
-                    onClick={() => scrollToSection(link.id)}
+                  <Link
+                    key={link.to}
+                    to={link.to}
                     className="text-left text-foreground hover:text-primary transition-colors font-medium py-2"
                     aria-label={`Go to ${link.name} section`}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.name}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>

@@ -1,5 +1,10 @@
 import { Code2, Wrench, Brain, Users as UsersIcon, Globe } from "lucide-react";
 
+// File locations:
+// - Homepage component: src/pages/Index.tsx
+// - Project card tiles: src/components/Projects.tsx (uses Card from src/components/ui/card.tsx)
+// - Navbar component: src/components/Navbar.tsx
+
 const skillCategories = [
   {
     title: "Programming Languages",

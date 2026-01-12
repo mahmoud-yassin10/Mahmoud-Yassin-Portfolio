@@ -1,15 +1,11 @@
 import { Download, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { smoothScrollToId } from "@/lib/scroll";
 
 const Hero = () => {
-  const scrollToContact = () => {
-    smoothScrollToId("contact", { offset: 80, duration: 700, easing: "easeInOutCubic" });
-  };
-
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-  const cvHref = `${base}/Mahmoud-Yassin-CV.pdf`;
+  const servicesHref = `${base}/services`;
+  const workHref = `${base}/work`;
   const photoSrcWebp = encodeURI(`${base}/ME-NTA.webp`);
   const photoSrcJpg = encodeURI(`${base}/ME NTA.jpg`);
 
@@ -46,19 +42,19 @@ const Hero = () => {
                 className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                 asChild
               >
-                <a href={cvHref} download="Mahmoud-Yassin-CV.pdf">
+                <a href={servicesHref}>
                   <Download className="mr-2 h-5 w-5" />
-                  Download CV
+                  View services
                 </a>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                onClick={scrollToContact}
+                onClick={() => window.location.assign(workHref)}
                 className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105"
               >
                 <Mail className="mr-2 h-5 w-5" />
-                Contact Me
+                See work
               </Button>
             </div>
           </div>
