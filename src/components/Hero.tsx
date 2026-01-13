@@ -1,11 +1,13 @@
-import { Download, Mail } from "lucide-react";
+import { Download, Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
   const servicesHref = `${base}/services`;
-  const workHref = `${base}/work`;
+  const cvHref = `${base}/CV.pdf`;
+  const githubHref = "https://github.com/mahmoud-yassin10";
+  const linkedinHref = "https://linkedin.com/in/mahmoud--yassin";
   const photoSrcWebp = encodeURI(`${base}/ME-NTA.webp`);
   const photoSrcJpg = encodeURI(`${base}/ME NTA.jpg`);
 
@@ -36,25 +38,46 @@ const Hero = () => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-start items-center pt-4">
               <Button
                 size="lg"
                 className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                 asChild
               >
                 <a href={servicesHref}>
-                  <Download className="mr-2 h-5 w-5" />
                   View services
                 </a>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => window.location.assign(workHref)}
-                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105"
+                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 gap-1 px-4"
+                asChild
               >
-                <Mail className="mr-2 h-5 w-5" />
-                See work
+                <a href={cvHref} target="_blank" rel="noreferrer">
+                  <Download className="h-5 w-5" />
+                  CV
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 px-3"
+                asChild
+              >
+                <a href={githubHref} target="_blank" rel="noreferrer" aria-label="GitHub">
+                  <Github className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 px-3"
+                asChild
+              >
+                <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+                  <Linkedin className="h-5 w-5" />
+                </a>
               </Button>
             </div>
           </div>

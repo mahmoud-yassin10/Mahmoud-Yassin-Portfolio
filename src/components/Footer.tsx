@@ -1,22 +1,14 @@
-import { smoothScrollToId } from "@/lib/scroll";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const lastUpdated = new Date().toLocaleDateString(undefined, { year: "numeric", month: "short" });
 
-  const scrollToSection = (id: string) => {
-    smoothScrollToId(id, { offset: 80, duration: 700, easing: "easeInOutCubic" });
-  };
-
   const footerLinks = [
-    { name: "About", id: "about" },
-    { name: "Projects", id: "projects" },
-    { name: "Experience", id: "experience" },
-    { name: "Initiatives", id: "initiatives" },
-    { name: "Awards", id: "awards" },
-    { name: "Education", id: "education" },
-    { name: "Skills", id: "skills" },
-    { name: "Contact", id: "contact" },
+    { name: "Services", to: "/services" },
+    { name: "Work", to: "/work" },
+    { name: "Portfolio", to: "/portfolio" },
+    { name: "Contact", to: "/contact" }
   ];
 
   return (
@@ -32,13 +24,13 @@ const Footer = () => {
           {/* Navigation Links */}
           <div className="flex flex-wrap items-center justify-center gap-6">
             {footerLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => scrollToSection(link.id)}
+              <Link
+                key={link.to}
+                to={link.to}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium"
               >
                 {link.name}
-              </button>
+              </Link>
             ))}
           </div>
           

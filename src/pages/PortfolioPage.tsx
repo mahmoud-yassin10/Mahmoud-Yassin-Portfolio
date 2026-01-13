@@ -1,4 +1,4 @@
-import { Award, BookOpen, Globe } from "lucide-react";
+import { Award, BookOpen } from "lucide-react";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Awards from "@/components/Awards";
 import Education from "@/components/Education";
@@ -48,14 +48,6 @@ const certifications: CertificationItem[] = [
       "CLS Python Course - Intensive Training"
     ]
   }
-];
-
-const spokenLanguages = [
-  "Arabic - Native",
-  "English - Fluent (C2, IELTS 8.5 )",
-  "German - A2",
-  "French - A1",
-  "Spanish - A1"
 ];
 
 const PortfolioPage = () => {
@@ -123,39 +115,6 @@ const PortfolioPage = () => {
           </div>
         </section>
 
-        <section className="py-20 relative bg-muted/30">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Spoken Languages
-            </h2>
-
-            <div className="max-w-4xl mx-auto">
-              <div
-                className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 border border-border animate-fade-in"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
-                    <Globe className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground">
-                    Languages
-                  </h3>
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  {spokenLanguages.map((language) => (
-                    <span
-                      key={language}
-                      className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-sm font-medium text-foreground transition-colors duration-300 hover:scale-105 transform"
-                    >
-                      {language}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </div>
