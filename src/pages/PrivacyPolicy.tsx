@@ -139,18 +139,18 @@ const PrivacyPolicy = () => {
                     </p>
                     <div className="mt-3">
                       <h3 className="font-semibold">Key service providers used by Flousy</h3>
-                      <ul className="list-disc pl-5 mt-2 space-y-1 text-muted-foreground">
-                        <li>Google Firebase Authentication (sign-in and account authentication)</li>
-                        <li>
-                          Google Firebase Firestore (cloud database to store and sync your budgets,
+                      <div className="mt-2 space-y-1 text-muted-foreground">
+                        <p>- Google Firebase Authentication (sign-in and account authentication)</p>
+                        <p>
+                          - Google Firebase Firestore (cloud database to store and sync your budgets,
                           transactions, goals, and plans)
-                        </li>
-                        <li>Google Firebase Analytics (usage analytics to improve the app)</li>
-                        <li>
-                          Firebase App Check / Google Play Integrity (security/integrity checks to
+                        </p>
+                        <p>- Google Firebase Analytics (usage analytics to improve the app)</p>
+                        <p>
+                          - Firebase App Check / Google Play Integrity (security/integrity checks to
                           reduce abuse)
-                        </li>
-                      </ul>
+                        </p>
+                      </div>
                     </div>
                     <p className="mt-2 text-muted-foreground">
                       Depending on service provider infrastructure, your information may be processed
@@ -225,9 +225,9 @@ const PrivacyPolicy = () => {
                       <li>Resolve disputes and enforce agreements</li>
                     </ul>
                     <p className="mt-2 text-muted-foreground">
-                      If you delete your account, we delete your account data as described in Section 10.
-                      Some limited information may remain in backups for a short period for security and
-                      disaster recovery.
+                      If you delete your account, we delete your account and associated data as described
+                      below. Some limited information may remain in backups for a short period for security
+                      and disaster recovery.
                     </p>
                   </li>
 
