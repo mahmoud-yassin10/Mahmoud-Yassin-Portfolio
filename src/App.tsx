@@ -7,6 +7,8 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ContactPage from "./pages/ContactPage";
+import DeleteAccount from "./pages/DeleteAccount";
+import DeleteData from "./pages/DeleteData";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PortfolioPage from "./pages/PortfolioPage";
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/flousy/delete-account" element={<DeleteAccount />} />
+          <Route path="/flousy/delete-data" element={<DeleteData />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
