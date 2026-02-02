@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import PortfolioPage from "./pages/PortfolioPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ServicesPage from "./pages/ServicesPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkPage from "./pages/WorkPage";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+          <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
