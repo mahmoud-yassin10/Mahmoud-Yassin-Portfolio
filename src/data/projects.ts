@@ -72,7 +72,8 @@ const projectSeeds: ProjectSeed[] = [
       "Expense tracking with budgets and goals",
       "Preparing for Play Store release"
     ],
-    externalLinkPlaceholder: "#"
+    externalLinkPlaceholder: "#",
+    externalLink: "https://flousy.mahmoud-yassin.com"
   },
   {
     title: "AI VAR for Squash",
