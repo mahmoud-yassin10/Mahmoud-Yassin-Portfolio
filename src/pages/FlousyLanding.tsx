@@ -94,6 +94,9 @@ const audiencePoints = [
 ];
 
 const FlousyLanding = () => {
+  const playStoreHref =
+    "https://play.google.com/store/apps/details?id=com.mahmoud.flousy";
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <AnimatedBackground />
@@ -126,6 +129,16 @@ const FlousyLanding = () => {
                 >
                   <a href="https://flousy.mahmoud-yassin.com" target="_blank" rel="noreferrer">
                     Open Flousy
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </a>
+                </Button>
+                <Button
+                  size="lg"
+                  className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
+                  asChild
+                >
+                  <a href={playStoreHref} target="_blank" rel="noreferrer">
+                    Get it on Google Play
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </a>
                 </Button>
@@ -272,6 +285,16 @@ const FlousyLanding = () => {
                   >
                     <a href="https://flousy.mahmoud-yassin.com" target="_blank" rel="noreferrer">
                       Open Flousy
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </Button>
+                  <Button
+                    size="lg"
+                    className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
+                    asChild
+                  >
+                    <a href={playStoreHref} target="_blank" rel="noreferrer">
+                      Get it on Google Play
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </Button>
