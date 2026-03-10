@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/flousy", "destination": "/index.html" },
     { "source": "/flousy/privacy-policy", "destination": "/index.html" },
     { "source": "/flousy/delete-account", "destination": "/index.html" },
     { "source": "/flousy/delete-data", "destination": "/index.html" },

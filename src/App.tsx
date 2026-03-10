@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ContactPage from "./pages/ContactPage";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
+import FlousyLanding from "./pages/FlousyLanding";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PortfolioPage from "./pages/PortfolioPage";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+          <Route path="/flousy" element={<FlousyLanding />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/flousy/delete-account" element={<DeleteAccount />} />
           <Route path="/flousy/delete-data" element={<DeleteData />} />
