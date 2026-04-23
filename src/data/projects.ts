@@ -2,6 +2,12 @@ export type Project = {
   title: string;
   description: string;
   tech: string[];
+  /** Programming languages & core runtime tooling (e.g. Dart, TypeScript, Python). */
+  programmingLanguages: string[];
+  /** Languages used in the UI and content (e.g. English, Arabic). */
+  contentLanguages: string[];
+  /** Product and site capabilities end users interact with. */
+  features: string[];
   period: string;
   link: string;
   type: string;
@@ -20,9 +26,28 @@ export type ProjectTileData = Pick<Project, "title" | "description" | "tech" | "
 
 type ProjectSeed = Omit<
   Project,
-  "longDescription" | "skillsUsed" | "responsibilities" | "highlights" | "externalLinkPlaceholder"
+  | "longDescription"
+  | "skillsUsed"
+  | "responsibilities"
+  | "highlights"
+  | "externalLinkPlaceholder"
+  | "programmingLanguages"
+  | "contentLanguages"
+  | "features"
 > &
-  Partial<Pick<Project, "longDescription" | "skillsUsed" | "responsibilities" | "highlights" | "externalLinkPlaceholder">>;
+  Partial<
+    Pick<
+      Project,
+      | "longDescription"
+      | "skillsUsed"
+      | "responsibilities"
+      | "highlights"
+      | "externalLinkPlaceholder"
+      | "programmingLanguages"
+      | "contentLanguages"
+      | "features"
+    >
+  >;
 
 const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
 
@@ -72,6 +97,17 @@ const projectSeeds: ProjectSeed[] = [
       "Expense tracking with budgets and goals",
       "Preparing for Play Store release"
     ],
+    programmingLanguages: ["Dart"],
+    contentLanguages: ["English", "Arabic"],
+    features: [
+      "Expense tracking and categorized spending",
+      "Category budgets and savings goals",
+      "Bill reminders and recurring costs",
+      "AI-assisted financial planning workflows",
+      "Firebase Authentication sign-in",
+      "Bilingual interface (Arabic / English)",
+      "Mobile-first Flutter UI optimized for everyday use"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://flousy.mahmoud-yassin.com"
   },
@@ -97,6 +133,16 @@ const projectSeeds: ProjectSeed[] = [
       "Reviewable clips for officiating",
       "Research paper in progress"
     ],
+    programmingLanguages: ["Python"],
+    contentLanguages: ["English"],
+    features: [
+      "Video ingestion and frame processing",
+      "Ball detection and trajectory reasoning",
+      "Front-wall and side-wall shot classification",
+      "Bounce and player movement cues for review",
+      "Exportable review clips for officiating workflows",
+      "Configurable evaluation and accuracy experiments"
+    ],
     externalLinkPlaceholder: "#"
   },
   {
@@ -120,6 +166,15 @@ const projectSeeds: ProjectSeed[] = [
       "Secured +2M virtual funding",
       "Promoted community energy sharing"
     ],
+    programmingLanguages: ["JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "Household listings and surplus-energy offers",
+      "Map-based discovery (Maps API)",
+      "Firebase-backed data and auth prototype",
+      "Guided listing and browse flows",
+      "Hackathon pitch and demo-ready screens"
+    ],
     externalLinkPlaceholder: "#"
   },
   {
@@ -142,6 +197,15 @@ const projectSeeds: ProjectSeed[] = [
       "NASA Space Apps Port Said 1st place",
       "Global nominee",
       "Interactive flood-risk map"
+    ],
+    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "IMERG rainfall and NASA data fusion",
+      "SAR (OPERA) and terrain (DEM) inputs for risk context",
+      "Interactive mapping and regional flood-risk visualization",
+      "Charts and explainable risk scoring UI",
+      "React-based explorer suitable for judge demos"
     ],
     externalLinkPlaceholder: "#",
     externalLink: "https://mahmoud-yassin10.github.io/flood-lens-nasa/"
@@ -170,6 +234,15 @@ const projectSeeds: ProjectSeed[] = [
       "Clear feature grid and trust-led enrollment path",
       "Free lectures and materials surfaced for discovery"
     ],
+    programmingLanguages: ["JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "Marketing narrative with feature grid (classes, homework, mocks, materials)",
+      "Enrollment form with grade, school, exam type, and schedule fields",
+      "Free lectures and downloadable materials sections",
+      "Contact and intake-oriented CTAs",
+      "Responsive layout for parents and students on mobile"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://thetruetutor.com"
   },
@@ -196,6 +269,16 @@ const projectSeeds: ProjectSeed[] = [
       "Student, parent, and admin pathways",
       "Free lecture and PDF previews for trust and SEO",
       "Registration and consult CTAs tuned for mobile families"
+    ],
+    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English", "Arabic"],
+    features: [
+      "Dedicated student, parent, and admin entry points",
+      "Multi-step registration and academic profile capture",
+      "How-it-works, FAQ, and testimonial sections",
+      "Free video lectures and PDF study starters",
+      "WhatsApp and consult CTAs for family onboarding",
+      "Stats, instructor profile, and trust-led English exam positioning"
     ],
     externalLinkPlaceholder: "#",
     externalLink: "https://new.thetruetutor.com"
@@ -224,6 +307,17 @@ const projectSeeds: ProjectSeed[] = [
       "Group sessions and Bluebook-style mocks highlighted",
       "Clear join-and-learn calls to action"
     ],
+    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English", "Arabic"],
+    features: [
+      "Course tiles for SAT Math, ACT Math, and EST Math",
+      "Student registration and login flows",
+      "Structured lectures with topic hierarchy",
+      "Practice quizzes with instant feedback",
+      "Small-group session positioning",
+      "Timed mock exams modeled on Bluebook-style testing",
+      "Hosted on Vercel for fast global loads"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://mrghonem.vercel.app"
   },
@@ -246,6 +340,14 @@ const projectSeeds: ProjectSeed[] = [
       "Aligned visuals with the client’s brand tone"
     ],
     highlights: ["Clean, modern aesthetic", "Mobile-first experience", "Deployment on Vercel"],
+    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "Brand-led hero and scannable marketing sections",
+      "Mobile-first responsive grid and typography",
+      "Fast static delivery via Vercel",
+      "Clear CTAs and touch-friendly navigation"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://fresheria.vercel.app"
   },
@@ -268,6 +370,14 @@ const projectSeeds: ProjectSeed[] = [
       "Ensured navigation and anchors support quick browsing"
     ],
     highlights: ["Structured portfolio narrative", "Professional presentation", "Responsive across devices"],
+    programmingLanguages: ["JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "Profile and achievements layout",
+      "Portfolio-style sections and anchors",
+      "Responsive imagery and typography",
+      "Professional personal-brand presentation"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://nineyyassin.com"
   },
@@ -290,6 +400,14 @@ const projectSeeds: ProjectSeed[] = [
       "Applied consistent spacing and hierarchy across shop pages"
     ],
     highlights: ["Product-led layout", "Conversion-oriented structure", "Cohesive brand feel"],
+    programmingLanguages: ["JavaScript", "HTML", "CSS", "Liquid"],
+    contentLanguages: ["English"],
+    features: [
+      "Product grids and collection-style navigation",
+      "Product detail views and purchase-oriented layout",
+      "Checkout-trust patterns and consistent brand styling",
+      "Mobile-optimized shopping flows"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://revwear.store"
   },
@@ -317,6 +435,16 @@ const projectSeeds: ProjectSeed[] = [
       "Shipping, security, and returns messaging",
       "Community and newsletter growth hooks"
     ],
+    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    contentLanguages: ["Arabic", "English"],
+    features: [
+      "Shop and collections browsing",
+      "Featured products and editorial-style merchandising",
+      "Newsletter signup for campaigns",
+      "Trust messaging: shipping thresholds, secure payment, returns",
+      "Bilingual-friendly layout (Arabic / English)",
+      "RTL-ready content presentation where needed"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://modx-egypt.com"
   },
@@ -339,6 +467,15 @@ const projectSeeds: ProjectSeed[] = [
       "Ensured responsive behavior for long-form content"
     ],
     highlights: ["Editorial readability", "Strong brand presence", "Content-first structure"],
+    programmingLanguages: ["JavaScript", "HTML", "CSS"],
+    contentLanguages: ["English"],
+    features: [
+      "Magazine-style article and index templates",
+      "Typography-first reading experience",
+      "Category and issue-style content discovery",
+      "Responsive long-form layouts",
+      "Brand-consistent visuals across sections"
+    ],
     externalLinkPlaceholder: "#",
     externalLink: "https://femplusmag.com"
   }
@@ -348,6 +485,9 @@ const isClientWork = (project: Project) => project.type === "Client Work";
 
 export const projects: Project[] = projectSeeds.map((project) => ({
   ...project,
+  programmingLanguages: project.programmingLanguages ?? [],
+  contentLanguages: project.contentLanguages ?? [],
+  features: project.features ?? [],
   longDescription: project.longDescription ?? fallbackLongDescription,
   skillsUsed: buildSkillsUsed(project),
   highlights: project.highlights && project.highlights.length > 0 ? project.highlights : fallbackHighlights,

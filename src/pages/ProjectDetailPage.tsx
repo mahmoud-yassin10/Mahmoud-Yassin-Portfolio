@@ -1,4 +1,4 @@
-import { Code2 } from "lucide-react";
+import { Code2, Globe2, ListChecks, Terminal } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
@@ -76,6 +76,52 @@ const ProjectDetailPage = () => {
                 </CardContent>
               </Card>
 
+              {project.programmingLanguages.length > 0 && (
+                <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
+                  <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Terminal className="h-6 w-6 text-accent shrink-0" aria-hidden />
+                      Languages and runtime
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground font-normal">
+                      Programming languages and core tooling used to build this project.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {project.programmingLanguages.map((lang) => (
+                        <Badge key={lang} variant="outline" className="border-primary/30">
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {project.contentLanguages.length > 0 && (
+                <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
+                  <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Globe2 className="h-6 w-6 text-accent shrink-0" aria-hidden />
+                      Content and UI languages
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground font-normal">
+                      Languages available in the interface and on-page content.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {project.contentLanguages.map((lang) => (
+                        <Badge key={lang} variant="secondary">
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
                   <CardTitle className="text-2xl">Skills Used</CardTitle>
@@ -101,6 +147,30 @@ const ProjectDetailPage = () => {
                   </p>
                 </CardContent>
               </Card>
+
+              {project.features.length > 0 && (
+                <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
+                  <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <ListChecks className="h-6 w-6 text-accent shrink-0" aria-hidden />
+                      Features
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground font-normal">
+                      Capabilities and product surface area shipped on this project.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {project.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2">
+                          <span className="text-accent mt-1">-</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
 
               <div className="grid gap-6 md:grid-cols-2">
                 <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
