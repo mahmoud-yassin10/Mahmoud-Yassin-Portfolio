@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Briefcase, Send } from "lucide-react";
+import { Briefcase, Clipboard, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,7 +170,7 @@ function CountryFlagVisual({ iso }: { iso: string }) {
   }
 
   return (
-    <span className="relative inline-flex h-5 w-[22px] shrink-0 overflow-hidden rounded-sm shadow-sm ring-1 ring-border/50">
+    <span className="relative mr-0.5 inline-flex h-[18px] w-[26px] shrink-0 overflow-hidden rounded-[3px] shadow-sm ring-1 ring-border/50 sm:h-5 sm:w-[28px]">
       <img
         src={`https://flagcdn.com/w40/${lower}.png`}
         srcSet={`https://flagcdn.com/w80/${lower}.png 2x`}
@@ -523,6 +523,32 @@ const BusinessInquiryForm = () => {
       email: prev.email,
       details: prev.details
     }));
+  };
+
+  const handleCopyPhone = async () => {
+    const national = data.phoneNational.trim();
+    if (!national) {
+      toast({
+        title: "Nothing to copy",
+        description: "Enter your phone number first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    const full = `${data.phoneCountryCode} ${national}`.trim();
+    try {
+      await navigator.clipboard.writeText(full);
+      toast({
+        title: "Copied",
+        description: "Phone number copied to clipboard."
+      });
+    } catch {
+      toast({
+        title: "Copy failed",
+        description: "Could not copy. Please try manually.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -956,7 +982,8 @@ const BusinessInquiryForm = () => {
                 {fieldErrors["biz-phone"]}
               </p>
             ) : null}
-            <div className="mt-1.5 flex gap-2">
+            <div className="mt-1.5 flex items-center gap-2">
+              <div className="flex min-w-0 flex-1 gap-2">
               <Select
                 value={data.phoneCountryCode}
                 onValueChange={(v) => setData({ ...data, phoneCountryCode: v })}
@@ -964,27 +991,26 @@ const BusinessInquiryForm = () => {
                 <SelectTrigger
                   id="biz-phone-cc"
                   className={cn(
-                    "h-9 w-[9rem] shrink-0 gap-1.5 px-2 py-1 text-xs md:w-[9.5rem]",
-                    "[&_svg]:h-3.5 [&_svg]:w-3.5",
+                    "h-9 min-w-[10rem] shrink-0 justify-between gap-2 px-2.5 py-1 text-xs md:min-w-[11rem]",
+                    "[&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0",
                     fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
                   )}
                   aria-invalid={Boolean(fieldErrors["biz-phone"])}
                   aria-label="Country calling code"
                 >
-                  <SelectValue
-                    placeholder="Code"
-                    className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-left"
-                  >
+                  <SelectValue placeholder="Code">
                     {(() => {
                       const sel = PHONE_COUNTRY_CODES.find((o) => o.value === data.phoneCountryCode);
                       if (!sel) {
-                        return <span className="truncate">{data.phoneCountryCode}</span>;
+                        return (
+                          <span className="flex min-w-0 flex-1 items-center truncate text-left">{data.phoneCountryCode}</span>
+                        );
                       }
                       return (
-                        <>
+                        <span className="flex min-w-0 flex-1 items-center gap-2.5 text-left md:gap-3">
                           <CountryFlagVisual iso={sel.iso} />
-                          <span className="truncate">{sel.label}</span>
-                        </>
+                          <span className="min-w-0 flex-1 truncate leading-tight">{sel.label}</span>
+                        </span>
                       );
                     })()}
                   </SelectValue>
@@ -992,9 +1018,11 @@ const BusinessInquiryForm = () => {
                 <SelectContent position="popper" className="max-h-[min(280px,50vh)]">
                   {PHONE_COUNTRY_CODES.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <span className="flex items-center gap-2.5 py-0.5">
-                        <CountryFlagVisual iso={opt.iso} />
-                        <span className="leading-snug">{opt.label}</span>
+                      <span className="flex items-center gap-3 py-1 pr-1">
+                        <span className="shrink-0">
+                          <CountryFlagVisual iso={opt.iso} />
+                        </span>
+                        <span className="min-w-0 flex-1 leading-snug">{opt.label}</span>
                       </span>
                     </SelectItem>
                   ))}
@@ -1015,6 +1043,19 @@ const BusinessInquiryForm = () => {
                 aria-invalid={Boolean(fieldErrors["biz-phone"])}
                 aria-required
               />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 touch-manipulation rounded-full text-muted-foreground hover:text-foreground"
+                onClick={handleCopyPhone}
+                disabled={!data.phoneNational.trim()}
+                aria-label="Copy full phone number"
+                title="Copy phone number"
+              >
+                <Clipboard className="h-4 w-4" aria-hidden />
+              </Button>
             </div>
           </div>
         </div>
