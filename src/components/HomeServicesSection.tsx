@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ClipboardList, CreditCard, Globe, Link2 } from "lucide-react";
+import { ArrowRight, Check, CreditCard, Globe, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import {
 import { WebsiteShowcaseMiniGrid } from "@/components/WebsiteShowcaseMiniGrid";
 import { cn } from "@/lib/utils";
 
-const secondaryIcons = [CreditCard, Link2, ClipboardList] as const;
+const secondaryIcons = [CreditCard, Link2, Globe] as const;
 
 const HomeServicesSection = () => {
   const inquiryHref = getServicesInquiryHref();
@@ -110,7 +110,7 @@ const HomeServicesSection = () => {
           {/* Three supporting tiles */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {secondaryServiceOfferings.map((svc, index) => {
-              const Icon = secondaryIcons[index] ?? ClipboardList;
+              const Icon = secondaryIcons[index] ?? Globe;
               return (
                 <Card
                   key={svc.id}

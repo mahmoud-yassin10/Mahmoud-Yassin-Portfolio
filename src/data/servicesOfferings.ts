@@ -36,10 +36,15 @@ export const secondaryServiceOfferings: ServiceOffering[] = [
   },
   {
     id: "intake",
-    title: "Project brief & intake",
+    title: "Website-only brief & intake",
     description:
-      "Same structured questionnaire as the full services page: scope, Kashier vs web priorities, timeline, and payment context — delivered to my inbox.",
-    bullets: ["Guided multiple-choice intake", "Timeline and flexibility", "Payment methods (COD, InstaPay, online)", "Email follow-up"]
+      "Structured questionnaire focused on web work — goals, pages and scope, timeline, and what you need live — delivered to my inbox.",
+    bullets: [
+      "Website-focused guided intake",
+      "Pages, features, and brand priorities",
+      "Timeline and flexibility",
+      "Email follow-up"
+    ]
   }
 ];
 
