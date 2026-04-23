@@ -1,49 +1,107 @@
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Briefcase, HelpCircle, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
 
+type PrimaryNeed = "website" | "kashier" | "both" | "unsure" | "";
+
 type InquiryState = {
+  primaryNeed: PrimaryNeed;
+  /** Website branch */
+  websiteSiteType: string;
+  websiteScope: string;
+  /** Kashier branch */
+  kashierFocus: string;
+  /** Both branch */
+  bothStartingPoint: string;
+  /** Unsure branch */
+  consultFocus: string;
+  /** Shared */
+  projectStage: string;
+  timeline: string;
+  timelineFlexibleNote: string;
+  paymentMethods: string[];
   company: string;
   name: string;
   email: string;
   phone: string;
-  primaryNeed: string;
-  projectStage: string;
-  timeline: string;
-  kashierSituation: string;
   details: string;
 };
 
 const initialState: InquiryState = {
+  primaryNeed: "",
+  websiteSiteType: "",
+  websiteScope: "",
+  kashierFocus: "",
+  bothStartingPoint: "",
+  consultFocus: "",
+  projectStage: "",
+  timeline: "",
+  timelineFlexibleNote: "",
+  paymentMethods: [],
   company: "",
   name: "",
   email: "",
   phone: "",
-  primaryNeed: "",
-  projectStage: "",
-  timeline: "",
-  kashierSituation: "",
   details: ""
 };
 
 const primaryNeedOptions = [
-  { value: "website", label: "Website development (marketing site, landing page, or web app)" },
-  { value: "kashier", label: "Kashier — POS, payment links, and in-store / online payments" },
-  { value: "both", label: "Both — website (or web app) integrated with Kashier" },
-  { value: "unsure", label: "Not sure yet — I want a quick consult" }
+  { value: "website", label: "Website only — marketing site, landing page, or web app" },
+  { value: "kashier", label: "Kashier only — POS, payment links, terminals, catalog" },
+  {
+    value: "both",
+    label: "Website + Kashier — web presence aligned with Kashier checkout and payments"
+  },
+  { value: "unsure", label: "Not sure yet — quick consult first" }
+] as const;
+
+const websiteSiteTypeOptions = [
+  { value: "marketing", label: "Marketing / company website" },
+  { value: "landing", label: "Landing page or campaign page" },
+  { value: "webapp", label: "Small web app or internal tool" },
+  { value: "catalog", label: "Catalog-style site (products & story, checkout can come later)" }
+];
+
+const websiteScopeOptions = [
+  { value: "single", label: "Single page" },
+  { value: "small", label: "Small site (about 2–5 pages)" },
+  { value: "larger", label: "Larger site or ongoing sections" }
+];
+
+const kashierFocusOptions = [
+  { value: "new-setup", label: "New Kashier setup & onboarding" },
+  { value: "optimize", label: "Already on Kashier — tuning, integrations, or training" },
+  { value: "payment-links", label: "Payment links / online collections focus" },
+  { value: "migrate", label: "Moving from another POS or payment setup" }
+];
+
+const bothStartingPointOptions = [
+  { value: "site-first", label: "Website first — then Kashier alignment" },
+  { value: "kashier-first", label: "Kashier first — then web experience" },
+  { value: "parallel", label: "Parallel — coordinated launch plan" }
+];
+
+const consultFocusOptions = [
+  { value: "web", label: "Mostly websites / UX" },
+  { value: "payments", label: "Mostly payments / Kashier" },
+  { value: "combo", label: "How web + Kashier could work together" },
+  { value: "open", label: "Open agenda — surprise me on the call" }
 ];
 
 const projectStageOptions = [
   { value: "exploring", label: "Exploring options" },
   { value: "planning", label: "Planning / scoping requirements" },
   { value: "ready", label: "Ready to start" },
-  { value: "live", label: "Already live — need improvements or new features" }
+  { value: "live", label: "Already live — improvements or new features" }
 ];
 
 const timelineOptions = [
@@ -53,35 +111,167 @@ const timelineOptions = [
   { value: "flexible", label: "Flexible" }
 ];
 
-const kashierSituationOptions = [
-  { value: "na", label: "Not focused on payments / Kashier right now" },
-  { value: "new-kashier", label: "New to Kashier — need setup & training" },
-  { value: "have-kashier", label: "Already use Kashier — need site or integration help" },
-  { value: "migrate", label: "Switching from another POS or payment setup" }
-];
+const paymentOptionDefs = [
+  {
+    id: "cod",
+    label: "Cash on delivery (COD)",
+    hint: "Customer pays when the order arrives."
+  },
+  {
+    id: "instapay",
+    label: "InstaPay",
+    hint: "Bank transfer style payments you offer or plan to advertise at checkout."
+  },
+  {
+    id: "onsite",
+    label: "Payment on website / online checkout",
+    hint: "Card or Kashier-hosted payment page linked from your site."
+  }
+] as const;
 
-function buildMessageBody(data: InquiryState): string {
+function labelFor(options: { value: string; label: string }[], value: string) {
+  return options.find((o) => o.value === value)?.label ?? value;
+}
+
+function buildMessageBody(
+  data: InquiryState,
+  resolved: {
+    primaryLabel: string;
+    branchBlock: string;
+    stageLabel: string;
+    timeLabel: string;
+    paymentSummary: string;
+  }
+): string {
   const lines = [
     "--- Business inquiry (Services) ---",
-    `Company / brand: ${data.company || "(not provided)"}`,
-    `Phone: ${data.phone || "(not provided)"}`,
     "",
-    "Primary need:",
-    data.primaryNeed || "(not answered)",
+    "Primary focus:",
+    resolved.primaryLabel,
     "",
-    "Project stage:",
-    data.projectStage || "(not answered)",
+    resolved.branchBlock,
+    "",
+    "Where is the project today?",
+    resolved.stageLabel,
     "",
     "Timeline:",
-    data.timeline || "(not answered)",
+    resolved.timeLabel,
+    ...(data.timeline === "flexible" && data.timelineFlexibleNote.trim()
+      ? ["Flexible timing note:", data.timelineFlexibleNote.trim(), ""]
+      : []),
     "",
-    "Payments / Kashier situation:",
-    data.kashierSituation || "(not answered)",
+    "Payment methods selected:",
+    resolved.paymentSummary,
+    "",
+    "--- Contact ---",
+    `Company / brand: ${data.company || "(not provided)"}`,
+    `Name: ${data.name}`,
+    `Email: ${data.email}`,
+    `Phone: ${data.phone || "(not provided)"}`,
     "",
     "Additional details:",
     data.details || "(none)"
   ];
   return lines.join("\n");
+}
+
+function branchSectionFromState(data: InquiryState): string {
+  const need = data.primaryNeed;
+  if (!need) return "(not answered)";
+
+  if (need === "website") {
+    return [
+      "[Website]",
+      `Type: ${labelFor(websiteSiteTypeOptions, data.websiteSiteType)}`,
+      `Scope: ${labelFor(websiteScopeOptions, data.websiteScope)}`
+    ].join("\n");
+  }
+  if (need === "kashier") {
+    return ["[Kashier]", `Focus: ${labelFor(kashierFocusOptions, data.kashierFocus)}`].join("\n");
+  }
+  if (need === "both") {
+    return ["[Website + Kashier]", `Starting point: ${labelFor(bothStartingPointOptions, data.bothStartingPoint)}`].join(
+      "\n"
+    );
+  }
+  return ["[Consult]", `Discussion focus: ${labelFor(consultFocusOptions, data.consultFocus)}`].join("\n");
+}
+
+type FirstError = { id: string; message: string };
+
+/** DOM order used to scroll to the first invalid field after a failed submit. */
+const VALIDATION_SCROLL_ORDER = [
+  "fieldset-need",
+  "fieldset-web-type",
+  "fieldset-web-scope",
+  "fieldset-kashier-focus",
+  "fieldset-both-start",
+  "fieldset-consult",
+  "fieldset-stage",
+  "fieldset-timeline",
+  "timeline-flex-note",
+  "fieldset-payment",
+  "biz-name",
+  "biz-email"
+] as const;
+
+function emailLooksValid(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/** All applicable error messages — used to highlight every missing required answer at once. */
+function getValidationErrors(data: InquiryState, paymentRequiredFlag: boolean): Record<string, string> {
+  const e: Record<string, string> = {};
+
+  if (!data.primaryNeed) {
+    e["fieldset-need"] = "Select what you are building.";
+    return e;
+  }
+
+  if (data.primaryNeed === "website") {
+    if (!data.websiteSiteType) e["fieldset-web-type"] = "Choose a website type.";
+    if (!data.websiteScope) e["fieldset-web-scope"] = "Choose an approximate scope.";
+  }
+  if (data.primaryNeed === "kashier" && !data.kashierFocus) {
+    e["fieldset-kashier-focus"] = "Select what you need from Kashier.";
+  }
+  if (data.primaryNeed === "both" && !data.bothStartingPoint) {
+    e["fieldset-both-start"] = "Choose where you want to start.";
+  }
+  if (data.primaryNeed === "unsure" && !data.consultFocus) {
+    e["fieldset-consult"] = "Select a focus for the consult.";
+  }
+
+  if (!data.projectStage) e["fieldset-stage"] = "Select where the project is today.";
+  if (!data.timeline) e["fieldset-timeline"] = "Select when you want to move forward.";
+  if (data.timeline === "flexible" && !data.timelineFlexibleNote.trim()) {
+    e["timeline-flex-note"] = "Describe what flexible timing means for you.";
+  }
+
+  if (paymentRequiredFlag && data.paymentMethods.length === 0) {
+    e["fieldset-payment"] = "Select at least one payment method.";
+  }
+
+  if (!data.name.trim()) e["biz-name"] = "Enter your name.";
+  else if (data.name.trim().length < 2) e["biz-name"] = "Name must be at least 2 characters.";
+
+  if (!data.email.trim()) e["biz-email"] = "Enter your work email.";
+  else if (!emailLooksValid(data.email)) e["biz-email"] = "Enter a valid email address.";
+
+  return e;
+}
+
+function firstValidationError(errors: Record<string, string>): FirstError | null {
+  for (const id of VALIDATION_SCROLL_ORDER) {
+    if (errors[id]) return { id, message: errors[id] };
+  }
+  const rest = Object.entries(errors)[0];
+  return rest ? { id: rest[0], message: rest[1] } : null;
+}
+
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  el?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 const McqBlock = ({
@@ -90,7 +280,10 @@ const McqBlock = ({
   value,
   onChange,
   options,
-  name
+  name,
+  fieldsetId,
+  showError,
+  errorMessage
 }: {
   title: string;
   required?: boolean;
@@ -98,12 +291,27 @@ const McqBlock = ({
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
   name: string;
+  fieldsetId?: string;
+  showError?: boolean;
+  errorMessage?: string;
 }) => (
-  <fieldset className="space-y-3 rounded-xl border border-border bg-card/30 p-4">
+  <fieldset
+    id={fieldsetId}
+    className={cn(
+      "space-y-3 rounded-xl border bg-card/30 p-4",
+      showError ? "border-destructive border-2" : "border-border"
+    )}
+    aria-invalid={showError ? true : undefined}
+  >
     <legend className="px-1 text-sm font-medium text-foreground">
       {title}
       {isRequired ? <span className="text-destructive"> *</span> : null}
     </legend>
+    {showError && errorMessage ? (
+      <p className="text-sm text-destructive" role="alert">
+        {errorMessage}
+      </p>
+    ) : null}
     <RadioGroup value={value} onValueChange={onChange} className="gap-3">
       {options.map((opt) => (
         <div key={opt.value} className="flex items-start gap-3">
@@ -121,41 +329,81 @@ const BusinessInquiryForm = () => {
   const [data, setData] = useState<InquiryState>(initialState);
   const [botField, setBotField] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationAttempted, setValidationAttempted] = useState(false);
   const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
   const { toast } = useToast();
+
+  const showPaymentMulti = data.primaryNeed !== "";
+  const paymentRequired = data.primaryNeed === "kashier" || data.primaryNeed === "both";
+
+  const fieldErrors =
+    validationAttempted ? getValidationErrors(data, paymentRequired) : ({} as Record<string, string>);
+
+  const togglePayment = (id: string, checked: boolean) => {
+    setData((prev) => ({
+      ...prev,
+      paymentMethods: checked
+        ? [...prev.paymentMethods, id]
+        : prev.paymentMethods.filter((p) => p !== id)
+    }));
+  };
+
+  const setPrimaryNeed = (v: string) => {
+    setData((prev) => ({
+      ...initialState,
+      primaryNeed: v as PrimaryNeed,
+      company: prev.company,
+      phone: prev.phone,
+      name: prev.name,
+      email: prev.email,
+      details: prev.details
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (botField) return;
 
-    if (!data.name?.trim() || !data.email?.trim()) {
-      toast({ title: "Missing info", description: "Please add your name and email.", variant: "destructive" });
+    const errs = getValidationErrors(data, paymentRequired);
+    if (Object.keys(errs).length > 0) {
+      setValidationAttempted(true);
+      const first = firstValidationError(errs);
+      toast({
+        title: "Complete required fields",
+        description: first?.message ?? "Review the sections marked below.",
+        variant: "destructive"
+      });
+      if (first) scrollToId(first.id);
       return;
     }
-    if (!data.primaryNeed || !data.projectStage || !data.timeline || !data.kashierSituation) {
-      toast({ title: "Complete the questionnaire", description: "Please answer all multiple-choice sections.", variant: "destructive" });
-      return;
-    }
+
     if (!accessKey) {
       toast({
         title: "Form not configured",
-        description: "Set VITE_WEB3FORMS_KEY (Web3Forms) to enable sending.",
+        description: "The inquiry form cannot send email until the site key is configured.",
         variant: "destructive"
       });
       return;
     }
 
-    const primaryLabel = primaryNeedOptions.find((o) => o.value === data.primaryNeed)?.label ?? data.primaryNeed;
-    const stageLabel = projectStageOptions.find((o) => o.value === data.projectStage)?.label ?? data.projectStage;
-    const timeLabel = timelineOptions.find((o) => o.value === data.timeline)?.label ?? data.timeline;
-    const kashierLabel = kashierSituationOptions.find((o) => o.value === data.kashierSituation)?.label ?? data.kashierSituation;
+    const primaryLabel =
+      primaryNeedOptions.find((o) => o.value === data.primaryNeed)?.label ?? data.primaryNeed;
+    const stageLabel = labelFor(projectStageOptions, data.projectStage);
+    const timeLabel = labelFor(timelineOptions, data.timeline);
+    const branchBlock = branchSectionFromState(data);
 
-    const body = buildMessageBody({
-      ...data,
-      primaryNeed: primaryLabel,
-      projectStage: stageLabel,
-      timeline: timeLabel,
-      kashierSituation: kashierLabel
+    const paymentLabels = paymentOptionDefs
+      .filter((p) => data.paymentMethods.includes(p.id))
+      .map((p) => p.label);
+    const paymentSummary =
+      paymentLabels.length > 0 ? paymentLabels.join(", ") : "(none selected — optional for this flow)";
+
+    const body = buildMessageBody(data, {
+      primaryLabel,
+      branchBlock,
+      stageLabel,
+      timeLabel,
+      paymentSummary
     });
 
     try {
@@ -172,14 +420,17 @@ const BusinessInquiryForm = () => {
       payload.append("primary_need", primaryLabel);
       payload.append("project_stage", stageLabel);
       payload.append("timeline", timeLabel);
-      payload.append("kashier_situation", kashierLabel);
+      payload.append("timeline_flexible_note", data.timelineFlexibleNote.trim());
+      payload.append("branch_detail", branchBlock);
+      payload.append("payment_methods", paymentSummary);
 
       const result = await submitWeb3Forms(payload);
       if (result.success) {
         toast({
           title: "Request sent",
-          description: "Thanks — you'll get a response at the email you provided."
+          description: "Thanks — you'll hear back at the email you provided."
         });
+        setValidationAttempted(false);
         setData(initialState);
       } else {
         throw new Error(result.message || "Submission failed");
@@ -201,13 +452,31 @@ const BusinessInquiryForm = () => {
       className="max-w-3xl mx-auto scroll-mt-24 rounded-2xl border border-border bg-card/50 p-8 backdrop-blur-sm"
     >
       <h3 className="text-2xl font-bold text-foreground mb-2">Request a project</h3>
-      <p className="text-muted-foreground mb-6">
-        Tell me what you need: a few multiple-choice answers plus your details. Submissions are delivered by{" "}
-        <strong className="text-foreground">Web3Forms</strong> (same provider as the contact page) using your{" "}
-        <code className="rounded bg-muted px-1.5 py-0.5 text-sm">VITE_WEB3FORMS_KEY</code> key.
+      <p className="text-muted-foreground mb-2">
+        Pick your focus first — the questions adjust for websites, Kashier-only, or both together. Then share your details
+        and timeline.
+      </p>
+      <p className="text-sm text-muted-foreground mb-6">
+        <span className="text-destructive font-medium">*</span> Required fields must be completed before you can send the
+        request.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="mb-6 flex flex-col gap-4 rounded-xl border border-primary/25 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-3">
+          <Briefcase className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden />
+          <div>
+            <p className="text-sm font-medium text-foreground">Want to see previous work first?</p>
+            <p className="text-sm text-muted-foreground">
+              Browse the Work page for live client deliveries and deeper case studies before you submit a request.
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="secondary" className="shrink-0 border border-primary/30 w-full sm:w-auto">
+          <Link to="/work">View previous work</Link>
+        </Button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div className="hidden" aria-hidden>
           <label htmlFor="biz-website-hp">Leave empty</label>
           <Input
@@ -218,6 +487,226 @@ const BusinessInquiryForm = () => {
             autoComplete="off"
           />
         </div>
+
+        <McqBlock
+          title="What are we building?"
+          required
+          name="need"
+          fieldsetId="fieldset-need"
+          value={data.primaryNeed}
+          onChange={setPrimaryNeed}
+          options={[...primaryNeedOptions]}
+          showError={Boolean(fieldErrors["fieldset-need"])}
+          errorMessage={fieldErrors["fieldset-need"]}
+        />
+
+        {data.primaryNeed === "website" && (
+          <>
+            <McqBlock
+              title="Website — what type?"
+              required
+              name="web-type"
+              fieldsetId="fieldset-web-type"
+              value={data.websiteSiteType}
+              onChange={(v) => setData({ ...data, websiteSiteType: v })}
+              options={websiteSiteTypeOptions}
+              showError={Boolean(fieldErrors["fieldset-web-type"])}
+              errorMessage={fieldErrors["fieldset-web-type"]}
+            />
+            <McqBlock
+              title="Website — rough scope?"
+              required
+              name="web-scope"
+              fieldsetId="fieldset-web-scope"
+              value={data.websiteScope}
+              onChange={(v) => setData({ ...data, websiteScope: v })}
+              options={websiteScopeOptions}
+              showError={Boolean(fieldErrors["fieldset-web-scope"])}
+              errorMessage={fieldErrors["fieldset-web-scope"]}
+            />
+          </>
+        )}
+
+        {data.primaryNeed === "kashier" && (
+          <McqBlock
+            title="Kashier — what do you need most?"
+            required
+            name="kashier-focus"
+            fieldsetId="fieldset-kashier-focus"
+            value={data.kashierFocus}
+            onChange={(v) => setData({ ...data, kashierFocus: v })}
+            options={kashierFocusOptions}
+            showError={Boolean(fieldErrors["fieldset-kashier-focus"])}
+            errorMessage={fieldErrors["fieldset-kashier-focus"]}
+          />
+        )}
+
+        {data.primaryNeed === "both" && (
+          <McqBlock
+            title="Website + Kashier — where should we start?"
+            required
+            name="both-start"
+            fieldsetId="fieldset-both-start"
+            value={data.bothStartingPoint}
+            onChange={(v) => setData({ ...data, bothStartingPoint: v })}
+            options={bothStartingPointOptions}
+            showError={Boolean(fieldErrors["fieldset-both-start"])}
+            errorMessage={fieldErrors["fieldset-both-start"]}
+          />
+        )}
+
+        {data.primaryNeed === "unsure" && (
+          <McqBlock
+            title="Consult — what should we focus on first?"
+            required
+            name="consult"
+            fieldsetId="fieldset-consult"
+            value={data.consultFocus}
+            onChange={(v) => setData({ ...data, consultFocus: v })}
+            options={consultFocusOptions}
+            showError={Boolean(fieldErrors["fieldset-consult"])}
+            errorMessage={fieldErrors["fieldset-consult"]}
+          />
+        )}
+
+        <McqBlock
+          title="Where is the project today?"
+          required
+          name="stage"
+          fieldsetId="fieldset-stage"
+          value={data.projectStage}
+          onChange={(v) => setData({ ...data, projectStage: v })}
+          options={projectStageOptions}
+          showError={Boolean(fieldErrors["fieldset-stage"])}
+          errorMessage={fieldErrors["fieldset-stage"]}
+        />
+
+        <fieldset
+          id="fieldset-timeline"
+          className={cn(
+            "space-y-3 rounded-xl border bg-card/30 p-4",
+            fieldErrors["fieldset-timeline"] ? "border-destructive border-2" : "border-border"
+          )}
+        >
+          <legend className="px-1 text-sm font-medium text-foreground">
+            When do you want to move forward?<span className="text-destructive"> *</span>
+          </legend>
+          {fieldErrors["fieldset-timeline"] ? (
+            <p className="text-sm text-destructive" role="alert">
+              {fieldErrors["fieldset-timeline"]}
+            </p>
+          ) : null}
+          <RadioGroup
+            value={data.timeline}
+            onValueChange={(v) =>
+              setData({
+                ...data,
+                timeline: v,
+                timelineFlexibleNote: v === "flexible" ? data.timelineFlexibleNote : ""
+              })
+            }
+            className="gap-3"
+          >
+            {timelineOptions.map((opt) => (
+              <div key={opt.value} className="flex items-start gap-3">
+                <RadioGroupItem value={opt.value} id={`time-${opt.value}`} className="mt-1" />
+                <Label htmlFor={`time-${opt.value}`} className="font-normal leading-snug cursor-pointer">
+                  {opt.label}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+          {data.timeline === "flexible" && (
+            <div
+              className={cn(
+                "pt-4 mt-4 border-t border-border space-y-2",
+                fieldErrors["timeline-flex-note"] && "rounded-lg border border-destructive bg-destructive/5 p-3"
+              )}
+            >
+              <Label htmlFor="timeline-flex-note">
+                Describe what &quot;flexible&quot; looks like for you<span className="text-destructive"> *</span>
+              </Label>
+              {fieldErrors["timeline-flex-note"] ? (
+                <p className="text-sm text-destructive mt-1" role="alert">
+                  {fieldErrors["timeline-flex-note"]}
+                </p>
+              ) : null}
+              <Textarea
+                id="timeline-flex-note"
+                value={data.timelineFlexibleNote}
+                onChange={(e) => setData({ ...data, timelineFlexibleNote: e.target.value })}
+                placeholder="Example: aiming for next quarter once budget is approved; open to phased delivery…"
+                rows={3}
+                className={cn(
+                  "mt-2",
+                  fieldErrors["timeline-flex-note"] ? "border-destructive ring-2 ring-destructive/25" : ""
+                )}
+                aria-invalid={Boolean(fieldErrors["timeline-flex-note"])}
+                aria-required
+              />
+            </div>
+          )}
+        </fieldset>
+
+        {showPaymentMulti && (
+          <fieldset
+            id="fieldset-payment"
+            className={cn(
+              "space-y-4 rounded-xl border bg-card/30 p-4",
+              fieldErrors["fieldset-payment"] ? "border-destructive border-2" : "border-border"
+            )}
+          >
+            <legend className="flex flex-wrap items-center gap-2 px-1 text-sm font-medium text-foreground">
+              <span>
+                Payment methods{" "}
+                {paymentRequired ? (
+                  <span className="text-destructive">*</span>
+                ) : (
+                  <span className="text-muted-foreground font-normal">(optional)</span>
+                )}
+              </span>
+              <span
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-xs font-normal text-muted-foreground"
+                title="Choose every option that applies today or that you want to enable for customers."
+              >
+                <HelpCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Tap for guidance below
+              </span>
+            </legend>
+            {fieldErrors["fieldset-payment"] ? (
+              <p className="text-sm text-destructive" role="alert">
+                {fieldErrors["fieldset-payment"]}
+              </p>
+            ) : null}
+            <p className="text-sm text-muted-foreground leading-relaxed border-l-2 border-accent pl-3">
+              Select <strong className="text-foreground font-medium">every</strong> option that fits: how customers pay you{" "}
+              <strong className="text-foreground font-medium">today</strong>, or what you want to enable next. Check all that
+              apply — COD means cash when the order is delivered; InstaPay means the instant bank-transfer style paths you show
+              at checkout; payment on site means checkout on your website or through a Kashier payment link online.
+            </p>
+            <div className="space-y-3">
+              {paymentOptionDefs.map((p) => (
+                <div key={p.id} className="flex flex-col gap-1 rounded-lg bg-background/40 p-3 sm:flex-row sm:items-start sm:gap-4">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id={`pay-${p.id}`}
+                      checked={data.paymentMethods.includes(p.id)}
+                      onCheckedChange={(c) => togglePayment(p.id, c === true)}
+                      aria-describedby={`hint-${p.id}`}
+                      className="mt-1"
+                    />
+                    <Label htmlFor={`pay-${p.id}`} className="font-medium cursor-pointer leading-snug">
+                      {p.label}
+                    </Label>
+                  </div>
+                  <p id={`hint-${p.id}`} className="text-xs text-muted-foreground sm:flex-1 sm:text-right sm:pt-0.5">
+                    {p.hint}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -248,68 +737,51 @@ const BusinessInquiryForm = () => {
             <Label htmlFor="biz-name">
               Your name <span className="text-destructive">*</span>
             </Label>
+            {fieldErrors["biz-name"] ? (
+              <p className="text-sm text-destructive mt-1" role="alert">
+                {fieldErrors["biz-name"]}
+              </p>
+            ) : null}
             <Input
               id="biz-name"
-              required
-              minLength={2}
+              autoComplete="name"
               value={data.name}
               onChange={(e) => setData({ ...data, name: e.target.value })}
               placeholder="Full name"
-              className="mt-1.5"
+              className={cn(
+                "mt-1.5",
+                fieldErrors["biz-name"] ? "border-destructive ring-2 ring-destructive/25" : ""
+              )}
+              aria-invalid={Boolean(fieldErrors["biz-name"])}
+              aria-required
             />
           </div>
           <div>
             <Label htmlFor="biz-email">
               Work email <span className="text-destructive">*</span>
             </Label>
+            {fieldErrors["biz-email"] ? (
+              <p className="text-sm text-destructive mt-1" role="alert">
+                {fieldErrors["biz-email"]}
+              </p>
+            ) : null}
             <Input
               id="biz-email"
               type="email"
-              required
+              autoComplete="email"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
               placeholder="you@business.com"
-              className="mt-1.5"
+              className={cn(
+                "mt-1.5",
+                fieldErrors["biz-email"] ? "border-destructive ring-2 ring-destructive/25" : ""
+              )}
               inputMode="email"
+              aria-invalid={Boolean(fieldErrors["biz-email"])}
+              aria-required
             />
           </div>
         </div>
-
-        <McqBlock
-          title="What do you need most?"
-          required
-          name="need"
-          value={data.primaryNeed}
-          onChange={(v) => setData({ ...data, primaryNeed: v })}
-          options={primaryNeedOptions}
-        />
-
-        <McqBlock
-          title="Where is the project today?"
-          required
-          name="stage"
-          value={data.projectStage}
-          onChange={(v) => setData({ ...data, projectStage: v })}
-          options={projectStageOptions}
-        />
-
-        <McqBlock
-          title="When do you want to move forward?"
-          required
-          name="time"
-          value={data.timeline}
-          onChange={(v) => setData({ ...data, timeline: v })}
-          options={timelineOptions}
-        />
-
-        <McqBlock
-          title="Payments & Kashier"
-          required
-          name="kashier"
-          value={data.kashierSituation}
-          onChange={(v) => setData({ ...data, kashierSituation: v })}
-          options={kashierSituationOptions}
-        />
 
         <div>
           <Label htmlFor="biz-details">Anything else we should know? (optional)</Label>
@@ -317,7 +789,7 @@ const BusinessInquiryForm = () => {
             id="biz-details"
             value={data.details}
             onChange={(e) => setData({ ...data, details: e.target.value })}
-            placeholder="Goals, constraints, links to your current site or store..."
+            placeholder="Goals, links to your site or Kashier receipts, constraints…"
             rows={4}
             className="mt-1.5"
           />

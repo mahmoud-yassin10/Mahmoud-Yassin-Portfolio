@@ -3,7 +3,9 @@ import BusinessInquiryForm from "@/components/BusinessInquiryForm";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { ProjectTile } from "@/components/Projects";
+import { Badge } from "@/components/ui/badge";
 import { type ProjectTileData } from "@/data/projects";
+import { cn } from "@/lib/utils";
 
 type ServiceItem = {
   title: string;
@@ -18,6 +20,7 @@ const ServicesPage = () => {
   const basePath = rawBase.replace(/\/+$/, "");
   const servicesInquiryHref =
     basePath === "" ? "/services#business-inquiry" : `${basePath}/services#business-inquiry`;
+  /** Website development is intentionally first (primary tile). Order is fixed for layout emphasis. */
   const services: ServiceItem[] = [
     {
       title: "Website development",
@@ -76,16 +79,36 @@ const ServicesPage = () => {
                   type: "Service"
                 };
 
+                const isWebsiteFirst = index === 0;
+
                 return (
-                  <ProjectTile
+                  <div
                     key={service.title}
-                    project={project}
-                    index={index}
-                    buttonLabel={service.ctaLabel}
-                    linkRel={undefined}
-                    linkTarget="_self"
-                    alignButton
-                  />
+                    className={cn(
+                      "relative flex flex-col min-h-0",
+                      isWebsiteFirst &&
+                        "rounded-2xl p-[2px] bg-gradient-to-br from-primary/50 via-primary/25 to-accent/30 shadow-lg shadow-primary/10"
+                    )}
+                  >
+                    {isWebsiteFirst ? (
+                      <Badge
+                        variant="secondary"
+                        className="absolute -top-2.5 left-4 z-10 border border-primary/40 bg-background/95 shadow-sm"
+                      >
+                        Core offering
+                      </Badge>
+                    ) : null}
+                    <div className={cn("flex flex-col flex-1 min-h-0", isWebsiteFirst && "rounded-[14px] bg-background")}>
+                      <ProjectTile
+                        project={project}
+                        index={index}
+                        buttonLabel={service.ctaLabel}
+                        linkRel={undefined}
+                        linkTarget="_self"
+                        alignButton
+                      />
+                    </div>
+                  </div>
                 );
               })}
             </div>

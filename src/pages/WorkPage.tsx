@@ -3,6 +3,7 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { ClientWorkTile } from "@/components/ClientWorkTile";
 import { ProjectTile } from "@/components/Projects";
 import { clientProjects, technicalProjects } from "@/data/projects";
 
@@ -24,7 +25,7 @@ const WorkPage = () => {
               Work
             </h2>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
               <Button
                 type="button"
                 variant={isClientTab ? "default" : "outline"}
@@ -43,16 +44,27 @@ const WorkPage = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-              {items.map((project, index) => (
-                <ProjectTile
-                  key={`${activeTab}-${project.slug}`}
-                  project={project}
-                  index={index}
-                  alignButton
-                  linkTarget="_self"
-                />
-              ))}
+            {isClientTab ? (
+              <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+                Each card includes a homepage snapshot (similar to a hosting preview). Click the image or &quot;Live
+                site&quot; to open the real URL; open &quot;View case study&quot; for the full write-up.
+              </p>
+            ) : null}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {items.map((project, index) =>
+                isClientTab ? (
+                  <ClientWorkTile key={project.slug} project={project} index={index} />
+                ) : (
+                  <ProjectTile
+                    key={`${activeTab}-${project.slug}`}
+                    project={project}
+                    index={index}
+                    alignButton
+                    linkTarget="_self"
+                  />
+                )
+              )}
             </div>
           </div>
         </section>
