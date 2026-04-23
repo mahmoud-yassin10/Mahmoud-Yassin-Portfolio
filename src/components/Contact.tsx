@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { submitWeb3Forms } from "@/lib/web3forms";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -51,11 +52,7 @@ const Contact = () => {
       payload.append("message", formData.message);
       payload.append("botcheck", botField);
 
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: payload
-      });
-      const data = await response.json();
+      const data = await submitWeb3Forms(payload);
 
       if (data.success) {
         toast({

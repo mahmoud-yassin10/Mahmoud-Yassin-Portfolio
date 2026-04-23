@@ -1,4 +1,5 @@
 import AnimatedBackground from "@/components/AnimatedBackground";
+import BusinessInquiryForm from "@/components/BusinessInquiryForm";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { ProjectTile } from "@/components/Projects";
@@ -13,35 +14,34 @@ type ServiceItem = {
 };
 
 const ServicesPage = () => {
-  const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+  const rawBase = import.meta.env.BASE_URL || "/";
+  const basePath = rawBase.replace(/\/+$/, "");
+  const servicesInquiryHref =
+    basePath === "" ? "/services#business-inquiry" : `${basePath}/services#business-inquiry`;
   const services: ServiceItem[] = [
     {
-      title: "Product & MVP Build",
-      description: "Rapid MVPs to validate ideas with real users and clear next steps.",
-      bullets: ["Scope definition", "Clickable prototype", "MVP build", "User feedback loop"],
-      ctaLabel: "Get started",
-      ctaHref: `${base}/contact`
+      title: "Website development",
+      description:
+        "Marketing sites, landing pages, and lightweight web apps — fast, responsive, and ready for search and analytics. Ideal when your priority is a credible online presence and clear customer journeys.",
+      bullets: ["Design-to-code implementation", "Performance & SEO fundamentals", "Analytics-ready structure", "Hosting guidance & handoff"],
+      ctaLabel: "Request this",
+      ctaHref: servicesInquiryHref
     },
     {
-      title: "Flutter Mobile Apps",
-      description: "Cross-platform apps with clean UI, auth, and data sync.",
-      bullets: ["Flutter/Dart", "Firebase Auth", "Push-ready", "Store support"],
-      ctaLabel: "Contact",
-      ctaHref: `${base}/contact`
+      title: "Kashier systems",
+      description:
+        "Payments and operations with Kashier — terminals, payment links, catalog alignment, and practical workflows so your team can sell online and in-store with confidence.",
+      bullets: ["POS & payment links setup", "Products / pricing alignment", "Staff-friendly flows", "Reporting & reconciliation basics"],
+      ctaLabel: "Request this",
+      ctaHref: servicesInquiryHref
     },
     {
-      title: "Websites & Landing Pages",
-      description: "Responsive sites for brands, campaigns, and portfolios.",
-      bullets: ["Design to code", "SEO basics", "Analytics setup", "Fast hosting"],
-      ctaLabel: "Get started",
-      ctaHref: `${base}/contact`
-    },
-    {
-      title: "AI/CV Prototypes",
-      description: "Proof-of-concept AI features for vision or NLP.",
-      bullets: ["Model selection", "Data pipeline", "Inference demo", "Report + roadmap"],
-      ctaLabel: "Contact",
-      ctaHref: `${base}/contact`
+      title: "Website + Kashier together",
+      description:
+        "When your brand needs both: a polished site that reflects your offers and a Kashier-backed payment story — from consultation through integration planning so web and checkout stay consistent.",
+      bullets: ["Unified customer journey", "Site + catalog / pricing consistency", "Online pay + in-store flows", "Integration planning & rollout support"],
+      ctaLabel: "Request this",
+      ctaHref: servicesInquiryHref
     }
   ];
 
@@ -52,11 +52,20 @@ const ServicesPage = () => {
       <main id="main-content" className="relative z-10">
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Services
-            </h2>
+            <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Services
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                I focus on{" "}
+                <strong className="text-foreground font-medium">website development</strong>,{" "}
+                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), and projects that{" "}
+                <strong className="text-foreground font-medium">combine both</strong> so your web presence and checkout
+                experience stay aligned.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
               {services.map((service, index) => {
                 const project: ProjectTileData = {
                   title: service.title,
@@ -73,12 +82,15 @@ const ServicesPage = () => {
                     project={project}
                     index={index}
                     buttonLabel={service.ctaLabel}
-                    linkRel="noreferrer"
+                    linkRel={undefined}
+                    linkTarget="_self"
                     alignButton
                   />
                 );
               })}
             </div>
+
+            <BusinessInquiryForm />
           </div>
         </section>
       </main>
