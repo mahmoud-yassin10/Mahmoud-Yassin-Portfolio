@@ -796,7 +796,8 @@ const BusinessInquiryForm = () => {
                 <SelectTrigger
                   id="biz-phone-cc"
                   className={cn(
-                    "w-[min(100%,11rem)] shrink-0",
+                    "h-9 w-[8rem] shrink-0 gap-1 px-2 py-1 text-xs [&>span]:truncate md:w-[8.75rem]",
+                    "[&_svg]:h-3.5 [&_svg]:w-3.5",
                     fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
                   )}
                   aria-invalid={Boolean(fieldErrors["biz-phone"])}
@@ -821,7 +822,7 @@ const BusinessInquiryForm = () => {
                 onChange={(e) => setData({ ...data, phoneNational: e.target.value })}
                 placeholder="Number"
                 className={cn(
-                  "min-w-0 flex-1",
+                  "h-9 min-w-0 flex-1 text-sm",
                   fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
                 )}
                 aria-invalid={Boolean(fieldErrors["biz-phone"])}
