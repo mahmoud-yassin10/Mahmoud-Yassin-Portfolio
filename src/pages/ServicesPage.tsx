@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import BusinessInquiryForm from "@/components/BusinessInquiryForm";
 import Footer from "@/components/Footer";
@@ -9,7 +11,17 @@ import { getServicesInquiryHref, servicesPageOfferings } from "@/data/servicesOf
 import { cn } from "@/lib/utils";
 
 const ServicesPage = () => {
+  const location = useLocation();
   const servicesInquiryHref = getServicesInquiryHref();
+
+  useEffect(() => {
+    if (location.hash !== "#business-inquiry") return;
+    const node = document.getElementById("business-inquiry");
+    if (!node) return;
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [location.pathname, location.hash]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -25,13 +37,14 @@ const ServicesPage = () => {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 I focus on{" "}
                 <strong className="text-foreground font-medium">website development</strong>,{" "}
-                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), and projects that{" "}
-                <strong className="text-foreground font-medium">combine both</strong> so your web presence and checkout
-                experience stay aligned.
+                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), projects that{" "}
+                <strong className="text-foreground font-medium">combine both</strong>, and a dedicated{" "}
+                <strong className="text-foreground font-medium">website-only intake</strong> path — scroll down for the
+                full questionnaire.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto mb-20">
               {servicesPageOfferings.map((service, index) => {
                 const project: ProjectTileData = {
                   title: service.title,

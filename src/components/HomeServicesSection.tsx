@@ -15,7 +15,10 @@ const secondaryIcons = [CreditCard, Link2, Globe] as const;
 
 const HomeServicesSection = () => {
   const inquiryHref = getServicesInquiryHref();
-  const fullServicesHref = getServicesPageHref();
+  /** Top of `/services` — overview + all tiles. */
+  const servicesOverviewHref = getServicesPageHref();
+  /** Jump to the questionnaire on `/services`. */
+  const servicesFullFormHref = getServicesPageHref("business-inquiry");
 
   return (
     <section id="services" className="scroll-mt-24 py-20 relative">
@@ -71,7 +74,7 @@ const HomeServicesSection = () => {
                       </a>
                     </Button>
                     <Button size="lg" variant="outline" className="border-primary/40" asChild>
-                      <a href={fullServicesHref}>
+                      <a href={servicesFullFormHref}>
                         Full form & details
                       </a>
                     </Button>
@@ -147,7 +150,7 @@ const HomeServicesSection = () => {
 
           <p className="text-center text-sm text-muted-foreground">
             Need the full-screen intake, privacy context, or want to skim everything in one place?{" "}
-            <a href={fullServicesHref} className="font-medium text-primary underline-offset-4 hover:underline">
+            <a href={servicesOverviewHref} className="font-medium text-primary underline-offset-4 hover:underline">
               Open the dedicated services page
             </a>
             .

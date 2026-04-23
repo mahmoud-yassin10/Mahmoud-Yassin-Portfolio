@@ -48,11 +48,10 @@ export const secondaryServiceOfferings: ServiceOffering[] = [
   }
 ];
 
-/** Dedicated `/services` grid: website + Kashier + combined (no duplicate “intake” tile — that lives only on home). */
+/** Dedicated `/services` grid: core website row plus Kashier, combined, and website-only intake (matches home offerings). */
 export const servicesPageOfferings: ServiceOffering[] = [
   websiteOffering,
-  secondaryServiceOfferings[0],
-  secondaryServiceOfferings[1]
+  ...secondaryServiceOfferings
 ];
 
 export function getServicesInquiryHref() {
@@ -60,7 +59,11 @@ export function getServicesInquiryHref() {
   return basePath === "" ? "/services#business-inquiry" : `${basePath}/services#business-inquiry`;
 }
 
-export function getServicesPageHref() {
+/** Path to the full Services page. Pass a section id (with or without `#`) to scroll to that anchor, e.g. `business-inquiry`. */
+export function getServicesPageHref(hash?: string) {
   const basePath = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-  return basePath === "" ? "/services" : `${basePath}/services`;
+  const path = basePath === "" ? "/services" : `${basePath}/services`;
+  if (!hash) return path;
+  const suffix = hash.startsWith("#") ? hash : `#${hash}`;
+  return `${path}${suffix}`;
 }
