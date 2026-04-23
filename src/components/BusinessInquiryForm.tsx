@@ -145,12 +145,46 @@ const paymentOptionDefs = [
 
 type PhoneCountryOption = { value: string; label: string; iso: string };
 
-/** ISO 3166-1 alpha-2 → Unicode regional-indicator flag emoji. */
+/** Unicode flags often render as two letters (EG, US) on Windows — use PNGs with emoji fallback. */
 function isoToFlagEmoji(iso: string): string {
   const upper = iso.toUpperCase();
   if (!/^[A-Z]{2}$/.test(upper)) return "";
-  const base = 0x1f1e6 - 65; // Regional Indicator Symbol Letter A
+  const base = 0x1f1e6 - 65;
   return String.fromCodePoint(base + upper.charCodeAt(0)) + String.fromCodePoint(base + upper.charCodeAt(1));
+}
+
+function CountryFlagVisual({ iso }: { iso: string }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const lower = iso.toLowerCase();
+
+  if (imgFailed || !/^[a-z]{2}$/i.test(iso)) {
+    return (
+      <span
+        className="inline-flex h-5 w-6 shrink-0 items-center justify-center text-lg leading-none"
+        style={{ fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif' }}
+        aria-hidden
+      >
+        {isoToFlagEmoji(iso)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative inline-flex h-5 w-[22px] shrink-0 overflow-hidden rounded-sm shadow-sm ring-1 ring-border/50">
+      <img
+        src={`https://flagcdn.com/w40/${lower}.png`}
+        srcSet={`https://flagcdn.com/w80/${lower}.png 2x`}
+        width={22}
+        height={15}
+        alt=""
+        className="h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        onError={() => setImgFailed(true)}
+      />
+    </span>
+  );
 }
 
 /** Dial codes for the phone field — value is stored without spaces (e.g. "+20"); `iso` picks the flag. */
@@ -948,9 +982,7 @@ const BusinessInquiryForm = () => {
                       }
                       return (
                         <>
-                          <span className="text-[1rem] leading-none shrink-0" aria-hidden>
-                            {isoToFlagEmoji(sel.iso)}
-                          </span>
+                          <CountryFlagVisual iso={sel.iso} />
                           <span className="truncate">{sel.label}</span>
                         </>
                       );
@@ -960,11 +992,9 @@ const BusinessInquiryForm = () => {
                 <SelectContent position="popper" className="max-h-[min(280px,50vh)]">
                   {PHONE_COUNTRY_CODES.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <span className="flex items-center gap-2">
-                        <span className="text-base leading-none shrink-0" aria-hidden>
-                          {isoToFlagEmoji(opt.iso)}
-                        </span>
-                        <span>{opt.label}</span>
+                      <span className="flex items-center gap-2.5 py-0.5">
+                        <CountryFlagVisual iso={opt.iso} />
+                        <span className="leading-snug">{opt.label}</span>
                       </span>
                     </SelectItem>
                   ))}
