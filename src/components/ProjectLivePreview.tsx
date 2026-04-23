@@ -31,11 +31,22 @@ type ProjectLivePreviewProps = {
   className?: string;
 };
 
+/** Only http(s) URLs get a live preview — skip placeholder / missing links entirely. */
+export function isLiveSiteUrl(url: string | undefined | null): boolean {
+  const raw = url?.trim() ?? "";
+  return /^https?:\/\//i.test(raw);
+}
+
 /**
  * Browser-style live preview: mshots thumbnail with iframe fallback (same strategy as client work tiles).
+ * Renders nothing when there is no public http(s) URL (no empty “no live site” chrome).
  */
 export function ProjectLivePreview({ liveUrl, title, variant = "card", className }: ProjectLivePreviewProps) {
-  const url = liveUrl?.trim() || "";
+  const url = useMemo(() => {
+    const raw = liveUrl?.trim() ?? "";
+    return /^https?:\/\//i.test(raw) ? raw : "";
+  }, [liveUrl]);
+
   const candidates = useMemo(() => (url ? buildScreenshotCandidates(url) : []), [url]);
 
   const [thumbAttempt, setThumbAttempt] = useState(0);
@@ -68,11 +79,15 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
     advanceThumbnail();
   };
 
-  const hostname = url ? safeHostname(url) : "";
+  const hostname = safeHostname(url);
 
   const showSkeleton = Boolean(
     url && ((!showIframeFallback && !imgLoaded && thumbAttempt < candidates.length) || (showIframeFallback && !iframeLoaded))
   );
+
+  if (!url) {
+    return null;
+  }
 
   const previewAreaClass =
     variant === "detail"
@@ -96,28 +111,26 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
           <Globe className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="truncate font-mono text-[11px] text-muted-foreground sm:text-xs">{hostname || "Live site"}</span>
         </div>
-        {url ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/15 hover:text-primary"
-            aria-label={`Open ${title} live site in a new tab`}
-          >
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        ) : null}
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/15 hover:text-primary"
+          aria-label={`Open ${title} live site in a new tab`}
+        >
+          <ExternalLink className="h-4 w-4" />
+        </a>
       </div>
 
       <div className={previewAreaClass}>
-        {url && showSkeleton ? (
+        {showSkeleton ? (
           <div
             className="absolute inset-0 z-[1] animate-pulse bg-gradient-to-br from-muted via-muted/80 to-muted"
             aria-hidden
           />
         ) : null}
 
-        {url && currentThumbSrc && !showIframeFallback ? (
+        {currentThumbSrc && !showIframeFallback ? (
           <a
             href={url}
             target="_blank"
@@ -143,7 +156,7 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
           </a>
         ) : null}
 
-        {url && showIframeFallback ? (
+        {showIframeFallback ? (
           <div className="relative z-[2] h-full min-h-[inherit] w-full">
             <iframe
               title={`Live preview of ${title}`}
@@ -163,15 +176,6 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
           </div>
         ) : null}
 
-        {!url ? (
-          <div className="absolute inset-0 z-[3] flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary/10 via-background to-accent/10 p-8 text-center">
-            <Globe className="h-14 w-14 text-muted-foreground/35" aria-hidden />
-            <p className="text-base font-medium text-foreground">No public live URL</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              This entry doesn&apos;t include a hosted link — details below still describe the build.
-            </p>
-          </div>
-        ) : null}
       </div>
     </div>
   );

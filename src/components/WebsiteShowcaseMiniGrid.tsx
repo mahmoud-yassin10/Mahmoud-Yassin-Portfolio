@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Globe } from "lucide-react";
 import type { Project } from "@/data/projects";
 import { clientProjects } from "@/data/projects";
+import { isLiveSiteUrl } from "@/components/ProjectLivePreview";
 import { cn } from "@/lib/utils";
 
 function previewImageUrl(siteUrl: string) {
@@ -49,9 +50,9 @@ function Tile({ project }: { project: Project }) {
 
 const SHOWCASE_COUNT = 6;
 
-/** Six recent client websites — thumbnails + links to `/projects/:slug`. */
+/** Recent client websites with a public http(s) URL — thumbnails + links to `/projects/:slug`. */
 export function WebsiteShowcaseMiniGrid() {
-  const items = clientProjects.slice(0, SHOWCASE_COUNT);
+  const items = clientProjects.filter((p) => isLiveSiteUrl(p.externalLink)).slice(0, SHOWCASE_COUNT);
 
   return (
     <div

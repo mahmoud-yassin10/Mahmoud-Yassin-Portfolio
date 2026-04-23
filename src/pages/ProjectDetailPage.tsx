@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { ProjectLivePreview } from "@/components/ProjectLivePreview";
+import { isLiveSiteUrl, ProjectLivePreview } from "@/components/ProjectLivePreview";
 import { getProjectBySlug } from "@/data/projects";
 import { getContactPageHrefWithSimilar, getServicesInquiryHrefWithSimilar } from "@/data/servicesOfferings";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,8 @@ const ProjectDetailPage = () => {
   const externalHref = project?.externalLink ?? project?.externalLinkPlaceholder ?? "#";
   const isExternal = /^https?:\/\//i.test(externalHref);
   const canOpenExternal = Boolean(externalHref && externalHref !== "#");
-  const liveUrl = project?.externalLink?.trim() || "";
+  const liveUrlCandidate = project?.externalLink?.trim() ?? "";
+  const liveUrl = isLiveSiteUrl(liveUrlCandidate) ? liveUrlCandidate : "";
 
   if (!project) {
     return (

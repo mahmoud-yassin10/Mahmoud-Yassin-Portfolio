@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Project } from "@/data/projects";
-import { ProjectLivePreview } from "@/components/ProjectLivePreview";
+import { isLiveSiteUrl, ProjectLivePreview } from "@/components/ProjectLivePreview";
 
 type ClientWorkTileProps = {
   project: Project;
@@ -12,7 +12,8 @@ type ClientWorkTileProps = {
 };
 
 export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
-  const liveUrl = project.externalLink?.trim();
+  const externalTrim = project.externalLink?.trim();
+  const liveUrl = isLiveSiteUrl(externalTrim) ? externalTrim : undefined;
   const internalTo = `/projects/${project.slug}`;
 
   const cardStyle = {
@@ -34,7 +35,7 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
         className="rounded-t-xl rounded-b-none border-x-0 border-t-0 border-b border-border shadow-none"
       />
 
-      <CardHeader className="flex-1">
+      <CardHeader className={liveUrl ? "flex-1" : "flex-1 rounded-t-xl"}>
         <div className="flex items-start justify-between gap-2 mb-2">
           <Badge variant="secondary">{project.type}</Badge>
           <span className="text-sm text-muted-foreground shrink-0">{project.period}</span>
