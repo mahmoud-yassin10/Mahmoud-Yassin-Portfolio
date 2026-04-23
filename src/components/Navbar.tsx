@@ -20,9 +20,19 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 20);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobileMenuOpen]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -38,12 +48,23 @@ const Navbar = () => {
     { name: "Contact", to: "/contact" },
   ];
 
+  const navSurfaceActive = isScrolled || isMobileMenuOpen;
+
   return (
     <>
+      {isMobileMenuOpen ? (
+        <div
+          role="presentation"
+          className="fixed inset-0 z-40 bg-background/70 backdrop-blur-[2px] transition-opacity duration-300 md:hidden motion-reduce:transition-none"
+          aria-hidden
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      ) : null}
+
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-background/80 backdrop-blur-lg shadow-lg border-b border-border"
+          navSurfaceActive
+            ? "bg-background/90 backdrop-blur-lg shadow-lg border-b border-border"
             : "bg-transparent"
         }`}
         aria-label="Primary"

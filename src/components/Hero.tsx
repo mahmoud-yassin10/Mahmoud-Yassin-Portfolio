@@ -40,57 +40,55 @@ const Hero = () => {
             </div>
 
             <div
-              className="flex w-full max-w-lg flex-col gap-3 pt-4 mx-auto lg:mx-0 lg:max-w-none"
+              className="grid w-full max-w-lg grid-cols-1 gap-3 pt-4 mx-auto lg:mx-0 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center lg:gap-x-4 lg:gap-y-3"
               role="group"
               aria-label="Primary links and social profiles"
             >
               <Button
                 size="lg"
-                className="group relative h-12 w-full min-h-[44px] touch-manipulation overflow-hidden bg-gradient-to-r from-primary to-accent text-base shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] sm:h-11 sm:w-auto sm:min-w-[11rem]"
+                className="group relative h-12 w-full min-h-[44px] justify-center touch-manipulation overflow-hidden bg-gradient-to-r from-primary to-accent text-base shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] lg:h-11 lg:min-h-[44px]"
                 asChild
               >
                 <a href={servicesPageHref}>View services</a>
               </Button>
 
-              <div className="flex flex-col items-stretch gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 lg:justify-start">
+              <Button
+                size="lg"
+                variant="outline"
+                className="group h-12 min-h-[44px] w-full justify-center touch-manipulation gap-2 rounded-xl border-2 border-primary px-4 transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-[0.98] lg:h-11 lg:min-h-0"
+                asChild
+              >
+                <a href={cvHref} target="_blank" rel="noreferrer">
+                  <Download className="h-5 w-5 shrink-0" aria-hidden />
+                  Download CV
+                </a>
+              </Button>
+
+              <div
+                className="flex shrink-0 items-center justify-center gap-2 justify-self-center rounded-2xl border border-primary/25 bg-card/50 p-1.5 backdrop-blur-sm lg:justify-self-end"
+                role="group"
+                aria-label="GitHub and LinkedIn"
+              >
                 <Button
-                  size="lg"
+                  size="icon"
                   variant="outline"
-                  className="group h-12 min-h-[44px] w-full touch-manipulation gap-2 rounded-xl border-2 border-primary px-4 transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-[0.98] sm:h-11 sm:min-h-0 sm:w-auto sm:flex-1 sm:min-w-[min(100%,220px)] sm:max-w-[260px]"
+                  className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 lg:h-10 lg:w-10"
                   asChild
                 >
-                  <a href={cvHref} target="_blank" rel="noreferrer">
-                    <Download className="h-5 w-5 shrink-0" aria-hidden />
-                    Download CV
+                  <a href={githubHref} target="_blank" rel="noreferrer" aria-label="Open GitHub profile">
+                    <Github className="h-5 w-5" aria-hidden />
                   </a>
                 </Button>
-
-                <div
-                  className="flex shrink-0 items-center justify-center gap-2 self-center rounded-2xl border border-primary/25 bg-card/50 p-1.5 backdrop-blur-sm sm:self-auto sm:justify-start"
-                  role="group"
-                  aria-label="GitHub and LinkedIn"
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 lg:h-10 lg:w-10"
+                  asChild
                 >
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 sm:h-10 sm:w-10"
-                    asChild
-                  >
-                    <a href={githubHref} target="_blank" rel="noreferrer" aria-label="Open GitHub profile">
-                      <Github className="h-5 w-5" aria-hidden />
-                    </a>
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 sm:h-10 sm:w-10"
-                    asChild
-                  >
-                    <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile">
-                      <Linkedin className="h-5 w-5" aria-hidden />
-                    </a>
-                  </Button>
-                </div>
+                  <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile">
+                    <Linkedin className="h-5 w-5" aria-hidden />
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
