@@ -22,6 +22,9 @@ import { getProjectBySlug } from "@/data/projects";
 type PrimaryNeed = "website" | "kashier" | "both" | "unsure" | "";
 
 type InquiryState = {
+  /** Industry / business category (5 presets + other) */
+  businessType: string;
+  businessTypeOther: string;
   primaryNeed: PrimaryNeed;
   /** Website branch */
   websiteSiteType: string;
@@ -47,6 +50,8 @@ type InquiryState = {
 };
 
 const initialState: InquiryState = {
+  businessType: "",
+  businessTypeOther: "",
   primaryNeed: "",
   websiteSiteType: "",
   websiteScope: "",
@@ -65,6 +70,15 @@ const initialState: InquiryState = {
   email: "",
   details: ""
 };
+
+const businessTypeOptions = [
+  { value: "retail-ecommerce", label: "Retail & e-commerce (shop, catalog, online sales)" },
+  { value: "food-hospitality", label: "Food, beverage, or hospitality" },
+  { value: "professional", label: "Professional services (consulting, agency, finance, legal)" },
+  { value: "education", label: "Education, training, or tutoring" },
+  { value: "health-wellness", label: "Health, beauty, or wellness" },
+  { value: "other", label: "Other — describe below" }
+];
 
 const primaryNeedOptions = [
   { value: "website", label: "Website only — marketing site, landing page, or web app" },
@@ -200,8 +214,18 @@ function buildMessageBody(
     paymentSummary: string;
   }
 ): string {
+  const businessLine =
+    data.businessType === "other"
+      ? `Other (describe): ${data.businessTypeOther.trim() || "(empty)"}`
+      : data.businessType
+        ? labelFor(businessTypeOptions, data.businessType)
+        : "(not selected)";
+
   const lines = [
     "--- Business inquiry (Services) ---",
+    "",
+    "Your business / industry:",
+    businessLine,
     "",
     "Primary focus:",
     resolved.primaryLabel,
@@ -259,6 +283,8 @@ type FirstError = { id: string; message: string };
 
 /** DOM order used to scroll to the first invalid field after a failed submit. */
 const VALIDATION_SCROLL_ORDER = [
+  "fieldset-business-type",
+  "business-type-other",
   "fieldset-need",
   "fieldset-web-type",
   "fieldset-web-scope",
@@ -283,9 +309,19 @@ function emailLooksValid(email: string) {
 function getValidationErrors(data: InquiryState, paymentRequiredFlag: boolean): Record<string, string> {
   const e: Record<string, string> = {};
 
+  if (!data.businessType) {
+    e["fieldset-business-type"] = "Select what best describes your business.";
+  }
+  if (data.businessType === "other") {
+    if (!data.businessTypeOther.trim()) {
+      e["business-type-other"] = "Briefly describe your type of business.";
+    } else if (data.businessTypeOther.trim().length < 2) {
+      e["business-type-other"] = "Add a bit more detail (at least 2 characters).";
+    }
+  }
+
   if (!data.primaryNeed) {
     e["fieldset-need"] = "Select what you are building.";
-    return e;
   }
 
   if (data.primaryNeed === "website") {
@@ -443,6 +479,8 @@ const BusinessInquiryForm = () => {
     setData((prev) => ({
       ...initialState,
       primaryNeed: v as PrimaryNeed,
+      businessType: prev.businessType,
+      businessTypeOther: prev.businessTypeOther,
       company: prev.company,
       phoneCountryCode: prev.phoneCountryCode,
       phoneNational: prev.phoneNational,
@@ -504,6 +542,15 @@ const BusinessInquiryForm = () => {
       const payload = new FormData();
       payload.append("access_key", accessKey);
       payload.append("subject", "[Services] Business inquiry");
+      payload.append(
+        "business_type",
+        data.businessType === "other"
+          ? `other: ${data.businessTypeOther.trim()}`
+          : labelFor(businessTypeOptions, data.businessType)
+      );
+      if (data.businessType === "other") {
+        payload.append("business_type_other", data.businessTypeOther.trim());
+      }
       payload.append("name", data.name.trim());
       payload.append("email", data.email.trim());
       payload.append("message", body);
@@ -592,6 +639,52 @@ const BusinessInquiryForm = () => {
             autoComplete="off"
           />
         </div>
+
+        <McqBlock
+          title="What best describes your business?"
+          required
+          name="business-type"
+          fieldsetId="fieldset-business-type"
+          value={data.businessType}
+          onChange={(v) =>
+            setData({
+              ...data,
+              businessType: v,
+              businessTypeOther: v === "other" ? data.businessTypeOther : ""
+            })
+          }
+          options={businessTypeOptions}
+          showError={Boolean(fieldErrors["fieldset-business-type"])}
+          errorMessage={fieldErrors["fieldset-business-type"]}
+        />
+
+        {data.businessType === "other" && (
+          <div
+            className={cn(
+              "space-y-2 rounded-xl border bg-card/30 p-4",
+              fieldErrors["business-type-other"] ? "border-destructive border-2" : "border-border"
+            )}
+          >
+            <Label htmlFor="business-type-other">
+              Describe your business <span className="text-destructive">*</span>
+            </Label>
+            {fieldErrors["business-type-other"] ? (
+              <p className="text-sm text-destructive" role="alert">
+                {fieldErrors["business-type-other"]}
+              </p>
+            ) : null}
+            <Input
+              id="business-type-other"
+              value={data.businessTypeOther}
+              onChange={(e) => setData({ ...data, businessTypeOther: e.target.value })}
+              placeholder="e.g. logistics, nonprofit, manufacturing, SaaS…"
+              className={cn(fieldErrors["business-type-other"] ? "border-destructive ring-2 ring-destructive/25" : "")}
+              aria-invalid={Boolean(fieldErrors["business-type-other"])}
+              aria-required
+              autoComplete="organization-title"
+            />
+          </div>
+        )}
 
         <McqBlock
           title="What are we building?"
