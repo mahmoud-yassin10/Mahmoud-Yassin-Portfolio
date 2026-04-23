@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Briefcase, HelpCircle, Send } from "lucide-react";
+import { Briefcase, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
 
@@ -30,9 +37,11 @@ type InquiryState = {
   timelineFlexibleNote: string;
   paymentMethods: string[];
   company: string;
+  phoneCountryCode: string;
+  phoneNational: string;
+  instagram: string;
   name: string;
   email: string;
-  phone: string;
   details: string;
 };
 
@@ -48,9 +57,11 @@ const initialState: InquiryState = {
   timelineFlexibleNote: "",
   paymentMethods: [],
   company: "",
+  phoneCountryCode: "+20",
+  phoneNational: "",
+  instagram: "",
   name: "",
   email: "",
-  phone: "",
   details: ""
 };
 
@@ -112,22 +123,57 @@ const timelineOptions = [
 ];
 
 const paymentOptionDefs = [
-  {
-    id: "cod",
-    label: "Cash on delivery (COD)",
-    hint: "Customer pays when the order arrives."
-  },
-  {
-    id: "instapay",
-    label: "InstaPay",
-    hint: "Bank transfer style payments you offer or plan to advertise at checkout."
-  },
-  {
-    id: "onsite",
-    label: "Payment on website / online checkout",
-    hint: "Card or Kashier-hosted payment page linked from your site."
-  }
+  { id: "cod", label: "Cash on delivery (COD)" },
+  { id: "instapay", label: "InstaPay" },
+  { id: "onsite", label: "Payment on website / online checkout" }
 ] as const;
+
+/** Dial codes for the phone field — value is stored without spaces (e.g. "+20"). */
+const PHONE_COUNTRY_CODES = [
+  { value: "+20", label: "Egypt +20" },
+  { value: "+1", label: "US / CA +1" },
+  { value: "+44", label: "UK +44" },
+  { value: "+971", label: "UAE +971" },
+  { value: "+966", label: "Saudi Arabia +966" },
+  { value: "+965", label: "Kuwait +965" },
+  { value: "+974", label: "Qatar +974" },
+  { value: "+973", label: "Bahrain +973" },
+  { value: "+968", label: "Oman +968" },
+  { value: "+962", label: "Jordan +962" },
+  { value: "+961", label: "Lebanon +961" },
+  { value: "+90", label: "Turkey +90" },
+  { value: "+33", label: "France +33" },
+  { value: "+49", label: "Germany +49" },
+  { value: "+39", label: "Italy +39" },
+  { value: "+34", label: "Spain +34" },
+  { value: "+31", label: "Netherlands +31" },
+  { value: "+32", label: "Belgium +32" },
+  { value: "+41", label: "Switzerland +41" },
+  { value: "+46", label: "Sweden +46" },
+  { value: "+45", label: "Denmark +45" },
+  { value: "+47", label: "Norway +47" },
+  { value: "+358", label: "Finland +358" },
+  { value: "+213", label: "Algeria +213" },
+  { value: "+216", label: "Tunisia +216" },
+  { value: "+212", label: "Morocco +212" },
+  { value: "+249", label: "Sudan +249" },
+  { value: "+254", label: "Kenya +254" },
+  { value: "+234", label: "Nigeria +234" },
+  { value: "+27", label: "South Africa +27" },
+  { value: "+91", label: "India +91" },
+  { value: "+92", label: "Pakistan +92" },
+  { value: "+86", label: "China +86" },
+  { value: "+81", label: "Japan +81" },
+  { value: "+82", label: "South Korea +82" },
+  { value: "+65", label: "Singapore +65" },
+  { value: "+60", label: "Malaysia +60" },
+  { value: "+61", label: "Australia +61" },
+  { value: "+64", label: "New Zealand +64" }
+] as const;
+
+function nationalPhoneDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
 
 function labelFor(options: { value: string; label: string }[], value: string) {
   return options.find((o) => o.value === value)?.label ?? value;
@@ -164,10 +210,11 @@ function buildMessageBody(
     resolved.paymentSummary,
     "",
     "--- Contact ---",
-    `Company / brand: ${data.company || "(not provided)"}`,
+    `Company / brand: ${data.company.trim()}`,
     `Name: ${data.name}`,
     `Email: ${data.email}`,
-    `Phone: ${data.phone || "(not provided)"}`,
+    `Phone: ${data.phoneCountryCode} ${data.phoneNational.trim()}`,
+    `Instagram: ${data.instagram.trim() || "(not provided)"}`,
     "",
     "Additional details:",
     data.details || "(none)"
@@ -211,6 +258,8 @@ const VALIDATION_SCROLL_ORDER = [
   "fieldset-timeline",
   "timeline-flex-note",
   "fieldset-payment",
+  "biz-company",
+  "biz-phone",
   "biz-name",
   "biz-email"
 ] as const;
@@ -250,6 +299,17 @@ function getValidationErrors(data: InquiryState, paymentRequiredFlag: boolean): 
 
   if (paymentRequiredFlag && data.paymentMethods.length === 0) {
     e["fieldset-payment"] = "Select at least one payment method.";
+  }
+
+  if (!data.company.trim()) {
+    e["biz-company"] = "Enter your company or brand name.";
+  }
+
+  const phoneDigits = nationalPhoneDigits(data.phoneNational);
+  if (!data.phoneNational.trim()) {
+    e["biz-phone"] = "Enter your phone number.";
+  } else if (phoneDigits.length < 6) {
+    e["biz-phone"] = "Enter a valid phone number (include area code if applicable).";
   }
 
   if (!data.name.trim()) e["biz-name"] = "Enter your name.";
@@ -353,7 +413,9 @@ const BusinessInquiryForm = () => {
       ...initialState,
       primaryNeed: v as PrimaryNeed,
       company: prev.company,
-      phone: prev.phone,
+      phoneCountryCode: prev.phoneCountryCode,
+      phoneNational: prev.phoneNational,
+      instagram: prev.instagram,
       name: prev.name,
       email: prev.email,
       details: prev.details
@@ -416,7 +478,9 @@ const BusinessInquiryForm = () => {
       payload.append("message", body);
       payload.append("botcheck", botField);
       payload.append("company", data.company.trim());
-      payload.append("phone", data.phone.trim());
+      payload.append("phone", `${data.phoneCountryCode} ${data.phoneNational.trim()}`);
+      payload.append("phone_country_code", data.phoneCountryCode);
+      payload.append("instagram", data.instagram.trim());
       payload.append("primary_need", primaryLabel);
       payload.append("project_stage", stageLabel);
       payload.append("timeline", timeLabel);
@@ -656,22 +720,13 @@ const BusinessInquiryForm = () => {
               fieldErrors["fieldset-payment"] ? "border-destructive border-2" : "border-border"
             )}
           >
-            <legend className="flex flex-wrap items-center gap-2 px-1 text-sm font-medium text-foreground">
-              <span>
-                Payment methods{" "}
-                {paymentRequired ? (
-                  <span className="text-destructive">*</span>
-                ) : (
-                  <span className="text-muted-foreground font-normal">(optional)</span>
-                )}
-              </span>
-              <span
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-xs font-normal text-muted-foreground"
-                title="Choose every option that applies today or that you want to enable for customers."
-              >
-                <HelpCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                Tap for guidance below
-              </span>
+            <legend className="px-1 text-sm font-medium text-foreground">
+              Payment methods{" "}
+              {paymentRequired ? (
+                <span className="text-destructive">*</span>
+              ) : (
+                <span className="text-muted-foreground font-normal">(optional)</span>
+              )}
             </legend>
             {fieldErrors["fieldset-payment"] ? (
               <p className="text-sm text-destructive" role="alert">
@@ -679,29 +734,21 @@ const BusinessInquiryForm = () => {
               </p>
             ) : null}
             <p className="text-sm text-muted-foreground leading-relaxed border-l-2 border-accent pl-3">
-              Select <strong className="text-foreground font-medium">every</strong> option that fits: how customers pay you{" "}
-              <strong className="text-foreground font-medium">today</strong>, or what you want to enable next. Check all that
-              apply — COD means cash when the order is delivered; InstaPay means the instant bank-transfer style paths you show
-              at checkout; payment on site means checkout on your website or through a Kashier payment link online.
+              Select <strong className="text-foreground font-medium">every</strong> option your customers use or that you want
+              to offer — check all that apply.
             </p>
             <div className="space-y-3">
               {paymentOptionDefs.map((p) => (
-                <div key={p.id} className="flex flex-col gap-1 rounded-lg bg-background/40 p-3 sm:flex-row sm:items-start sm:gap-4">
-                  <div className="flex items-start gap-3">
-                    <Checkbox
-                      id={`pay-${p.id}`}
-                      checked={data.paymentMethods.includes(p.id)}
-                      onCheckedChange={(c) => togglePayment(p.id, c === true)}
-                      aria-describedby={`hint-${p.id}`}
-                      className="mt-1"
-                    />
-                    <Label htmlFor={`pay-${p.id}`} className="font-medium cursor-pointer leading-snug">
-                      {p.label}
-                    </Label>
-                  </div>
-                  <p id={`hint-${p.id}`} className="text-xs text-muted-foreground sm:flex-1 sm:text-right sm:pt-0.5">
-                    {p.hint}
-                  </p>
+                <div key={p.id} className="flex items-start gap-3 rounded-lg bg-background/40 p-3">
+                  <Checkbox
+                    id={`pay-${p.id}`}
+                    checked={data.paymentMethods.includes(p.id)}
+                    onCheckedChange={(c) => togglePayment(p.id, c === true)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor={`pay-${p.id}`} className="font-medium cursor-pointer leading-snug">
+                    {p.label}
+                  </Label>
                 </div>
               ))}
             </div>
@@ -710,26 +757,90 @@ const BusinessInquiryForm = () => {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="biz-company">Company / brand (optional)</Label>
+            <Label htmlFor="biz-company">
+              Company / brand <span className="text-destructive">*</span>
+            </Label>
+            {fieldErrors["biz-company"] ? (
+              <p className="text-sm text-destructive mt-1" role="alert">
+                {fieldErrors["biz-company"]}
+              </p>
+            ) : null}
             <Input
               id="biz-company"
+              autoComplete="organization"
               value={data.company}
               onChange={(e) => setData({ ...data, company: e.target.value })}
               placeholder="Business name"
-              className="mt-1.5"
+              className={cn(
+                "mt-1.5",
+                fieldErrors["biz-company"] ? "border-destructive ring-2 ring-destructive/25" : ""
+              )}
+              aria-invalid={Boolean(fieldErrors["biz-company"])}
+              aria-required
             />
           </div>
-          <div>
-            <Label htmlFor="biz-phone">Phone (optional)</Label>
-            <Input
-              id="biz-phone"
-              type="tel"
-              value={data.phone}
-              onChange={(e) => setData({ ...data, phone: e.target.value })}
-              placeholder="+20 ..."
-              className="mt-1.5"
-            />
+          <div id="biz-phone">
+            <Label htmlFor="biz-phone-national">
+              Phone <span className="text-destructive">*</span>
+            </Label>
+            {fieldErrors["biz-phone"] ? (
+              <p className="text-sm text-destructive mt-1" role="alert">
+                {fieldErrors["biz-phone"]}
+              </p>
+            ) : null}
+            <div className="mt-1.5 flex gap-2">
+              <Select
+                value={data.phoneCountryCode}
+                onValueChange={(v) => setData({ ...data, phoneCountryCode: v })}
+              >
+                <SelectTrigger
+                  id="biz-phone-cc"
+                  className={cn(
+                    "w-[min(100%,11rem)] shrink-0",
+                    fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
+                  )}
+                  aria-invalid={Boolean(fieldErrors["biz-phone"])}
+                  aria-label="Country calling code"
+                >
+                  <SelectValue placeholder="Code" />
+                </SelectTrigger>
+                <SelectContent position="popper" className="max-h-[min(280px,50vh)]">
+                  {PHONE_COUNTRY_CODES.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                id="biz-phone-national"
+                type="tel"
+                autoComplete="tel-national"
+                inputMode="tel"
+                value={data.phoneNational}
+                onChange={(e) => setData({ ...data, phoneNational: e.target.value })}
+                placeholder="Number"
+                className={cn(
+                  "min-w-0 flex-1",
+                  fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
+                )}
+                aria-invalid={Boolean(fieldErrors["biz-phone"])}
+                aria-required
+              />
+            </div>
           </div>
+        </div>
+
+        <div>
+          <Label htmlFor="biz-instagram">Instagram handle (optional)</Label>
+          <Input
+            id="biz-instagram"
+            autoComplete="username"
+            value={data.instagram}
+            onChange={(e) => setData({ ...data, instagram: e.target.value })}
+            placeholder="@yourbrand or username"
+            className="mt-1.5"
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

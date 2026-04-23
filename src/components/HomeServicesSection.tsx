@@ -8,6 +8,7 @@ import {
   secondaryServiceOfferings,
   websiteOffering
 } from "@/data/servicesOfferings";
+import { WebsiteShowcaseMiniGrid } from "@/components/WebsiteShowcaseMiniGrid";
 import { cn } from "@/lib/utils";
 
 const secondaryIcons = [CreditCard, Link2, ClipboardList] as const;
@@ -81,18 +82,26 @@ const HomeServicesSection = () => {
                 </div>
                 <div
                   className={cn(
-                    "relative min-h-[220px] rounded-2xl border border-border/60 bg-gradient-to-br from-muted/40 via-primary/5 to-accent/10",
-                    "flex flex-col justify-end p-6 md:p-8"
+                    "relative min-h-[280px] rounded-2xl border border-border/60 bg-gradient-to-br from-muted/40 via-primary/5 to-accent/10",
+                    "flex flex-col p-6 md:p-8"
                   )}
                 >
-                  <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-                  <p className="relative text-sm font-medium text-foreground">
-                    Landing pages, brand sites, light web apps — shipped with performance, accessibility, and launch hygiene
-                    in mind.
-                  </p>
-                  <p className="relative mt-3 text-xs text-muted-foreground">
-                    Prefer Kashier-first or a hybrid? Use the tiles below.
-                  </p>
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
+                  <div className="relative z-[1] flex flex-1 flex-col gap-5">
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recent web work</p>
+                      <WebsiteShowcaseMiniGrid />
+                    </div>
+                    <div className="border-t border-border/40 pt-4 mt-auto">
+                      <p className="text-sm font-medium text-foreground leading-snug">
+                        Landing pages, brand sites, light web apps — shipped with performance, accessibility, and launch
+                        hygiene in mind.
+                      </p>
+                      <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+                        Prefer Kashier-first or a hybrid? Use the tiles below.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
