@@ -29,6 +29,11 @@ type ProjectLivePreviewProps = {
   /** Larger frame for project detail vs work cards */
   variant?: "card" | "detail";
   className?: string;
+  /**
+   * Wait this many ms before revealing the iframe so splash/intro animations can finish.
+   * Skips thumbnail services (they often capture only the splash).
+   */
+  livePreviewRevealDelayMs?: number;
 };
 
 /** Only http(s) URLs get a live preview — skip placeholder / missing links entirely. */
@@ -41,17 +46,31 @@ export function isLiveSiteUrl(url: string | undefined | null): boolean {
  * Browser-style live preview: mshots thumbnail with iframe fallback (same strategy as client work tiles).
  * Renders nothing when there is no public http(s) URL (no empty “no live site” chrome).
  */
-export function ProjectLivePreview({ liveUrl, title, variant = "card", className }: ProjectLivePreviewProps) {
+export function ProjectLivePreview({
+  liveUrl,
+  title,
+  variant = "card",
+  className,
+  livePreviewRevealDelayMs
+}: ProjectLivePreviewProps) {
   const url = useMemo(() => {
     const raw = liveUrl?.trim() ?? "";
     return /^https?:\/\//i.test(raw) ? raw : "";
   }, [liveUrl]);
 
-  const candidates = useMemo(() => (url ? buildScreenshotCandidates(url) : []), [url]);
+  const useDelayedIframe = Boolean(
+    url && livePreviewRevealDelayMs != null && livePreviewRevealDelayMs > 0
+  );
+
+  const candidates = useMemo(() => {
+    if (!url || useDelayedIframe) return [];
+    return buildScreenshotCandidates(url);
+  }, [url, useDelayedIframe]);
 
   const [thumbAttempt, setThumbAttempt] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [splashDelayElapsed, setSplashDelayElapsed] = useState(() => !useDelayedIframe);
 
   useEffect(() => {
     setThumbAttempt(0);
@@ -59,7 +78,20 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
     setIframeLoaded(false);
   }, [url]);
 
-  const showIframeFallback = Boolean(url && candidates.length > 0 && thumbAttempt >= candidates.length);
+  useEffect(() => {
+    if (!useDelayedIframe) {
+      setSplashDelayElapsed(true);
+      return;
+    }
+    setSplashDelayElapsed(false);
+    const ms = livePreviewRevealDelayMs ?? 0;
+    const id = window.setTimeout(() => setSplashDelayElapsed(true), ms);
+    return () => window.clearTimeout(id);
+  }, [useDelayedIframe, livePreviewRevealDelayMs, url]);
+
+  const showIframeFallback = Boolean(
+    url && (useDelayedIframe || (candidates.length > 0 && thumbAttempt >= candidates.length))
+  );
   const currentThumbSrc = url && !showIframeFallback ? candidates[thumbAttempt] : undefined;
 
   const advanceThumbnail = () => {
@@ -82,7 +114,10 @@ export function ProjectLivePreview({ liveUrl, title, variant = "card", className
   const hostname = safeHostname(url);
 
   const showSkeleton = Boolean(
-    url && ((!showIframeFallback && !imgLoaded && thumbAttempt < candidates.length) || (showIframeFallback && !iframeLoaded))
+    url &&
+      (showIframeFallback
+        ? !splashDelayElapsed || !iframeLoaded
+        : !imgLoaded && thumbAttempt < candidates.length)
   );
 
   if (!url) {

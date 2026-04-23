@@ -18,6 +18,11 @@ export type Project = {
   highlights: string[];
   externalLinkPlaceholder: string;
   externalLink?: string;
+  /**
+   * If set, skip screenshot APIs and reveal the live iframe after this many ms so splash screens
+   * can finish before the preview is shown (e.g. Flousy marketing site).
+   */
+  livePreviewRevealDelayMs?: number;
 };
 
 export type ProjectTileData = Pick<Project, "title" | "description" | "tech" | "period" | "link" | "type"> & {
@@ -109,7 +114,8 @@ const projectSeeds: ProjectSeed[] = [
       "Mobile-first Flutter UI optimized for everyday use"
     ],
     externalLinkPlaceholder: "#",
-    externalLink: "https://flousy.mahmoud-yassin.com"
+    externalLink: "https://flousy.mahmoud-yassin.com",
+    livePreviewRevealDelayMs: 3000
   },
   {
     title: "AI VAR for Squash",

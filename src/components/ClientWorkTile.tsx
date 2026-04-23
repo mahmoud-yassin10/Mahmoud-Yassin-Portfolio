@@ -33,6 +33,7 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
         title={project.title}
         variant="card"
         className="rounded-t-xl rounded-b-none border-x-0 border-t-0 border-b border-border shadow-none"
+        livePreviewRevealDelayMs={project.livePreviewRevealDelayMs}
       />
 
       <CardHeader className={liveUrl ? "flex-1" : "flex-1 rounded-t-xl"}>

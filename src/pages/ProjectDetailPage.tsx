@@ -75,7 +75,12 @@ const ProjectDetailPage = () => {
                 </p>
               </div>
 
-              <ProjectLivePreview liveUrl={liveUrl || undefined} title={project.title} variant="detail" />
+              <ProjectLivePreview
+                liveUrl={liveUrl || undefined}
+                title={project.title}
+                variant="detail"
+                livePreviewRevealDelayMs={project.livePreviewRevealDelayMs}
+              />
 
               <div className="relative overflow-hidden rounded-2xl border border-primary/35 bg-gradient-to-br from-primary/[0.12] via-card to-accent/[0.08] p-6 shadow-xl shadow-primary/10 md:p-8">
                 <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/20 blur-3xl" aria-hidden />
