@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ExternalLink, Code2, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
-/** Remote screenshot used for a Vercel-style static preview (iframes are often blocked by sites). */
-function screenshotPreviewUrl(siteUrl: string, width = 720, crop = 960) {
-  return `https://image.thum.io/get/width/${width}/crop/${crop}/noanimate/${encodeURIComponent(siteUrl)}`;
+/** Multiple thumbnail APIs — free tiers can be flaky; we cycle on failure (see handlers below). */
+function buildScreenshotCandidates(siteUrl: string): string[] {
+  const encoded = encodeURIComponent(siteUrl);
+  return [
+    `https://s0.wp.com/mshots/v1/${encoded}?w=900`,
+    `https://image.thum.io/get/width/720/crop/960/noanimate/${encoded}`
+  ];
 }
 
 function safeHostname(url: string) {
@@ -20,6 +24,11 @@ function safeHostname(url: string) {
   }
 }
 
+/** Some CDNs return HTTP 200 with a 1×1 or tiny placeholder — treat as failure. */
+function isLikelyBadThumbnail(img: HTMLImageElement) {
+  return img.naturalWidth < 48 || img.naturalHeight < 48;
+}
+
 type ClientWorkTileProps = {
   project: Project;
   index: number;
@@ -28,8 +37,39 @@ type ClientWorkTileProps = {
 export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
   const liveUrl = project.externalLink?.trim();
   const internalTo = `/projects/${project.slug}`;
-  const [previewFailed, setPreviewFailed] = useState(false);
-  const [previewLoaded, setPreviewLoaded] = useState(false);
+
+  const candidates = useMemo(() => (liveUrl ? buildScreenshotCandidates(liveUrl) : []), [liveUrl]);
+
+  /** Index into `candidates`; once >= length, we show live iframe fallback. */
+  const [thumbAttempt, setThumbAttempt] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  useEffect(() => {
+    setThumbAttempt(0);
+    setImgLoaded(false);
+    setIframeLoaded(false);
+  }, [liveUrl]);
+
+  const showIframeFallback = Boolean(liveUrl && candidates.length > 0 && thumbAttempt >= candidates.length);
+  const currentThumbSrc = liveUrl && !showIframeFallback ? candidates[thumbAttempt] : undefined;
+
+  const advanceThumbnail = () => {
+    setImgLoaded(false);
+    setThumbAttempt((n) => n + 1);
+  };
+
+  const handleImgLoad: React.ReactEventHandler<HTMLImageElement> = (e) => {
+    if (isLikelyBadThumbnail(e.currentTarget)) {
+      advanceThumbnail();
+      return;
+    }
+    setImgLoaded(true);
+  };
+
+  const handleImgError = () => {
+    advanceThumbnail();
+  };
 
   const cardStyle = {
     animationDelay: `${index * 0.1}s`,
@@ -39,6 +79,12 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
   };
 
   const hostname = liveUrl ? safeHostname(liveUrl) : "";
+
+  const showSkeleton = Boolean(
+    liveUrl &&
+      ((!showIframeFallback && !imgLoaded && thumbAttempt < candidates.length) ||
+        (showIframeFallback && !iframeLoaded))
+  );
 
   return (
     <Card
@@ -72,59 +118,68 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
         </div>
 
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/30">
-          {liveUrl && !previewFailed ? (
-            <>
-              {!previewLoaded ? (
-                <div
-                  className="absolute inset-0 animate-pulse bg-gradient-to-br from-muted via-muted/80 to-muted"
-                  aria-hidden
-                />
-              ) : null}
+          {/* Loading pulse until image or iframe paints */}
+          {liveUrl && (showSkeleton || (showIframeFallback && !iframeLoaded)) ? (
+            <div
+              className="absolute inset-0 z-[1] animate-pulse bg-gradient-to-br from-muted via-muted/80 to-muted"
+              aria-hidden
+            />
+          ) : null}
+
+          {liveUrl && currentThumbSrc && !showIframeFallback ? (
+            <a
+              href={liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-[2] block h-full w-full outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            >
+              <img
+                key={`${currentThumbSrc}-${thumbAttempt}`}
+                src={currentThumbSrc}
+                alt={`Homepage preview of ${project.title}`}
+                className={cn(
+                  "h-full w-full object-cover object-top transition duration-500 ease-out",
+                  imgLoaded ? "opacity-100" : "opacity-0",
+                  "group-hover:brightness-[1.03]"
+                )}
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onLoad={handleImgLoad}
+                onError={handleImgError}
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </a>
+          ) : null}
+
+          {liveUrl && showIframeFallback ? (
+            <div className="relative z-[2] h-full w-full">
+              {/* Live embed (zoomed out). Some hosts send empty frames — full-area link always opens the real URL. */}
+              <iframe
+                title={`Live preview of ${project.title}`}
+                src={liveUrl}
+                className="pointer-events-none absolute left-0 top-0 h-[200%] w-[200%] origin-top-left scale-50 border-0 bg-white"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onLoad={() => setIframeLoaded(true)}
+              />
               <a
                 href={liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative block h-full w-full outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-              >
-                <img
-                  src={screenshotPreviewUrl(liveUrl)}
-                  alt={`Homepage preview of ${project.title}`}
-                  className={cn(
-                    "h-full w-full object-cover object-top transition duration-500 ease-out",
-                    previewLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]",
-                    "group-hover:brightness-[1.03]"
-                  )}
-                  loading="lazy"
-                  decoding="async"
-                  onLoad={() => setPreviewLoaded(true)}
-                  onError={() => {
-                    setPreviewFailed(true);
-                    setPreviewLoaded(false);
-                  }}
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              </a>
-            </>
+                className="absolute inset-0 z-10 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                aria-label={`Open ${project.title} live site in a new tab`}
+              />
+            </div>
           ) : null}
 
-          {(!liveUrl || previewFailed) && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6 text-center">
+          {!liveUrl ? (
+            <div className="absolute inset-0 z-[3] flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary/10 via-background to-accent/10 p-6 text-center">
               <Globe className="h-12 w-12 text-muted-foreground/40" aria-hidden />
-              <p className="text-sm font-medium text-foreground">Live preview unavailable</p>
-              <p className="max-w-xs text-xs text-muted-foreground">
-                {previewFailed
-                  ? "Thumbnail could not be generated. Open the site or case study below."
-                  : "No public URL on file for this entry."}
-              </p>
-              {liveUrl ? (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={liveUrl} target="_blank" rel="noopener noreferrer">
-                    Open live site
-                  </a>
-                </Button>
-              ) : null}
+              <p className="text-sm font-medium text-foreground">No live URL</p>
+              <p className="max-w-xs text-xs text-muted-foreground">No public URL on file for this entry.</p>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 

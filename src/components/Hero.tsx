@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 const Hero = () => {
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-  const servicesHref = `${base}/services`;
+  const homeServicesHref = base ? `${base}/#services` : "/#services";
   const cvHref = `${base}/CV.pdf`;
   const githubHref = "https://github.com/mahmoud-yassin10";
   const linkedinHref = "https://linkedin.com/in/mahmoud--yassin";
@@ -44,7 +44,7 @@ const Hero = () => {
                 className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                 asChild
               >
-                <a href={servicesHref}>
+                <a href={homeServicesHref}>
                   View services
                 </a>
               </Button>

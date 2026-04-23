@@ -8,11 +8,11 @@ const Footer = () => {
   const instagramUser = storeInstagram?.replace(/^@/, "") ?? "";
 
   const footerLinks = [
-    { name: "Services", to: "/services" },
+    { name: "Services", to: { pathname: "/", hash: "#services" } },
     { name: "Work", to: "/work" },
     { name: "Portfolio", to: "/portfolio" },
     { name: "Contact", to: "/contact" }
-  ];
+  ] as const;
 
   return (
     <footer className="bg-card/50 backdrop-blur-sm border-t border-border py-8">
@@ -28,7 +28,7 @@ const Footer = () => {
           <div className="flex flex-wrap items-center justify-center gap-6">
             {footerLinks.map((link) => (
               <Link
-                key={link.to}
+                key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                 to={link.to}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium"
               >

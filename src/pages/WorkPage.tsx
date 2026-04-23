@@ -46,8 +46,8 @@ const WorkPage = () => {
 
             {isClientTab ? (
               <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                Each card includes a homepage snapshot (similar to a hosting preview). Click the image or &quot;Live
-                site&quot; to open the real URL; open &quot;View case study&quot; for the full write-up.
+                Previews try a screenshot first, then a live mini embed if needed (some hosts block thumbnails). Click the
+                preview or &quot;Live site&quot; to open the real URL; use &quot;View case study&quot; for details.
               </p>
             ) : null}
 

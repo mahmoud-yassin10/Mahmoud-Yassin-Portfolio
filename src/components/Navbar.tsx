@@ -3,6 +3,11 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
+const servicesHomeLink = {
+  pathname: "/" as const,
+  hash: "#services" as const
+};
+
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,7 +37,7 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Services", to: "/services" },
+    { name: "Services", to: servicesHomeLink },
     { name: "Work", to: "/work" },
     { name: "Portfolio", to: "/portfolio" },
     { name: "Contact", to: "/contact" },
@@ -61,10 +66,12 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
-                  key={link.to}
+                  key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                   to={link.to}
                   className="text-foreground hover:text-primary transition-colors font-medium"
-                  aria-label={`Go to ${link.name} section`}
+                  aria-label={
+                    link.name === "Services" ? "Go to Services section on the home page" : `Go to ${link.name}`
+                  }
                 >
                   {link.name}
                 </Link>
@@ -110,10 +117,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link
-                    key={link.to}
+                    key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                     to={link.to}
                     className="text-left text-foreground hover:text-primary transition-colors font-medium py-2"
-                    aria-label={`Go to ${link.name} section`}
+                    aria-label={
+                      link.name === "Services" ? "Go to Services section on the home page" : `Go to ${link.name}`
+                    }
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.name}

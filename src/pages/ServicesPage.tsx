@@ -5,48 +5,11 @@ import Navbar from "@/components/Navbar";
 import { ProjectTile } from "@/components/Projects";
 import { Badge } from "@/components/ui/badge";
 import { type ProjectTileData } from "@/data/projects";
+import { getServicesInquiryHref, servicesPageOfferings } from "@/data/servicesOfferings";
 import { cn } from "@/lib/utils";
 
-type ServiceItem = {
-  title: string;
-  description: string;
-  bullets: string[];
-  ctaLabel: string;
-  ctaHref: string;
-};
-
 const ServicesPage = () => {
-  const rawBase = import.meta.env.BASE_URL || "/";
-  const basePath = rawBase.replace(/\/+$/, "");
-  const servicesInquiryHref =
-    basePath === "" ? "/services#business-inquiry" : `${basePath}/services#business-inquiry`;
-  /** Website development is intentionally first (primary tile). Order is fixed for layout emphasis. */
-  const services: ServiceItem[] = [
-    {
-      title: "Website development",
-      description:
-        "Marketing sites, landing pages, and lightweight web apps — fast, responsive, and ready for search and analytics. Ideal when your priority is a credible online presence and clear customer journeys.",
-      bullets: ["Design-to-code implementation", "Performance & SEO fundamentals", "Analytics-ready structure", "Hosting guidance & handoff"],
-      ctaLabel: "Request this",
-      ctaHref: servicesInquiryHref
-    },
-    {
-      title: "Kashier systems",
-      description:
-        "Payments and operations with Kashier — terminals, payment links, catalog alignment, and practical workflows so your team can sell online and in-store with confidence.",
-      bullets: ["POS & payment links setup", "Products / pricing alignment", "Staff-friendly flows", "Reporting & reconciliation basics"],
-      ctaLabel: "Request this",
-      ctaHref: servicesInquiryHref
-    },
-    {
-      title: "Website + Kashier together",
-      description:
-        "When your brand needs both: a polished site that reflects your offers and a Kashier-backed payment story — from consultation through integration planning so web and checkout stay consistent.",
-      bullets: ["Unified customer journey", "Site + catalog / pricing consistency", "Online pay + in-store flows", "Integration planning & rollout support"],
-      ctaLabel: "Request this",
-      ctaHref: servicesInquiryHref
-    }
-  ];
+  const servicesInquiryHref = getServicesInquiryHref();
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -69,13 +32,13 @@ const ServicesPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
-              {services.map((service, index) => {
+              {servicesPageOfferings.map((service, index) => {
                 const project: ProjectTileData = {
                   title: service.title,
                   description: service.description,
                   tech: service.bullets,
                   period: "Available",
-                  link: service.ctaHref,
+                  link: servicesInquiryHref,
                   type: "Service"
                 };
 
@@ -83,7 +46,7 @@ const ServicesPage = () => {
 
                 return (
                   <div
-                    key={service.title}
+                    key={service.id}
                     className={cn(
                       "relative flex flex-col min-h-0",
                       isWebsiteFirst &&
@@ -102,7 +65,7 @@ const ServicesPage = () => {
                       <ProjectTile
                         project={project}
                         index={index}
-                        buttonLabel={service.ctaLabel}
+                        buttonLabel="Request this"
                         linkRel={undefined}
                         linkTarget="_self"
                         alignButton

@@ -784,7 +784,7 @@ const BusinessInquiryForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="biz-details">Anything else we should know? (optional)</Label>
+          <Label htmlFor="biz-details">Anything else I should know? (optional)</Label>
           <Textarea
             id="biz-details"
             value={data.details}
