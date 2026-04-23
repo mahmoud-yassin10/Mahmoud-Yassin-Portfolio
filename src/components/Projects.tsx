@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { projects, type ProjectTileData } from "@/data/projects";
+import { technicalProjects, type ProjectTileData } from "@/data/projects";
 
 type ProjectTileProps = {
   project: ProjectTileData;
@@ -110,7 +110,7 @@ type ProjectsProps = {
 
 const Projects = ({ limit, ctaHref, ctaLabel = "View all projects" }: ProjectsProps) => {
   const visibleProjects =
-    typeof limit === "number" ? projects.slice(0, limit) : projects;
+    typeof limit === "number" ? technicalProjects.slice(0, limit) : technicalProjects;
   return (
     <section id="projects" className="py-20 relative">
       <div className="container mx-auto px-4">
