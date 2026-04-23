@@ -39,47 +39,59 @@ const Hero = () => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-start items-center pt-4">
+            <div
+              className="flex w-full max-w-lg flex-col gap-3 pt-4 mx-auto lg:mx-0 lg:max-w-none"
+              role="group"
+              aria-label="Primary links and social profiles"
+            >
               <Button
                 size="lg"
-                className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="group relative h-12 w-full min-h-[44px] touch-manipulation overflow-hidden bg-gradient-to-r from-primary to-accent text-base shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] sm:h-11 sm:w-auto sm:min-w-[11rem]"
                 asChild
               >
-                <a href={servicesPageHref}>
-                  View services
-                </a>
+                <a href={servicesPageHref}>View services</a>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 gap-1 px-4"
-                asChild
-              >
-                <a href={cvHref} target="_blank" rel="noreferrer">
-                  <Download className="h-5 w-5" />
-                  CV
-                </a>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 px-3"
-                asChild
-              >
-                <a href={githubHref} target="_blank" rel="noreferrer" aria-label="GitHub">
-                  <Github className="h-5 w-5" />
-                </a>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 px-3"
-                asChild
-              >
-                <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              </Button>
+
+              <div className="flex flex-col items-stretch gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 lg:justify-start">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="group h-12 min-h-[44px] w-full touch-manipulation gap-2 rounded-xl border-2 border-primary px-4 transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-[0.98] sm:h-11 sm:min-h-0 sm:w-auto sm:flex-1 sm:min-w-[min(100%,220px)] sm:max-w-[260px]"
+                  asChild
+                >
+                  <a href={cvHref} target="_blank" rel="noreferrer">
+                    <Download className="h-5 w-5 shrink-0" aria-hidden />
+                    Download CV
+                  </a>
+                </Button>
+
+                <div
+                  className="flex shrink-0 items-center justify-center gap-2 self-center rounded-2xl border border-primary/25 bg-card/50 p-1.5 backdrop-blur-sm sm:self-auto sm:justify-start"
+                  role="group"
+                  aria-label="GitHub and LinkedIn"
+                >
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 sm:h-10 sm:w-10"
+                    asChild
+                  >
+                    <a href={githubHref} target="_blank" rel="noreferrer" aria-label="Open GitHub profile">
+                      <Github className="h-5 w-5" aria-hidden />
+                    </a>
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 sm:h-10 sm:w-10"
+                    asChild
+                  >
+                    <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile">
+                      <Linkedin className="h-5 w-5" aria-hidden />
+                    </a>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
