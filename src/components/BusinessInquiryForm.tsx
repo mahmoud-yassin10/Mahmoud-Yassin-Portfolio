@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Briefcase, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
+import { getProjectBySlug } from "@/data/projects";
 
 type PrimaryNeed = "website" | "kashier" | "both" | "unsure" | "";
 
@@ -128,48 +129,58 @@ const paymentOptionDefs = [
   { id: "onsite", label: "Payment on website / online checkout" }
 ] as const;
 
-/** Dial codes for the phone field — value is stored without spaces (e.g. "+20"). */
-const PHONE_COUNTRY_CODES = [
-  { value: "+20", label: "Egypt +20" },
-  { value: "+1", label: "US / CA +1" },
-  { value: "+44", label: "UK +44" },
-  { value: "+971", label: "UAE +971" },
-  { value: "+966", label: "Saudi Arabia +966" },
-  { value: "+965", label: "Kuwait +965" },
-  { value: "+974", label: "Qatar +974" },
-  { value: "+973", label: "Bahrain +973" },
-  { value: "+968", label: "Oman +968" },
-  { value: "+962", label: "Jordan +962" },
-  { value: "+961", label: "Lebanon +961" },
-  { value: "+90", label: "Turkey +90" },
-  { value: "+33", label: "France +33" },
-  { value: "+49", label: "Germany +49" },
-  { value: "+39", label: "Italy +39" },
-  { value: "+34", label: "Spain +34" },
-  { value: "+31", label: "Netherlands +31" },
-  { value: "+32", label: "Belgium +32" },
-  { value: "+41", label: "Switzerland +41" },
-  { value: "+46", label: "Sweden +46" },
-  { value: "+45", label: "Denmark +45" },
-  { value: "+47", label: "Norway +47" },
-  { value: "+358", label: "Finland +358" },
-  { value: "+213", label: "Algeria +213" },
-  { value: "+216", label: "Tunisia +216" },
-  { value: "+212", label: "Morocco +212" },
-  { value: "+249", label: "Sudan +249" },
-  { value: "+254", label: "Kenya +254" },
-  { value: "+234", label: "Nigeria +234" },
-  { value: "+27", label: "South Africa +27" },
-  { value: "+91", label: "India +91" },
-  { value: "+92", label: "Pakistan +92" },
-  { value: "+86", label: "China +86" },
-  { value: "+81", label: "Japan +81" },
-  { value: "+82", label: "South Korea +82" },
-  { value: "+65", label: "Singapore +65" },
-  { value: "+60", label: "Malaysia +60" },
-  { value: "+61", label: "Australia +61" },
-  { value: "+64", label: "New Zealand +64" }
-] as const;
+type PhoneCountryOption = { value: string; label: string; iso: string };
+
+/** ISO 3166-1 alpha-2 → Unicode regional-indicator flag emoji. */
+function isoToFlagEmoji(iso: string): string {
+  const upper = iso.toUpperCase();
+  if (!/^[A-Z]{2}$/.test(upper)) return "";
+  const base = 0x1f1e6 - 65; // Regional Indicator Symbol Letter A
+  return String.fromCodePoint(base + upper.charCodeAt(0)) + String.fromCodePoint(base + upper.charCodeAt(1));
+}
+
+/** Dial codes for the phone field — value is stored without spaces (e.g. "+20"); `iso` picks the flag. */
+const PHONE_COUNTRY_CODES: PhoneCountryOption[] = [
+  { value: "+20", label: "Egypt +20", iso: "EG" },
+  { value: "+1", label: "US / CA +1", iso: "US" },
+  { value: "+44", label: "UK +44", iso: "GB" },
+  { value: "+971", label: "UAE +971", iso: "AE" },
+  { value: "+966", label: "Saudi Arabia +966", iso: "SA" },
+  { value: "+965", label: "Kuwait +965", iso: "KW" },
+  { value: "+974", label: "Qatar +974", iso: "QA" },
+  { value: "+973", label: "Bahrain +973", iso: "BH" },
+  { value: "+968", label: "Oman +968", iso: "OM" },
+  { value: "+962", label: "Jordan +962", iso: "JO" },
+  { value: "+961", label: "Lebanon +961", iso: "LB" },
+  { value: "+90", label: "Turkey +90", iso: "TR" },
+  { value: "+33", label: "France +33", iso: "FR" },
+  { value: "+49", label: "Germany +49", iso: "DE" },
+  { value: "+39", label: "Italy +39", iso: "IT" },
+  { value: "+34", label: "Spain +34", iso: "ES" },
+  { value: "+31", label: "Netherlands +31", iso: "NL" },
+  { value: "+32", label: "Belgium +32", iso: "BE" },
+  { value: "+41", label: "Switzerland +41", iso: "CH" },
+  { value: "+46", label: "Sweden +46", iso: "SE" },
+  { value: "+45", label: "Denmark +45", iso: "DK" },
+  { value: "+47", label: "Norway +47", iso: "NO" },
+  { value: "+358", label: "Finland +358", iso: "FI" },
+  { value: "+213", label: "Algeria +213", iso: "DZ" },
+  { value: "+216", label: "Tunisia +216", iso: "TN" },
+  { value: "+212", label: "Morocco +212", iso: "MA" },
+  { value: "+249", label: "Sudan +249", iso: "SD" },
+  { value: "+254", label: "Kenya +254", iso: "KE" },
+  { value: "+234", label: "Nigeria +234", iso: "NG" },
+  { value: "+27", label: "South Africa +27", iso: "ZA" },
+  { value: "+91", label: "India +91", iso: "IN" },
+  { value: "+92", label: "Pakistan +92", iso: "PK" },
+  { value: "+86", label: "China +86", iso: "CN" },
+  { value: "+81", label: "Japan +81", iso: "JP" },
+  { value: "+82", label: "South Korea +82", iso: "KR" },
+  { value: "+65", label: "Singapore +65", iso: "SG" },
+  { value: "+60", label: "Malaysia +60", iso: "MY" },
+  { value: "+61", label: "Australia +61", iso: "AU" },
+  { value: "+64", label: "New Zealand +64", iso: "NZ" }
+];
 
 function nationalPhoneDigits(value: string) {
   return value.replace(/\D/g, "");
@@ -386,12 +397,32 @@ const McqBlock = ({
 );
 
 const BusinessInquiryForm = () => {
+  const [searchParams] = useSearchParams();
+  const similarPrefilledRef = useRef(false);
+
   const [data, setData] = useState<InquiryState>(initialState);
   const [botField, setBotField] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationAttempted, setValidationAttempted] = useState(false);
   const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (similarPrefilledRef.current) return;
+    const slug = searchParams.get("similar");
+    if (!slug) return;
+    const refProject = getProjectBySlug(slug);
+    if (!refProject) return;
+    similarPrefilledRef.current = true;
+    setData((prev) => {
+      if (prev.details.trim()) return prev;
+      const site = refProject.externalLink?.trim();
+      const prefix = site
+        ? `Reference project: "${refProject.title}" — ${site}\n\n`
+        : `Reference project: "${refProject.title}"\n\n`;
+      return { ...prev, details: prefix };
+    });
+  }, [searchParams]);
 
   const showPaymentMulti = data.primaryNeed !== "";
   const paymentRequired = data.primaryNeed === "kashier" || data.primaryNeed === "both";
@@ -487,6 +518,16 @@ const BusinessInquiryForm = () => {
       payload.append("timeline_flexible_note", data.timelineFlexibleNote.trim());
       payload.append("branch_detail", branchBlock);
       payload.append("payment_methods", paymentSummary);
+
+      const refSlug = searchParams.get("similar");
+      if (refSlug) {
+        payload.append("reference_project_slug", refSlug);
+        const rp = getProjectBySlug(refSlug);
+        if (rp) {
+          payload.append("reference_project_title", rp.title);
+          if (rp.externalLink?.trim()) payload.append("reference_site", rp.externalLink.trim());
+        }
+      }
 
       const result = await submitWeb3Forms(payload);
       if (result.success) {
@@ -796,19 +837,42 @@ const BusinessInquiryForm = () => {
                 <SelectTrigger
                   id="biz-phone-cc"
                   className={cn(
-                    "h-9 w-[8rem] shrink-0 gap-1 px-2 py-1 text-xs [&>span]:truncate md:w-[8.75rem]",
+                    "h-9 w-[9rem] shrink-0 gap-1.5 px-2 py-1 text-xs md:w-[9.5rem]",
                     "[&_svg]:h-3.5 [&_svg]:w-3.5",
                     fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
                   )}
                   aria-invalid={Boolean(fieldErrors["biz-phone"])}
                   aria-label="Country calling code"
                 >
-                  <SelectValue placeholder="Code" />
+                  <SelectValue
+                    placeholder="Code"
+                    className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-left"
+                  >
+                    {(() => {
+                      const sel = PHONE_COUNTRY_CODES.find((o) => o.value === data.phoneCountryCode);
+                      if (!sel) {
+                        return <span className="truncate">{data.phoneCountryCode}</span>;
+                      }
+                      return (
+                        <>
+                          <span className="text-[1rem] leading-none shrink-0" aria-hidden>
+                            {isoToFlagEmoji(sel.iso)}
+                          </span>
+                          <span className="truncate">{sel.label}</span>
+                        </>
+                      );
+                    })()}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent position="popper" className="max-h-[min(280px,50vh)]">
                   {PHONE_COUNTRY_CODES.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      <span className="flex items-center gap-2">
+                        <span className="text-base leading-none shrink-0" aria-hidden>
+                          {isoToFlagEmoji(opt.iso)}
+                        </span>
+                        <span>{opt.label}</span>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>

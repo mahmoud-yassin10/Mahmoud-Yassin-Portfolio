@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import BusinessInquiryForm from "@/components/BusinessInquiryForm";
+import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { ProjectTile } from "@/components/Projects";
@@ -37,14 +38,13 @@ const ServicesPage = () => {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 I focus on{" "}
                 <strong className="text-foreground font-medium">website development</strong>,{" "}
-                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), projects that{" "}
-                <strong className="text-foreground font-medium">combine both</strong>, and a dedicated{" "}
-                <strong className="text-foreground font-medium">website-only intake</strong> path — scroll down for the
-                full questionnaire.
+                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), and projects that{" "}
+                <strong className="text-foreground font-medium">combine both</strong>. Scroll down for the full business
+                inquiry questionnaire and contact options.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
               {servicesPageOfferings.map((service, index) => {
                 const project: ProjectTileData = {
                   title: service.title,
@@ -92,6 +92,8 @@ const ServicesPage = () => {
             <BusinessInquiryForm />
           </div>
         </section>
+
+        <Contact />
       </main>
       <Footer />
     </div>

@@ -3,11 +3,6 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const servicesHomeLink = {
-  pathname: "/" as const,
-  hash: "#services" as const
-};
-
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,7 +32,7 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Services", to: servicesHomeLink },
+    { name: "Services", to: "/services" },
     { name: "Work", to: "/work" },
     { name: "Portfolio", to: "/portfolio" },
     { name: "Contact", to: "/contact" },
@@ -69,9 +64,7 @@ const Navbar = () => {
                   key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                   to={link.to}
                   className="text-foreground hover:text-primary transition-colors font-medium"
-                  aria-label={
-                    link.name === "Services" ? "Go to Services section on the home page" : `Go to ${link.name}`
-                  }
+                  aria-label={link.name === "Services" ? "Services page" : `Go to ${link.name}`}
                 >
                   {link.name}
                 </Link>
@@ -120,9 +113,7 @@ const Navbar = () => {
                     key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                     to={link.to}
                     className="text-left text-foreground hover:text-primary transition-colors font-medium py-2"
-                    aria-label={
-                      link.name === "Services" ? "Go to Services section on the home page" : `Go to ${link.name}`
-                    }
+                    aria-label={link.name === "Services" ? "Services page" : `Go to ${link.name}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.name}

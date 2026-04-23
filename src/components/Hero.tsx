@@ -1,10 +1,11 @@
 import { Download, Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getServicesPageHref } from "@/data/servicesOfferings";
 
 const Hero = () => {
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-  const homeServicesHref = base ? `${base}/#services` : "/#services";
+  const servicesPageHref = getServicesPageHref();
   const cvHref = `${base}/CV.pdf`;
   const githubHref = "https://github.com/mahmoud-yassin10";
   const linkedinHref = "https://linkedin.com/in/mahmoud--yassin";
@@ -44,7 +45,7 @@ const Hero = () => {
                 className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                 asChild
               >
-                <a href={homeServicesHref}>
+                <a href={servicesPageHref}>
                   View services
                 </a>
               </Button>

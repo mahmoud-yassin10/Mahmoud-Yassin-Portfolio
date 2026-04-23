@@ -8,7 +8,7 @@ const Footer = () => {
   const instagramUser = storeInstagram?.replace(/^@/, "") ?? "";
 
   const footerLinks = [
-    { name: "Services", to: { pathname: "/", hash: "#services" } },
+    { name: "Services", to: "/services" },
     { name: "Work", to: "/work" },
     { name: "Portfolio", to: "/portfolio" },
     { name: "Contact", to: "/contact" }
@@ -28,7 +28,7 @@ const Footer = () => {
           <div className="flex flex-wrap items-center justify-center gap-6">
             {footerLinks.map((link) => (
               <Link
-                key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
+                key={link.to}
                 to={link.to}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium"
               >

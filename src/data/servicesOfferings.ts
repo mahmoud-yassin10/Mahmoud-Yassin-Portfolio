@@ -48,10 +48,10 @@ export const secondaryServiceOfferings: ServiceOffering[] = [
   }
 ];
 
-/** Dedicated `/services` grid: core website row plus Kashier, combined, and website-only intake (matches home offerings). */
+/** Dedicated `/services` grid — website plus Kashier and combined offerings (website-only intake tile stays on home only). */
 export const servicesPageOfferings: ServiceOffering[] = [
   websiteOffering,
-  ...secondaryServiceOfferings
+  ...secondaryServiceOfferings.filter((s) => s.id !== "intake")
 ];
 
 export function getServicesInquiryHref() {
@@ -66,4 +66,16 @@ export function getServicesPageHref(hash?: string) {
   if (!hash) return path;
   const suffix = hash.startsWith("#") ? hash : `#${hash}`;
   return `${path}${suffix}`;
+}
+
+/** Full inquiry URL with `?similar=` so the form can attach the reference project + live site. */
+export function getServicesInquiryHrefWithSimilar(slug: string) {
+  const page = getServicesPageHref();
+  const sep = page.includes("?") ? "&" : "?";
+  return `${page}${sep}similar=${encodeURIComponent(slug)}#business-inquiry`;
+}
+
+/** Contact page with `?similar=` for message prefill (same slug). */
+export function getContactPageHrefWithSimilar(slug: string) {
+  return `/contact?similar=${encodeURIComponent(slug)}`;
 }

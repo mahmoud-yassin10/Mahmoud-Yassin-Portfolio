@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Mail, Phone, Linkedin, Send, Clipboard, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
+import { getProjectBySlug } from "@/data/projects";
 
 function emailLooksValidContact(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -25,6 +27,9 @@ function getContactFieldErrors(formData: { name: string; email: string; message:
 const CONTACT_FIELD_ORDER = ["name", "email", "message"] as const;
 
 const Contact = () => {
+  const [searchParams] = useSearchParams();
+  const similarPrefilledRef = useRef(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,6 +41,23 @@ const Contact = () => {
   const [botField, setBotField] = useState("");
   const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (similarPrefilledRef.current) return;
+    const slug = searchParams.get("similar");
+    if (!slug) return;
+    const refProject = getProjectBySlug(slug);
+    if (!refProject) return;
+    similarPrefilledRef.current = true;
+    setFormData((prev) => {
+      if (prev.message.trim()) return prev;
+      const site = refProject.externalLink?.trim();
+      const msg = site
+        ? `I'm interested in a website or experience similar to "${refProject.title}" (${site}).\n\n`
+        : `I'm interested in something similar to "${refProject.title}".\n\n`;
+      return { ...prev, message: msg };
+    });
+  }, [searchParams]);
 
   const fieldErrors = validationAttempted ? getContactFieldErrors(formData) : {};
 
@@ -80,6 +102,16 @@ const Contact = () => {
       payload.append("email", formData.email);
       payload.append("message", formData.message);
       payload.append("botcheck", botField);
+
+      const refSlug = searchParams.get("similar");
+      if (refSlug) {
+        payload.append("reference_project_slug", refSlug);
+        const rp = getProjectBySlug(refSlug);
+        if (rp) {
+          payload.append("reference_project_title", rp.title);
+          if (rp.externalLink?.trim()) payload.append("reference_site", rp.externalLink.trim());
+        }
+      }
 
       const data = await submitWeb3Forms(payload);
 
