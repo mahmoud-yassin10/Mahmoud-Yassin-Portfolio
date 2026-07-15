@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import ContactPage from "./pages/ContactPage";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
@@ -18,8 +18,20 @@ import ServicesPage from "./pages/ServicesPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkPage from "./pages/WorkPage";
 import FlousyDashboard from "./pages/FlousyDashboard";
+import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
 
 const queryClient = new QueryClient();
+
+const PortfolioRouteAnalytics = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/flousy/dashboard") return;
+    void trackPortfolioVisit(`${location.pathname}${location.search}`);
+  }, [location.pathname, location.search]);
+
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,6 +40,7 @@ const App = () => (
       <Sonner />
       <Analytics />
       <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <PortfolioRouteAnalytics />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />

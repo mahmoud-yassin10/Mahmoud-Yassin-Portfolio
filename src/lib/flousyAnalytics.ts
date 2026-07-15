@@ -74,6 +74,38 @@ export async function trackPublicFlousyEvent(name: "store_visit" | "install") {
   }
 }
 
+const PORTFOLIO_SESSION_KEY = "flousy_portfolio_session";
+
+function getPortfolioSessionId() {
+  try {
+    const existing = sessionStorage.getItem(PORTFOLIO_SESSION_KEY);
+    if (existing) return existing;
+    const sessionId = typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(PORTFOLIO_SESSION_KEY, sessionId);
+    return sessionId;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function trackPortfolioVisit(pathname: string) {
+  if (!flousyFunctions) return;
+  try {
+    await httpsCallable(flousyFunctions, "trackAnalyticsEvent")({
+      name: "portfolio_visit",
+      platform: "web",
+      appVersion: "portfolio",
+      locale: navigator.language.slice(0, 12),
+      sessionId: getPortfolioSessionId(),
+      metadata: { path: pathname.slice(0, 120) },
+    });
+  } catch {
+    // Portfolio telemetry is best-effort and must never block navigation.
+  }
+}
+
 const toDate = (value: unknown) => {
   if (value && typeof (value as { toDate?: () => Date }).toDate === "function") {
     return (value as { toDate: () => Date }).toDate();
