@@ -18,6 +18,8 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { trackPublicFlousyEvent } from "@/lib/flousyAnalytics";
+import { useEffect } from "react";
 
 type FeatureItem = {
   title: string;
@@ -97,6 +99,10 @@ const FlousyLanding = () => {
   const playStoreHref =
     "https://play.google.com/store/apps/details?id=com.mahmoud.flousy";
 
+  useEffect(() => {
+    void trackPublicFlousyEvent("store_visit");
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <AnimatedBackground />
@@ -137,7 +143,7 @@ const FlousyLanding = () => {
                   className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
                   asChild
                 >
-                  <a href={playStoreHref} target="_blank" rel="noreferrer">
+                  <a href={playStoreHref} target="_blank" rel="noreferrer" onClick={() => void trackPublicFlousyEvent("install")}>
                     Get it on Google Play
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </a>
@@ -293,7 +299,7 @@ const FlousyLanding = () => {
                     className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
                     asChild
                   >
-                    <a href={playStoreHref} target="_blank" rel="noreferrer">
+                    <a href={playStoreHref} target="_blank" rel="noreferrer" onClick={() => void trackPublicFlousyEvent("install")}>
                       Get it on Google Play
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
