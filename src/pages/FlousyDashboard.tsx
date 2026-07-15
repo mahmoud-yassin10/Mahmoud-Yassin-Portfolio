@@ -37,6 +37,7 @@ import {
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { flousyAuth, isFlousyFirebaseConfigured } from "@/lib/flousyFirebase";
 import { FUNNEL_EVENTS, isFlousyAdmin, loadLiveDashboardData, type AnalyticsEvent, type DashboardData, type FeedbackItem } from "@/lib/flousyAnalytics";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const accent = "#a4f26d";
 const violet = "#9a8cff";
@@ -121,7 +122,7 @@ function LoginGate({ onLogin }: { onLogin: (user: User) => void }) {
     catch { setError("That sign-in did not work. Check the account and try again."); }
     finally { setLoading(false); }
   };
-  return <div className="dashboard-login"><div className="dashboard-login-orbit" />
+  return <div className="dashboard-login"><AnimatedBackground /><div className="dashboard-login-orbit" />
     <div className="dashboard-login-panel"><div className="dashboard-brand-mark"><Sparkles size={17} /> FLOUSY / PRIVATE</div>
       <h1>Your operating picture.</h1><p>Owner analytics, feedback, and release signals in one quiet room.</p>
       <form onSubmit={submit} className="dashboard-login-form"><label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required /></label><label>Password<input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" required /></label>{error && <div className="dashboard-error"><CircleAlert size={15} />{error}</div>}<button className="dashboard-primary-button" disabled={loading}>{loading ? "Checking access…" : "Enter dashboard"}<LogIn size={16} /></button></form>
@@ -176,8 +177,8 @@ const FlousyDashboard = () => {
   const filteredFeedback = feedback.filter(item => `${item.message} ${item.category ?? ""}`.toLowerCase().includes(search.toLowerCase()));
 
   if (isFlousyFirebaseConfigured && !user) return <LoginGate onLogin={setUser} />;
-  if (accessDenied) return <div className="dashboard-login"><div className="dashboard-login-panel"><div className="dashboard-brand-mark"><ShieldCheck size={17} /> FLOUSY / PRIVATE</div><h1>Access denied.</h1><p>This account is authenticated but is not provisioned as a Flousy owner. Add its UID to <code>admin_users</code> in Firestore.</p><button className="dashboard-primary-button" onClick={() => flousyAuth && signOut(flousyAuth)}>Sign out <LogOut size={16} /></button></div></div>;
-  return <div className="dashboard-shell">
+  if (accessDenied) return <div className="dashboard-login"><AnimatedBackground /><div className="dashboard-login-panel"><div className="dashboard-brand-mark"><ShieldCheck size={17} /> FLOUSY / PRIVATE</div><h1>Access denied.</h1><p>This account is authenticated but is not provisioned as a Flousy owner. Add its UID to <code>admin_users</code> in Firestore.</p><button className="dashboard-primary-button" onClick={() => flousyAuth && signOut(flousyAuth)}>Sign out <LogOut size={16} /></button></div></div>;
+  return <div className="dashboard-shell"><AnimatedBackground />
     <aside className={`dashboard-sidebar ${mobileNav ? "open" : ""}`}><div className="dashboard-sidebar-brand"><div className="dashboard-logo"><Sparkles size={18} /></div><div><strong>FLOUSY</strong><span>owner console</span></div><button className="dashboard-mobile-close" onClick={() => setMobileNav(false)}><X size={17} /></button></div>
       <div className="dashboard-sidebar-section">Workspace</div>
       {[["overview", BarChart3, "Overview"], ["funnel", Users, "Funnel & retention"], ["feedback", Inbox, "Feedback inbox"]].map(([view, Icon, label]) => <button key={view as string} className={`dashboard-nav-item ${activeView === view ? "active" : ""}`} onClick={() => { setActiveView(view as typeof activeView); setMobileNav(false); }}><Icon size={17} />{label as string}{view === "feedback" && feedback.filter(item => item.status === "new").length > 0 && <span className="dashboard-nav-count">{feedback.filter(item => item.status === "new").length}</span>}</button>)}

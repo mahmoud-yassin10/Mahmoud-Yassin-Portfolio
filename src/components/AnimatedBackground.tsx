@@ -41,7 +41,7 @@ const AnimatedBackground = () => {
 
     // Observers and listeners for robust zoom/resize handling
     let ro: ResizeObserver | null = null;
-    const vv = (window as any).visualViewport as VisualViewport | undefined;
+    const vv = window.visualViewport;
     let dprInterval: number | null = null;
 
     const particles: Array<{

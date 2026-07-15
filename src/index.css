@@ -302,3 +302,23 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) { .dashboard-shell::after, .dashboard-login-orbit, .dashboard-stat, .dashboard-login-panel { animation: none; } .dashboard-nav-item, .dashboard-card, .dashboard-stat, .dashboard-feedback-item, .dashboard-primary-button, .dashboard-secondary-button { transition: none; } }
 @media (max-width: 900px) { .dashboard-topbar { padding: 0 28px; } .dashboard-content { padding: 40px 28px 72px; } }
 @media (max-width: 620px) { .dashboard-topbar { padding: 0 16px; } .dashboard-content { padding: 32px 14px 56px; } .dashboard-login-panel { padding: 30px 24px; border-radius: 18px; } .dashboard-login-panel h1 { font-size: 31px; } }
+
+/* Use the same animated canvas as the portfolio pages instead of a second background system. */
+.dashboard-shell > canvas,
+.dashboard-login > canvas { opacity: .68; }
+.dashboard-shell::before,
+.dashboard-shell::after,
+.dashboard-login::before,
+.dashboard-login-orbit { display: none; }
+.dashboard-shell,
+.dashboard-login { background: hsl(var(--background)); }
+.dashboard-login-form .dashboard-primary-button,
+.dashboard-login-form .dashboard-primary-button:disabled {
+  color: #061426 !important;
+  -webkit-text-fill-color: #061426;
+  background: linear-gradient(135deg, #72e3ff, #6da8ff);
+  opacity: 1;
+  font-weight: 800;
+  text-shadow: none;
+}
+.dashboard-login-form .dashboard-primary-button:disabled { filter: saturate(.72); cursor: not-allowed; }
