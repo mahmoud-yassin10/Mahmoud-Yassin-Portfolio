@@ -303,6 +303,87 @@ All colors MUST be HSL.
 @media (max-width: 900px) { .dashboard-topbar { padding: 0 28px; } .dashboard-content { padding: 40px 28px 72px; } }
 @media (max-width: 620px) { .dashboard-topbar { padding: 0 16px; } .dashboard-content { padding: 32px 14px 56px; } .dashboard-login-panel { padding: 30px 24px; border-radius: 18px; } .dashboard-login-panel h1 { font-size: 31px; } }
 
+.dashboard-login-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 33px; }
+.dashboard-login-head .dashboard-brand-mark { margin-bottom: 0; }
+.dashboard-theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 7px 10px; border: 1px solid rgba(151, 174, 221, .24); border-radius: 999px; color: #b9c8e6; background: rgba(7, 15, 35, .32); font-size: 10px; font-weight: 700; cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+.dashboard-theme-toggle:hover { color: #f4f7ff; border-color: rgba(114, 227, 255, .52); background: rgba(114, 227, 255, .1); transform: translateY(-1px); }
+.dashboard-theme-toggle:focus-visible { outline: 2px solid #72e3ff; outline-offset: 3px; }
+.dashboard-top-actions .dashboard-theme-toggle { min-width: 76px; }
+
+/* Light mode uses the same portfolio canvas with a readable, editorial admin surface. */
+html:not(.dark) .dashboard-shell {
+  --dash-ink: #172441;
+  --dash-muted: #53627f;
+  --dash-soft: #7b89a4;
+  --dash-line: rgba(46, 78, 137, .16);
+  --dash-panel: rgba(255, 255, 255, .72);
+  --dash-panel-solid: #ffffff;
+  color: var(--dash-ink);
+}
+html:not(.dark) .dashboard-shell .dashboard-sidebar { background: rgba(247, 250, 255, .84); border-right-color: rgba(46, 78, 137, .14); }
+html:not(.dark) .dashboard-shell .dashboard-sidebar-brand strong,
+html:not(.dark) .dashboard-shell .dashboard-owner strong { color: #172441; }
+html:not(.dark) .dashboard-shell .dashboard-sidebar-brand span,
+html:not(.dark) .dashboard-shell .dashboard-owner span,
+html:not(.dark) .dashboard-shell .dashboard-sidebar-section { color: #7483a0; }
+html:not(.dark) .dashboard-shell .dashboard-nav-item { color: #63718d; }
+html:not(.dark) .dashboard-shell .dashboard-nav-item:hover { color: #172441; background: rgba(72, 126, 235, .09); }
+html:not(.dark) .dashboard-shell .dashboard-nav-item.active { color: #193b79; background: rgba(109, 168, 255, .16); box-shadow: inset 3px 0 0 #4e8ff8, 0 9px 24px rgba(66, 109, 189, .1); }
+html:not(.dark) .dashboard-shell .dashboard-signal { color: #304467; }
+html:not(.dark) .dashboard-shell .dashboard-signal small { color: #7b89a4; }
+html:not(.dark) .dashboard-shell .dashboard-topbar { background: rgba(255, 255, 255, .5); border-bottom-color: rgba(46, 78, 137, .14); }
+html:not(.dark) .dashboard-shell .dashboard-breadcrumb { color: #7b89a4; }
+html:not(.dark) .dashboard-shell .dashboard-breadcrumb strong { color: #304467; }
+html:not(.dark) .dashboard-shell .dashboard-status { color: #25617b; background: rgba(114, 227, 255, .14); border-color: rgba(37, 133, 167, .2); }
+html:not(.dark) .dashboard-shell .dashboard-icon-button,
+html:not(.dark) .dashboard-shell .dashboard-menu-button { color: #53627f; border-color: rgba(46, 78, 137, .18); }
+html:not(.dark) .dashboard-shell .dashboard-theme-toggle { color: #53627f; background: rgba(255, 255, 255, .58); border-color: rgba(46, 78, 137, .18); }
+html:not(.dark) .dashboard-shell .dashboard-theme-toggle:hover { color: #173a76; background: rgba(109, 168, 255, .12); }
+html:not(.dark) .dashboard-shell .dashboard-heading h1,
+html:not(.dark) .dashboard-shell .dashboard-card h2 { color: #172441; text-shadow: none; }
+html:not(.dark) .dashboard-shell .dashboard-heading p,
+html:not(.dark) .dashboard-shell .dashboard-kicker,
+html:not(.dark) .dashboard-shell .dashboard-eyebrow { color: #657594; }
+html:not(.dark) .dashboard-shell .dashboard-card,
+html:not(.dark) .dashboard-shell .dashboard-stat { background: rgba(255, 255, 255, .76); border-color: rgba(46, 78, 137, .15); box-shadow: 0 12px 32px rgba(55, 89, 151, .1), inset 0 1px 0 rgba(255, 255, 255, .8); }
+html:not(.dark) .dashboard-shell .dashboard-stat-label,
+html:not(.dark) .dashboard-shell .dashboard-platform-list div,
+html:not(.dark) .dashboard-shell .dashboard-signal-stack > div { color: #647390; }
+html:not(.dark) .dashboard-shell .dashboard-stat-value,
+html:not(.dark) .dashboard-shell .dashboard-signal-stack strong,
+html:not(.dark) .dashboard-shell .dashboard-platform-list b { color: #172441; }
+html:not(.dark) .dashboard-shell .dashboard-stat-change { color: #28708a; }
+html:not(.dark) .dashboard-shell .dashboard-platform-list,
+html:not(.dark) .dashboard-shell .dashboard-signal-stack > div,
+html:not(.dark) .dashboard-shell .dashboard-event-row,
+html:not(.dark) .dashboard-shell .dashboard-retention-callout { border-color: rgba(46, 78, 137, .14); }
+html:not(.dark) .dashboard-shell .dashboard-event-row { color: #61708f; }
+html:not(.dark) .dashboard-shell .dashboard-event-row > span:first-child,
+html:not(.dark) .dashboard-shell .dashboard-funnel-label b,
+html:not(.dark) .dashboard-shell .dashboard-funnel-row > strong { color: #1f3152; }
+html:not(.dark) .dashboard-shell .dashboard-event-head,
+html:not(.dark) .dashboard-shell .dashboard-funnel-label span,
+html:not(.dark) .dashboard-shell .dashboard-funnel-label small { color: #7b89a4; }
+html:not(.dark) .dashboard-shell .dashboard-funnel-track { background: rgba(90, 124, 185, .14); }
+html:not(.dark) .dashboard-shell .dashboard-search,
+html:not(.dark) .dashboard-shell .dashboard-heading-actions select,
+html:not(.dark) .dashboard-shell .dashboard-event-controls select,
+html:not(.dark) .dashboard-shell .dashboard-feedback-item-bottom select { color: #304467; background: rgba(255, 255, 255, .7); border-color: rgba(46, 78, 137, .18); }
+html:not(.dark) .dashboard-shell .dashboard-search input,
+html:not(.dark) .dashboard-shell .dashboard-search select { color: #304467; }
+html:not(.dark) .dashboard-shell .dashboard-secondary-button { color: #304467; background: rgba(255, 255, 255, .66); border-color: rgba(46, 78, 137, .18); }
+html:not(.dark) .dashboard-shell .dashboard-feedback-item { background: rgba(248, 251, 255, .76); border-color: rgba(46, 78, 137, .15); }
+html:not(.dark) .dashboard-shell .dashboard-feedback-item p { color: #304467; }
+html:not(.dark) .dashboard-login .dashboard-login-panel { background: rgba(255, 255, 255, .88); border-color: rgba(46, 78, 137, .18); box-shadow: 0 24px 70px rgba(52, 84, 142, .2), inset 0 1px 0 rgba(255, 255, 255, .95); }
+html:not(.dark) .dashboard-login .dashboard-brand-mark { color: #2e6fd1; }
+html:not(.dark) .dashboard-login .dashboard-login-panel h1 { color: #172441; }
+html:not(.dark) .dashboard-login .dashboard-login-panel > p,
+html:not(.dark) .dashboard-login .dashboard-login-form label { color: #5d6d8c; }
+html:not(.dark) .dashboard-login .dashboard-login-form input { color: #172441; background: rgba(244, 248, 255, .92); border-color: rgba(46, 78, 137, .25); }
+html:not(.dark) .dashboard-login .dashboard-login-form input:focus { border-color: #4e8ff8; box-shadow: 0 0 0 4px rgba(78, 143, 248, .15); }
+html:not(.dark) .dashboard-login .dashboard-theme-toggle { color: #53627f; background: rgba(238, 245, 255, .82); border-color: rgba(46, 78, 137, .2); }
+html:not(.dark) .dashboard-login .dashboard-login-foot { color: #71809e; }
+
 /* Use the same animated canvas as the portfolio pages instead of a second background system. */
 .dashboard-shell > canvas,
 .dashboard-login > canvas { opacity: .68; }
