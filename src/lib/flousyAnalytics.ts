@@ -120,5 +120,8 @@ export async function loadLiveDashboardData(days = 30): Promise<DashboardData> {
 
 export async function isFlousyAdmin(uid: string) {
   if (!flousyDb) return false;
-  return (await getDoc(doc(flousyDb, "admin_users", uid))).exists();
+  const configuredOwnerUid = String(import.meta.env.VITE_FLOUSY_OWNER_UID ?? "").trim();
+  if (configuredOwnerUid && configuredOwnerUid !== uid) return false;
+  const ownerSnapshot = await getDoc(doc(flousyDb, "admin_users", uid));
+  return ownerSnapshot.exists() && ownerSnapshot.data().role === "owner";
 }
