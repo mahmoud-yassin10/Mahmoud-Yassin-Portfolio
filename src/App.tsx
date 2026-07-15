@@ -17,6 +17,7 @@ import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ServicesPage from "./pages/ServicesPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkPage from "./pages/WorkPage";
+import FlousyDashboard from "./pages/FlousyDashboard";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/flousy" element={<FlousyLanding />} />
+          <Route path="/flousy/dashboard" element={<FlousyDashboard />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/flousy/delete-account" element={<DeleteAccount />} />
           <Route path="/flousy/delete-data" element={<DeleteData />} />
