@@ -1,12 +1,15 @@
 import { Download, Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServicesPageHref } from "@/data/servicesOfferings";
+import { useAudience } from "@/context/AudienceContext";
 
 const Hero = () => {
+  const { profile } = useAudience();
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
   const servicesPageHref = getServicesPageHref();
   const cvHref = `${base}/CV.pdf`;
+  const secondaryHref = profile?.id === "client" ? "/contact" : cvHref;
   const githubHref = "https://github.com/mahmoud-yassin10";
   const linkedinHref = "https://linkedin.com/in/mahmoud--yassin";
   const photoSrcWebp = encodeURI(`${base}/ME-NTA.webp`);
@@ -28,14 +31,15 @@ const Hero = () => {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 items-center gap-12 animate-fade-in-up">
           <div className="space-y-6 text-center lg:text-left">
             <div className="space-y-3">
+              <p className="audience-hero-eyebrow">{profile?.eyebrow ?? "Software engineer · student founder"}</p>
               <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
                 Mahmoud Yassin
               </h1>
-              <h2 className="text-2xl md:text-4xl font-semibold text-foreground">
-                Software Engineer & Student Founder
+              <h2 className="text-2xl md:text-4xl font-semibold text-foreground audience-hero-title">
+                {profile?.title ?? "Building useful things with code, curiosity, and care."}
               </h2>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
-                Building impactful apps from Port Said, Egypt - combining AI, Flutter development, and leadership to create solutions that matter.
+                {profile?.description ?? "Building impactful apps from Port Said, Egypt — combining AI, Flutter development, and leadership to create solutions that matter."}
               </p>
             </div>
 
@@ -49,7 +53,7 @@ const Hero = () => {
                 className="group relative h-12 w-full min-h-[44px] justify-center touch-manipulation overflow-hidden bg-gradient-to-r from-primary to-accent text-base shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] lg:h-11 lg:min-h-[44px]"
                 asChild
               >
-                <a href={servicesPageHref}>View services</a>
+                <a href={profile?.primaryHref ?? servicesPageHref}>{profile?.primaryCta ?? "View services"}</a>
               </Button>
 
               <Button
@@ -58,9 +62,9 @@ const Hero = () => {
                 className="group h-12 min-h-[44px] w-full justify-center touch-manipulation gap-2 rounded-xl border-2 border-primary px-4 transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-[0.98] lg:h-11 lg:min-h-0"
                 asChild
               >
-                <a href={cvHref} target="_blank" rel="noreferrer">
+                <a href={secondaryHref} target={profile?.id === "client" ? undefined : "_blank"} rel={profile?.id === "client" ? undefined : "noreferrer"}>
                   <Download className="h-5 w-5 shrink-0" aria-hidden />
-                  Download CV
+                  {profile?.secondaryCta ?? "Download CV"}
                 </a>
               </Button>
 

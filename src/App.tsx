@@ -19,6 +19,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WorkPage from "./pages/WorkPage";
 import FlousyDashboard from "./pages/FlousyDashboard";
 import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
+import { AudienceProvider } from "@/context/AudienceContext";
+import AudienceGate from "@/components/AudienceGate";
 
 const queryClient = new QueryClient();
 
@@ -34,12 +36,14 @@ const PortfolioRouteAnalytics = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <AudienceProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <Analytics />
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <AudienceGate />
         <PortfolioRouteAnalytics />
         <ScrollToTop />
         <Routes>
@@ -57,9 +61,10 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </AudienceProvider>
 );
 
 export default App;

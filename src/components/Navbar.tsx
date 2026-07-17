@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAudience } from "@/context/AudienceContext";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { profile, clearAudience } = useAudience();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -41,12 +43,23 @@ const Navbar = () => {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
-  const navLinks = [
-    { name: "Services", to: "/services" },
-    { name: "Work", to: "/work" },
-    { name: "Portfolio", to: "/portfolio" },
-    { name: "Contact", to: "/contact" },
-  ];
+  const navLinks = profile?.id === "client"
+    ? [
+        { name: "Services", to: "/services" },
+        { name: "Work", to: "/work" },
+        { name: "Contact", to: "/contact" }
+      ]
+    : profile?.id === "admissions"
+      ? [
+          { name: "About", to: "/portfolio" },
+          { name: "Work", to: "/work" },
+          { name: "Contact", to: "/contact" }
+        ]
+      : [
+          { name: "Work", to: "/work" },
+          { name: "Services", to: "/services" },
+          { name: "Contact", to: "/contact" }
+        ];
 
   const navSurfaceActive = isScrolled || isMobileMenuOpen;
 
@@ -99,6 +112,10 @@ const Navbar = () => {
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
+              <button type="button" className="audience-switcher" onClick={clearAudience}>
+                <span className="audience-switcher-dot" />
+                {profile?.shortLabel ?? "Choose view"}
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -112,6 +129,10 @@ const Navbar = () => {
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
+              <button type="button" className="audience-switcher" onClick={clearAudience}>
+                <span className="audience-switcher-dot" />
+                {profile?.shortLabel ?? "Choose view"}
+              </button>
               <Button
                 variant="ghost"
                 size="icon"

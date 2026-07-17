@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
 import { getProjectBySlug } from "@/data/projects";
+import { useAudience } from "@/context/AudienceContext";
 
 function emailLooksValidContact(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -27,6 +28,7 @@ function getContactFieldErrors(formData: { name: string; email: string; message:
 const CONTACT_FIELD_ORDER = ["name", "email", "message"] as const;
 
 const Contact = () => {
+  const { audience } = useAudience();
   const [searchParams] = useSearchParams();
   const similarPrefilledRef = useRef(false);
 
@@ -183,7 +185,7 @@ const Contact = () => {
     <section id="contact" className="py-20 relative">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Get In Touch
+          {audience === "client" ? "Let’s build something useful" : audience === "admissions" ? "Thank you for looking closer" : "Let’s talk about the work"}
         </h2>
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
