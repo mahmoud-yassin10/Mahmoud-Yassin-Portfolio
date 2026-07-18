@@ -104,8 +104,10 @@ All colors MUST be HSL.
   inset: 0;
   z-index: 100;
   overflow: auto;
-  color: #f4f7ff;
-  background: #0a1020;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background) / .88);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   transition: opacity .7s cubic-bezier(.22, 1, .36, 1), visibility .7s;
 }
 .audience-gate-open { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -115,7 +117,7 @@ All colors MUST be HSL.
   inset: 0;
   opacity: .18;
   pointer-events: none;
-  background-image: linear-gradient(rgba(170, 198, 255, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(170, 198, 255, .08) 1px, transparent 1px);
+  background-image: linear-gradient(hsl(var(--primary) / .08) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / .08) 1px, transparent 1px);
   background-size: 54px 54px;
   mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
@@ -124,12 +126,12 @@ All colors MUST be HSL.
   position: absolute;
   width: 42vw;
   height: 42vw;
-  border: 1px solid rgba(124, 190, 255, .14);
+  border: 1px solid hsl(var(--primary) / .14);
   border-radius: 50%;
   pointer-events: none;
 }
-.audience-gate::before { left: -16vw; bottom: -24vw; box-shadow: 0 0 0 70px rgba(124, 190, 255, .03), 0 0 0 140px rgba(124, 190, 255, .018); }
-.audience-gate::after { right: -20vw; top: -24vw; border-color: rgba(194, 174, 255, .12); }
+.audience-gate::before { left: -16vw; bottom: -24vw; box-shadow: 0 0 0 70px hsl(var(--primary) / .03), 0 0 0 140px hsl(var(--primary) / .018); }
+.audience-gate::after { right: -20vw; top: -24vw; border-color: hsl(var(--accent) / .12); }
 .audience-gate-inner { position: relative; z-index: 1; width: min(1180px, calc(100% - 40px)); min-height: 100dvh; margin: 0 auto; padding: 42px 0 30px; display: flex; flex-direction: column; justify-content: center; }
 .audience-gate-brand { display: flex; align-items: center; gap: 13px; position: absolute; top: 42px; left: 0; color: #83e6ff; font-size: 18px; font-weight: 800; letter-spacing: -.07em; }
 .audience-gate-brand-line { width: 58px; height: 1px; background: rgba(131, 230, 255, .45); }
