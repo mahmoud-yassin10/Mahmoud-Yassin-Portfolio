@@ -77,6 +77,7 @@ const ProjectDetailPage = () => {
 
               <ProjectLivePreview
                 liveUrl={liveUrl || undefined}
+                livePreviewMode={project.livePreviewMode}
                 title={project.title}
                 variant="detail"
                 livePreviewRevealDelayMs={project.livePreviewRevealDelayMs}

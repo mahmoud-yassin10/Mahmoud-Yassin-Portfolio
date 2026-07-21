@@ -20,6 +20,8 @@ export type Project = {
   externalLink?: string;
   /** Optional URL used only for the embedded preview (for example, a forced language variant). */
   livePreviewUrl?: string;
+  /** Use the live iframe immediately when a project needs the restored browser-frame treatment. */
+  livePreviewMode?: "screenshot" | "iframe";
   /**
    * If set, skip screenshot APIs and reveal the live iframe after this many ms so splash screens
    * can finish before the preview is shown (e.g. Flousy marketing site).

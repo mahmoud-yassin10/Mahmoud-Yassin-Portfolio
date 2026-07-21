@@ -7,8 +7,9 @@ export function buildScreenshotCandidates(siteUrl: string): string[] {
   const encoded = encodeURIComponent(siteUrl);
   const refreshToken = Date.now();
   return [
-    `https://s0.wp.com/mshots/v1/${encoded}?w=900&refresh=${refreshToken}`,
-    `https://image.thum.io/get/width/720/crop/960/noanimate/${encoded}?refresh=${refreshToken}`
+    // Desktop capture first: this preserves the laptop/browser point of view in the card.
+    `https://image.thum.io/get/width/1440/crop/900/${siteUrl}`,
+    `https://s0.wp.com/mshots/v1/${encoded}?w=1440&refresh=${refreshToken}`
   ];
 }
 
@@ -28,6 +29,8 @@ type ProjectLivePreviewProps = {
   liveUrl?: string | null;
   /** Optional preview-only URL, while links still open the canonical live site. */
   previewUrl?: string | null;
+  /** Force the browser-frame preview to use the live iframe instead of screenshot services. */
+  livePreviewMode?: "screenshot" | "iframe";
   title: string;
   /** Larger frame for project detail vs work cards */
   variant?: "card" | "detail";
@@ -52,6 +55,7 @@ export function isLiveSiteUrl(url: string | undefined | null): boolean {
 export function ProjectLivePreview({
   liveUrl,
   previewUrl,
+  livePreviewMode = "screenshot",
   title,
   variant = "card",
   className,
@@ -64,7 +68,7 @@ export function ProjectLivePreview({
   const openUrl = liveUrl?.trim() || url;
 
   const useDelayedIframe = Boolean(
-    url && livePreviewRevealDelayMs != null && livePreviewRevealDelayMs > 0
+    url && (livePreviewMode === "iframe" || (livePreviewRevealDelayMs != null && livePreviewRevealDelayMs > 0))
   );
 
   const candidates = useMemo(() => {
@@ -92,7 +96,7 @@ export function ProjectLivePreview({
     const ms = livePreviewRevealDelayMs ?? 0;
     const id = window.setTimeout(() => setSplashDelayElapsed(true), ms);
     return () => window.clearTimeout(id);
-  }, [useDelayedIframe, livePreviewRevealDelayMs, url]);
+  }, [useDelayedIframe, livePreviewRevealDelayMs, livePreviewMode, url]);
 
   const showIframeFallback = Boolean(
     url && (useDelayedIframe || (candidates.length > 0 && thumbAttempt >= candidates.length))
