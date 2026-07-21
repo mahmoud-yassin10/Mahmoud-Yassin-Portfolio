@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils";
 /** Multiple thumbnail APIs — free tiers can be flaky; we cycle on failure. */
 export function buildScreenshotCandidates(siteUrl: string): string[] {
   const encoded = encodeURIComponent(siteUrl);
+  const refreshToken = Date.now();
   return [
-    `https://s0.wp.com/mshots/v1/${encoded}?w=900`,
-    `https://image.thum.io/get/width/720/crop/960/noanimate/${encoded}`
+    `https://s0.wp.com/mshots/v1/${encoded}?w=900&refresh=${refreshToken}`,
+    `https://image.thum.io/get/width/720/crop/960/noanimate/${encoded}?refresh=${refreshToken}`
   ];
 }
 
@@ -25,6 +26,8 @@ function isLikelyBadThumbnail(img: HTMLImageElement) {
 
 type ProjectLivePreviewProps = {
   liveUrl?: string | null;
+  /** Optional preview-only URL, while links still open the canonical live site. */
+  previewUrl?: string | null;
   title: string;
   /** Larger frame for project detail vs work cards */
   variant?: "card" | "detail";
@@ -48,15 +51,17 @@ export function isLiveSiteUrl(url: string | undefined | null): boolean {
  */
 export function ProjectLivePreview({
   liveUrl,
+  previewUrl,
   title,
   variant = "card",
   className,
   livePreviewRevealDelayMs
 }: ProjectLivePreviewProps) {
   const url = useMemo(() => {
-    const raw = liveUrl?.trim() ?? "";
+    const raw = (previewUrl ?? liveUrl)?.trim() ?? "";
     return /^https?:\/\//i.test(raw) ? raw : "";
-  }, [liveUrl]);
+  }, [liveUrl, previewUrl]);
+  const openUrl = liveUrl?.trim() || url;
 
   const useDelayedIframe = Boolean(
     url && livePreviewRevealDelayMs != null && livePreviewRevealDelayMs > 0
@@ -167,7 +172,7 @@ export function ProjectLivePreview({
 
         {currentThumbSrc && !showIframeFallback ? (
           <a
-            href={url}
+            href={openUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="relative z-[2] block h-full min-h-[inherit] w-full outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
@@ -202,7 +207,7 @@ export function ProjectLivePreview({
               onLoad={() => setIframeLoaded(true)}
             />
             <a
-              href={url}
+              href={openUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="absolute inset-0 z-10 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"

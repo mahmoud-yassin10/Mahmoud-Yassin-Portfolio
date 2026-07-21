@@ -30,6 +30,7 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
     >
       <ProjectLivePreview
         liveUrl={liveUrl}
+        previewUrl={project.livePreviewUrl}
         title={project.title}
         variant="card"
         className="rounded-t-xl rounded-b-none border-x-0 border-t-0 border-b border-border shadow-none"

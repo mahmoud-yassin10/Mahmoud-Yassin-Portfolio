@@ -21,6 +21,7 @@ import FlousyDashboard from "./pages/FlousyDashboard";
 import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
 import { AudienceProvider } from "@/context/AudienceContext";
 import AudienceGate from "@/components/AudienceGate";
+import AudienceTransition from "@/components/AudienceTransition";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
       <Analytics />
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AudienceGate />
+          <AudienceTransition />
         <PortfolioRouteAnalytics />
         <ScrollToTop />
         <Routes>

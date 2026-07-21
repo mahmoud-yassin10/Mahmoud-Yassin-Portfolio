@@ -103,7 +103,8 @@ All colors MUST be HSL.
   position: fixed;
   inset: 0;
   z-index: 100;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   color: hsl(var(--foreground));
   background: hsl(var(--background) / .88);
   -webkit-backdrop-filter: blur(8px);
@@ -158,6 +159,45 @@ All colors MUST be HSL.
 .audience-switcher { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; color: hsl(var(--muted-foreground)); background: transparent; border: 1px solid hsl(var(--border)); border-radius: 999px; font-size: 11px; cursor: pointer; transition: color .2s ease, border-color .2s ease, background .2s ease; }
 .audience-switcher:hover { color: hsl(var(--foreground)); border-color: hsl(var(--primary) / .5); background: hsl(var(--primary) / .08); }
 .audience-switcher-dot { width: 6px; height: 6px; display: inline-block; border-radius: 50%; background: hsl(var(--primary)); box-shadow: 0 0 0 4px hsl(var(--primary) / .12); }
+.audience-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #eaf8ff;
+  /* Let the shared AnimatedBackground canvas remain visible underneath. */
+  background: hsl(var(--background) / .42);
+  -webkit-backdrop-filter: blur(3px) saturate(125%);
+  backdrop-filter: blur(3px) saturate(125%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(1.025);
+  transition: opacity .32s ease, visibility .32s ease, transform .52s cubic-bezier(.22, 1, .36, 1);
+}
+.audience-transition-active { opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1); }
+.audience-transition-grid { position: absolute; inset: 0; opacity: .38; background-image: linear-gradient(rgba(114, 227, 255, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(114, 227, 255, .08) 1px, transparent 1px); background-size: 42px 42px; mask-image: radial-gradient(circle at center, black, transparent 72%); }
+.audience-transition::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, hsl(var(--primary) / .14), transparent 26%), linear-gradient(120deg, transparent 20%, hsl(var(--accent) / .06) 50%, transparent 80%); pointer-events: none; }
+.audience-transition-inner { position: relative; z-index: 1; width: min(330px, calc(100% - 40px)); text-align: center; }
+.audience-transition-mark { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 24px; color: #72e3ff; border: 1px solid rgba(114, 227, 255, .45); border-radius: 17px; background: rgba(114, 227, 255, .08); box-shadow: 0 0 0 8px rgba(114, 227, 255, .035), 0 0 42px rgba(114, 227, 255, .22); animation: transition-mark-pulse 1.4s ease-in-out infinite; }
+.audience-transition-kicker { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 10px; color: #83d9f3; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .13em; text-transform: uppercase; }
+.audience-transition-inner h2 { margin: 0; color: #f4fbff; font-size: clamp(32px, 6vw, 48px); font-weight: 700; letter-spacing: -.065em; }
+.audience-transition-status { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: #9bb7c8; font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.audience-transition-status svg { color: #72e3ff; animation: transition-arrow 1s ease-in-out infinite; }
+.audience-transition-pulse { width: 6px; height: 6px; border-radius: 50%; background: #72e3ff; box-shadow: 0 0 0 5px rgba(114, 227, 255, .12); animation: transition-dot 1s ease-in-out infinite; }
+.audience-transition-progress { height: 2px; margin: 28px auto 0; overflow: hidden; background: rgba(157, 196, 214, .18); }
+.audience-transition-progress span { display: block; width: 42%; height: 100%; background: linear-gradient(90deg, transparent, #72e3ff, #b3f1ff, transparent); animation: transition-progress 1.05s cubic-bezier(.4, 0, .2, 1) infinite; }
+.audience-transition-orbit { position: absolute; width: 46vw; aspect-ratio: 1; border: 1px solid rgba(114, 227, 255, .12); border-radius: 50%; transform: rotate(-22deg) skewX(-12deg); animation: transition-orbit 9s linear infinite; }
+.audience-transition-orbit::after { content: ""; position: absolute; top: 12%; left: 18%; width: 5px; height: 5px; border-radius: 50%; background: #72e3ff; box-shadow: 0 0 18px 4px rgba(114, 227, 255, .58); }
+.audience-transition-orbit-one { width: 56vw; }
+.audience-transition-orbit-two { width: 34vw; border-color: rgba(165, 123, 255, .12); transform: rotate(58deg) skewX(15deg); animation-direction: reverse; animation-duration: 7s; }
+@keyframes transition-mark-pulse { 0%, 100% { box-shadow: 0 0 0 8px rgba(114, 227, 255, .035), 0 0 32px rgba(114, 227, 255, .15); } 50% { box-shadow: 0 0 0 13px rgba(114, 227, 255, .02), 0 0 55px rgba(114, 227, 255, .34); } }
+@keyframes transition-dot { 0%, 100% { opacity: .38; } 50% { opacity: 1; } }
+@keyframes transition-arrow { 0%, 100% { transform: translateX(0); opacity: .6; } 50% { transform: translateX(4px); opacity: 1; } }
+@keyframes transition-progress { from { transform: translateX(-180%); } to { transform: translateX(330%); } }
+@keyframes transition-orbit { from { rotate: 0deg; } to { rotate: 360deg; } }
 .audience-path-section { position: relative; z-index: 1; padding: 24px 0 76px; }
 .audience-path { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, .9fr) auto; gap: 30px; align-items: end; max-width: 1180px; margin: 0 auto; padding: 24px 0; border-top: 1px solid hsl(var(--border) / .8); border-bottom: 1px solid hsl(var(--border) / .8); }
 .audience-path-intro h2 { max-width: 580px; margin: 12px 0 18px; color: hsl(var(--foreground)); font-size: clamp(22px, 3vw, 34px); line-height: 1.05; letter-spacing: -.05em; }
@@ -172,9 +212,32 @@ All colors MUST be HSL.
 .audience-proof span { margin-top: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.25; }
 .audience-path-cue { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; color: hsl(var(--foreground)); font-size: 12px; font-weight: 700; text-decoration: none; transition: color .25s ease, transform .25s ease; }
 .audience-path-cue:hover { color: hsl(var(--primary)); transform: translateY(-2px); }
+/* Light mode keeps the live canvas visible while restoring the contrast lost to the pale base. */
+html:not(.dark) .audience-gate {
+  background: hsl(var(--background) / .54);
+  -webkit-backdrop-filter: blur(3px) saturate(115%);
+  backdrop-filter: blur(3px) saturate(115%);
+}
+html:not(.dark) .audience-gate-kicker,
+html:not(.dark) .audience-gate-footnote { color: hsl(215 42% 39%); }
+html:not(.dark) .audience-gate-heading > p:last-child { color: hsl(215 34% 31%); }
+html:not(.dark) .audience-option {
+  color: #f7fbff;
+  border-color: hsl(217 55% 30% / .3);
+  background: linear-gradient(145deg, hsl(217 42% 39% / .96), hsl(215 42% 27% / .96));
+  box-shadow: 0 18px 40px hsl(217 48% 35% / .18), inset 0 1px 0 hsl(0 0% 100% / .14);
+}
+html:not(.dark) .audience-option:hover {
+  border-color: hsl(199 89% 45% / .8);
+  background: linear-gradient(145deg, hsl(217 48% 43% / .98), hsl(215 46% 29% / .98));
+}
+html:not(.dark) .audience-option-index,
+html:not(.dark) .audience-option-copy small,
+html:not(.dark) .audience-option-arrow { color: hsl(199 70% 82%); }
+html:not(.dark) .audience-option-icon { border-color: hsl(199 89% 65% / .42); background: hsl(199 89% 55% / .14); }
 @keyframes audience-option-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 760px) {
-  .audience-gate-inner { width: min(100% - 28px, 540px); padding-top: 108px; justify-content: flex-start; }
+  .audience-gate-inner { width: min(calc(100% - 28px), 540px); padding-top: 108px; justify-content: flex-start; }
   .audience-gate-brand { top: 32px; }
   .audience-gate-heading { margin-bottom: 30px; }
   .audience-gate-options { grid-template-columns: 1fr; gap: 10px; }
@@ -191,7 +254,7 @@ All colors MUST be HSL.
   .audience-path-cue { justify-self: start; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .audience-gate, .audience-option, .audience-option-arrow { transition: none; animation: none; }
+  .audience-gate, .audience-option, .audience-option-arrow, .audience-transition, .audience-transition-mark, .audience-transition-status svg, .audience-transition-pulse, .audience-transition-progress span, .audience-transition-orbit { transition: none; animation: none; }
 }
 
 @layer base {

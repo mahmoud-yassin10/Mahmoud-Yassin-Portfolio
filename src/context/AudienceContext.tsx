@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type Audience = "recruiter" | "admissions" | "client";
 
@@ -81,6 +81,8 @@ export const audienceProfiles: AudienceProfile[] = [
 type AudienceContextValue = {
   audience: Audience | null;
   profile: AudienceProfile | null;
+  isTransitioning: boolean;
+  transitionTarget: AudienceProfile | null;
   setAudience: (audience: Audience) => void;
   clearAudience: () => void;
 };
@@ -90,6 +92,10 @@ const STORAGE_KEY = "mahmoud-portfolio-audience";
 
 export const AudienceProvider = ({ children }: { children: ReactNode }) => {
   const [audience, setAudienceState] = useState<Audience | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionTarget, setTransitionTarget] = useState<AudienceProfile | null>(null);
+  const previousAudienceRef = useRef<Audience | null>(null);
+  const transitionTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY) as Audience | null;
@@ -98,11 +104,24 @@ export const AudienceProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo<AudienceContextValue>(() => {
     const setAudience = (nextAudience: Audience) => {
+      const fromAudience = audience ?? previousAudienceRef.current;
+      if (fromAudience && fromAudience !== nextAudience) {
+        if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
+        setTransitionTarget(audienceProfiles.find((profile) => profile.id === nextAudience) ?? null);
+        setIsTransitioning(true);
+        transitionTimerRef.current = window.setTimeout(() => {
+          setIsTransitioning(false);
+          setTransitionTarget(null);
+          transitionTimerRef.current = null;
+        }, 1050);
+      }
       setAudienceState(nextAudience);
       window.localStorage.setItem(STORAGE_KEY, nextAudience);
+      previousAudienceRef.current = null;
     };
 
     const clearAudience = () => {
+      previousAudienceRef.current = audience;
       setAudienceState(null);
       window.localStorage.removeItem(STORAGE_KEY);
     };
@@ -110,10 +129,16 @@ export const AudienceProvider = ({ children }: { children: ReactNode }) => {
     return {
       audience,
       profile: audienceProfiles.find((profile) => profile.id === audience) ?? null,
+      isTransitioning,
+      transitionTarget,
       setAudience,
       clearAudience
     };
-  }, [audience]);
+  }, [audience, isTransitioning, transitionTarget]);
+
+  useEffect(() => () => {
+    if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
+  }, []);
 
   return <AudienceContext.Provider value={value}>{children}</AudienceContext.Provider>;
 };

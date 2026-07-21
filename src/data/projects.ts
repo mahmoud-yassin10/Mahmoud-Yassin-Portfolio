@@ -18,6 +18,8 @@ export type Project = {
   highlights: string[];
   externalLinkPlaceholder: string;
   externalLink?: string;
+  /** Optional URL used only for the embedded preview (for example, a forced language variant). */
+  livePreviewUrl?: string;
   /**
    * If set, skip screenshot APIs and reveal the live iframe after this many ms so splash screens
    * can finish before the preview is shown (e.g. Flousy marketing site).
@@ -452,7 +454,10 @@ const projectSeeds: ProjectSeed[] = [
       "RTL-ready content presentation where needed"
     ],
     externalLinkPlaceholder: "#",
-    externalLink: "https://modx-egypt.com"
+    externalLink: "https://modx-egypt.com",
+    livePreviewUrl: "https://www.modx-egypt.com/?lang=en",
+    // MODX changes frequently; render the current storefront instead of a cached thumbnail.
+    livePreviewRevealDelayMs: 1800
   },
   {
     title: "FemPlus Magazine",
