@@ -13,7 +13,7 @@ const AudienceGate = () => {
   const { audience, setAudience } = useAudience();
   const location = useLocation();
   const isOpen = !audience;
-  if (location.pathname.startsWith("/flousy")) return null;
+  if (location.pathname.startsWith("/flousy") || location.pathname.startsWith("/hub")) return null;
 
   const chooseAudience = (nextAudience: Audience) => {
     setAudience(nextAudience);

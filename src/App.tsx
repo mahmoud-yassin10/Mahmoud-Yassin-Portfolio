@@ -22,6 +22,7 @@ import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
 import { AudienceProvider } from "@/context/AudienceContext";
 import AudienceGate from "@/components/AudienceGate";
 import AudienceTransition from "@/components/AudienceTransition";
+import HubPage from "./pages/HubPage";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/flousy" element={<FlousyLanding />} />
+          <Route path="/hub" element={<HubPage />} />
           <Route path="/flousy/dashboard" element={<FlousyDashboard />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/flousy/delete-account" element={<DeleteAccount />} />
