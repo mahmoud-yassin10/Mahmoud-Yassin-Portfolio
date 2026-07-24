@@ -58,6 +58,13 @@ const App = () => (
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/flousy" element={<FlousyLanding />} />
           <Route path="/hub" element={<HubPage />} />
+          <Route path="/hub/admin" element={<HubPage />} />
+          <Route path="/hub/student" element={<HubPage />} />
+          <Route path="/hub/students" element={<HubPage />} />
+          <Route path="/hub/groups" element={<HubPage />} />
+          <Route path="/hub/assignments" element={<HubPage />} />
+          <Route path="/hub/sessions" element={<HubPage />} />
+          <Route path="/hub/submissions" element={<HubPage />} />
           <Route path="/flousy/dashboard" element={<FlousyDashboard />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/flousy/delete-account" element={<DeleteAccount />} />

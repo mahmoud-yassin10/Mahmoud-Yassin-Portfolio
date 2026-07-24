@@ -289,6 +289,10 @@ html:not(.dark) .audience-option-icon { border-color: hsl(199 89% 65% / .42); ba
 .hub-admin-nav { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 36px; padding: 6px; border: 1px solid rgba(151, 174, 221, .15); border-radius: 13px; background: rgba(5, 12, 27, .38); }
 .hub-admin-nav button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; color: #8192b3; border: 1px solid transparent; border-radius: 8px; background: transparent; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; text-transform: capitalize; cursor: pointer; transition: color .2s ease, background .2s ease, border-color .2s ease; }
 .hub-admin-nav button:hover, .hub-admin-nav button.active { color: #eaf2ff; border-color: rgba(114, 227, 255, .22); background: rgba(114, 227, 255, .09); }
+.hub-student-nav { display: flex; gap: 7px; margin-bottom: 36px; padding: 6px; width: fit-content; border: 1px solid rgba(151, 174, 221, .15); border-radius: 13px; background: rgba(5, 12, 27, .38); }
+.hub-student-nav button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; color: #8192b3; border: 1px solid transparent; border-radius: 8px; background: transparent; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; cursor: pointer; transition: color .2s ease, background .2s ease, border-color .2s ease; }
+.hub-student-nav button:hover, .hub-student-nav button.active { color: #eaf2ff; border-color: rgba(114, 227, 255, .22); background: rgba(114, 227, 255, .09); }
+.hub-student-nav button span { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; color: #06172b; border-radius: 99px; background: #72e3ff; font-size: 9px; }
 .hub-admin-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .hub-metric-card { min-height: 170px; }
 .hub-metric-icon { display: grid; place-items: center; width: 35px; height: 35px; margin-bottom: 25px; color: #72e3ff; border: 1px solid rgba(114, 227, 255, .25); border-radius: 10px; background: rgba(114, 227, 255, .08); }
@@ -315,6 +319,18 @@ html:not(.dark) .audience-option-icon { border-color: hsl(199 89% 65% / .42); ba
 .hub-submission pre, .hub-submission-output { margin: 0; padding: 14px; overflow: auto; color: #bcd0ed; border-top: 1px solid rgba(151, 174, 221, .1); white-space: pre-wrap; font: 11px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .hub-submission-output { color: #9fe8b1; background: rgba(5, 12, 27, .3); }
 .hub-submission-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 14px; }
+.hub-assignment-brief { margin: 16px 0; }
+.hub-assignment-brief p { margin: 0; color: #91a4c5; font-size: 12px; line-height: 1.7; }
+.hub-session-card { margin-top: 16px; }
+.hub-feedback-field { display: grid; gap: 7px; padding: 14px; color: #aabbd8; border-top: 1px solid rgba(151, 174, 221, .1); font-size: 11px; }
+.hub-feedback-field textarea { width: 100%; resize: vertical; color: #edf5ff; outline: none; border: 1px solid rgba(151, 174, 221, .2); border-radius: 9px; background: rgba(5, 12, 27, .48); padding: 10px; font: 12px/1.5 ui-sans-serif, system-ui, sans-serif; }
+html:not(.dark) .hub-assignment-brief p { color: #657594; }
+html:not(.dark) .hub-feedback-field { color: #5d6d8c; border-color: rgba(46, 78, 137, .13); }
+html:not(.dark) .hub-feedback-field textarea { color: #172441; border-color: rgba(46, 78, 137, .2); background: rgba(248, 251, 255, .86); }
+.hub-submission-feedback { padding: 13px 14px; border-top: 1px solid rgba(151, 174, 221, .1); color: #9fe8b1; font-size: 11px; }
+.hub-submission-feedback p { margin: 5px 0 0; color: #b8c7e5; line-height: 1.5; }
+html:not(.dark) .hub-submission-feedback { border-color: rgba(46, 78, 137, .13); color: #28708a; }
+html:not(.dark) .hub-submission-feedback p { color: #53627f; }
 html:not(.dark) .hub-shell,
 html:not(.dark) .hub-auth-page,
 html:not(.dark) .hub-loading-state { color: #172441; background: rgba(239, 247, 255, .72); }
@@ -388,6 +404,11 @@ html:not(.dark) .hub-admin-nav { border-color: rgba(46, 78, 137, .15); backgroun
 html:not(.dark) .hub-admin-nav button { color: #6e7d99; }
 html:not(.dark) .hub-admin-nav button:hover,
 html:not(.dark) .hub-admin-nav button.active { color: #173a76; border-color: rgba(38, 120, 201, .22); background: rgba(114, 194, 255, .13); }
+html:not(.dark) .hub-student-nav { border-color: rgba(46, 78, 137, .15); background: rgba(255, 255, 255, .52); }
+html:not(.dark) .hub-student-nav button { color: #6e7d99; }
+html:not(.dark) .hub-student-nav button:hover,
+html:not(.dark) .hub-student-nav button.active { color: #173a76; border-color: rgba(38, 120, 201, .22); background: rgba(114, 194, 255, .13); }
+html:not(.dark) .hub-student-nav button span { color: #fff; background: #2678c9; }
 html:not(.dark) .hub-metric-icon { color: #2678c9; border-color: rgba(38, 120, 201, .25); background: rgba(114, 194, 255, .13); }
 html:not(.dark) .hub-metric-card > strong,
 html:not(.dark) .hub-metric-card h2 { color: #172441; }
