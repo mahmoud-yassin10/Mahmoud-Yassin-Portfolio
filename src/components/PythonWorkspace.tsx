@@ -1,12 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Check, Play, RotateCcw, Send, Terminal, TimerReset } from "lucide-react";
 
 const PYODIDE_VERSION = "0.26.2";
-const DEFAULT_CODE = `def greet(name):
-    return f"Hello, {name}!"
-
-
-print(greet("learner"))`;
+const DEFAULT_CODE = "";
 
 type PythonWorkspaceProps = {
   assignmentTitle?: string;
@@ -46,6 +42,7 @@ const PythonWorkspace = ({ assignmentTitle = "Python practice", initialCode = DE
   const [submitted, setSubmitted] = useState(false);
   const workerRef = useRef<Worker | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  const editorRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => () => {
     workerRef.current?.terminate();
@@ -88,8 +85,8 @@ const PythonWorkspace = ({ assignmentTitle = "Python practice", initialCode = DE
   };
 
   const resetCode = () => {
-    setCode(initialCode);
-    setOutput("Run your code to see the output here.");
+    setCode("");
+    setOutput("Workspace reset. Write your code and run it when you are ready.");
     setSubmitted(false);
   };
 
@@ -98,6 +95,43 @@ const PythonWorkspace = ({ assignmentTitle = "Python practice", initialCode = DE
     if (!onSubmit) return;
     await onSubmit(code, output);
     setSubmitted(true);
+  };
+
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    const editor = event.currentTarget;
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selected = code.slice(start, end);
+    const pairs: Record<string, string> = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const indent = "    ";
+      if (event.shiftKey && start === end && code.slice(Math.max(0, start - indent.length), start) === indent) {
+        const next = code.slice(0, start - indent.length) + code.slice(start);
+        setCode(next); requestAnimationFrame(() => { editor.selectionStart = editor.selectionEnd = start - indent.length; });
+      } else if (event.shiftKey) {
+        const lineStart = code.lastIndexOf("\n", start - 1) + 1;
+        if (code.slice(lineStart, start).startsWith(indent)) { const next = code.slice(0, lineStart) + code.slice(lineStart + indent.length); setCode(next); requestAnimationFrame(() => { editor.selectionStart = editor.selectionEnd = Math.max(lineStart, start - indent.length); }); }
+      } else { const next = code.slice(0, start) + indent + code.slice(end); setCode(next); requestAnimationFrame(() => { editor.selectionStart = editor.selectionEnd = start + indent.length; }); }
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const lineStart = code.lastIndexOf("\n", start - 1) + 1;
+      const indentation = code.slice(lineStart, start).match(/^\s*/)?.[0] ?? "";
+      const extraIndent = /:\s*(#.*)?$/.test(code.slice(lineStart, start)) ? "    " : "";
+      const next = code.slice(0, start) + "\n" + indentation + extraIndent + code.slice(end);
+      setCode(next); requestAnimationFrame(() => { const cursor = start + 1 + indentation.length + extraIndent.length; editor.selectionStart = editor.selectionEnd = cursor; });
+      return;
+    }
+    if (pairs[event.key]) {
+      event.preventDefault();
+      const closing = pairs[event.key];
+      const next = code.slice(0, start) + event.key + (selected || closing) + code.slice(end);
+      setCode(next); requestAnimationFrame(() => { editor.selectionStart = start + 1; editor.selectionEnd = selected ? start + 1 + selected.length : start + 1; });
+      return;
+    }
+    if ((event.key === ")" || event.key === "]" || event.key === "}") && start === end && code[start] === event.key) { event.preventDefault(); requestAnimationFrame(() => { editor.selectionStart = editor.selectionEnd = start + 1; }); }
   };
 
   return (
@@ -110,8 +144,11 @@ const PythonWorkspace = ({ assignmentTitle = "Python practice", initialCode = DE
         <div className="hub-editor-panel">
           <div className="hub-editor-toolbar"><span className="hub-file-tab">main.py</span><span className="hub-editor-meta">Standard library</span></div>
           <textarea
+            ref={editorRef}
             value={code}
             onChange={(event) => setCode(event.target.value)}
+            onKeyDown={handleEditorKeyDown}
+            placeholder="# Start writing Python here..."
             spellCheck={false}
             aria-label="Python code editor"
             className="hub-code-editor"

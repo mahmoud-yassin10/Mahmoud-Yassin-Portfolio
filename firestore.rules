@@ -3,30 +3,39 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isTeacher() {
-      return signedIn() && get(/databases/$(database)/documents/hub_teachers/$(request.auth.uid)).data.role == 'teacher';
-    }
+    function isAdmin() { return signedIn() && request.auth.uid == 'ONm43id8YgOFon8lVWMRMHcGqBs2'; }
+    function isTeacher() { return isAdmin(); }
 
     match /hub_teachers/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
-      allow write: if false;
+      allow write: if isAdmin() && uid == request.auth.uid;
     }
 
     match /hub_students/{uid} {
       allow read: if isTeacher() || (signedIn() && request.auth.uid == uid);
-      allow create, update, delete: if isTeacher();
+      allow create, update, delete: if isAdmin();
     }
 
     match /hub_assignments/{assignmentId} {
       allow read: if signedIn() && resource.data.published == true;
-      allow create, update, delete: if isTeacher();
+      allow create, update, delete: if isAdmin();
     }
 
     match /hub_submissions/{submissionId} {
       allow create: if signedIn() && request.resource.data.studentUid == request.auth.uid;
       allow read: if isTeacher() || (signedIn() && resource.data.studentUid == request.auth.uid);
-      allow update: if isTeacher() || (signedIn() && resource.data.studentUid == request.auth.uid);
+      allow update: if isTeacher();
       allow delete: if false;
+    }
+
+    match /hub_groups/{groupId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /hub_sessions/{sessionId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
     }
   }
 }

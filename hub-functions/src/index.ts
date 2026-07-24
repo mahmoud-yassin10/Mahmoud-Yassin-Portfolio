@@ -14,22 +14,21 @@ type CreateStudentData = {
   temporaryPassword?: unknown;
 };
 
+const ADMIN_UID = "ONm43id8YgOFon8lVWMRMHcGqBs2";
+
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-async function requireTeacher(request: CallableRequest<unknown>) {
+async function requireAdmin(request: CallableRequest<unknown>) {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Sign in to manage the Student Hub.");
-  const teacher = await db.doc(`hub_teachers/${uid}`).get();
-  if (!teacher.exists || teacher.data()?.role !== "teacher") {
-    throw new HttpsError("permission-denied", "Teacher access is required.");
-  }
+  if (uid !== ADMIN_UID) throw new HttpsError("permission-denied", "Only the Hub administrator can perform this action.");
   return uid;
 }
 
 export const createHubStudent = onCall({ region: "me-central1", timeoutSeconds: 30 }, async (request) => {
-  const teacherUid = await requireTeacher(request);
+  const teacherUid = await requireAdmin(request);
   const data = (request.data ?? {}) as CreateStudentData;
   const email = typeof data.email === "string" ? data.email.trim().toLowerCase() : "";
   const name = typeof data.name === "string" ? data.name.trim() : "";
