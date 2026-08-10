@@ -16,6 +16,7 @@ import PortfolioPage from "./pages/PortfolioPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ServicesPage from "./pages/ServicesPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import WorkPage from "./pages/WorkPage";
 import FlousyDashboard from "./pages/FlousyDashboard";
 import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
@@ -67,6 +68,7 @@ const App = () => (
           <Route path="/hub/submissions" element={<HubPage />} />
           <Route path="/flousy/dashboard" element={<FlousyDashboard />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/flousy/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/flousy/delete-account" element={<DeleteAccount />} />
           <Route path="/flousy/delete-data" element={<DeleteData />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

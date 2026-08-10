@@ -156,6 +156,14 @@ const FlousyLanding = () => {
                 >
                   <a href="/flousy/privacy-policy">Privacy Policy</a>
                 </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/40 hover:bg-primary hover:text-primary-foreground"
+                  asChild
+                >
+                  <a href="/flousy/terms-and-conditions">Terms and Conditions</a>
+                </Button>
               </div>
             </div>
           </div>
