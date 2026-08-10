@@ -6,6 +6,7 @@ import {
   CircleAlert,
   Download,
   Eye,
+  GraduationCap,
   Inbox,
   LogIn,
   LogOut,
@@ -36,7 +37,7 @@ import {
 } from "recharts";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { flousyAuth, isFlousyFirebaseConfigured } from "@/lib/flousyFirebase";
-import { FUNNEL_EVENTS, isFlousyAdmin, loadLiveDashboardData, type AnalyticsEvent, type DashboardData, type FeedbackItem } from "@/lib/flousyAnalytics";
+import { FUNNEL_EVENTS, isFlousyAdmin, loadLiveDashboardData, reviewStudentVerification, type AnalyticsEvent, type DashboardData, type FeedbackItem, type StudentVerificationItem } from "@/lib/flousyAnalytics";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -91,7 +92,11 @@ function makeDemoData(): DashboardData {
     { id: "f2", message: "SMS permission opens, then returns to the same screen on my Samsung device.", category: "Bug", createdAt: new Date(now.getTime() - 26 * 3600000), uid: "demo-user-22", hasPhotos: true, status: "reviewing" },
     { id: "f3", message: "Please add a way to quickly duplicate last month’s transactions.", category: "Idea", createdAt: new Date(now.getTime() - 4 * 86400000), uid: "demo-user-31", status: "resolved" },
   ];
-  return { events, feedback, live: false };
+  const studentVerifications: StudentVerificationItem[] = [
+    { id: "s1", uid: "demo-user-11", status: "pending", method: "document", email: "student@example.edu", universityHint: "AUC", documentDownloadUrl: "https://placehold.co/600x400", createdAt: new Date(now.getTime() - 3 * 3600000) },
+    { id: "s2", uid: "demo-user-22", status: "verified", method: "email", email: "name@guc.edu.eg", createdAt: new Date(now.getTime() - 2 * 86400000) },
+  ];
+  return { events, feedback, studentVerifications, live: false };
 }
 
 function StatCard({ label, value, change, icon: Icon, tone = "green" }: { label: string; value: string; change: string; icon: typeof Users; tone?: string }) {
@@ -142,7 +147,7 @@ const FlousyDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<DashboardData>(() => makeDemoData());
   const [days, setDays] = useState(30);
-  const [activeView, setActiveView] = useState<"overview" | "funnel" | "feedback">("overview");
+  const [activeView, setActiveView] = useState<"overview" | "funnel" | "feedback" | "students">("overview");
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -150,9 +155,12 @@ const FlousyDashboard = () => {
   const [mobileNav, setMobileNav] = useState(false);
   const [accessDenied, setAccessDenied] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
+  const [students, setStudents] = useState<StudentVerificationItem[]>([]);
+  const [studentBusyId, setStudentBusyId] = useState("");
 
   useEffect(() => { if (flousyAuth) return onAuthStateChanged(flousyAuth, setUser); return undefined; }, []);
   useEffect(() => { setFeedback(data.feedback); }, [data.feedback]);
+  useEffect(() => { setStudents(data.studentVerifications); }, [data.studentVerifications]);
 
   const refresh = useCallback(async () => {
     if (!isFlousyFirebaseConfigured || !user) return;
@@ -161,7 +169,7 @@ const FlousyDashboard = () => {
       if (!(await isFlousyAdmin(user.uid))) { setAccessDenied(true); return; }
       setData(await loadLiveDashboardData(days));
     }
-    catch { setNotice("Live data could not be loaded. Check Firestore indexes, rules, and the Firebase connection, then refresh."); setData({ events: [], feedback: [], live: true }); }
+    catch { setNotice("Live data could not be loaded. Check Firestore indexes, rules, and the Firebase connection, then refresh."); setData({ events: [], feedback: [], studentVerifications: [], live: true }); }
     finally { setLoading(false); }
   }, [days, user]);
   useEffect(() => { if (user) void refresh(); }, [user, refresh]);
@@ -179,23 +187,57 @@ const FlousyDashboard = () => {
   const platformData = useMemo(() => platforms.length ? platforms : data.live ? [] : [{ name: "android", value: 68 }, { name: "web", value: 25 }, { name: "ios", value: 7 }], [data.live, platforms]);
   const eventRows = useMemo(() => [...events].sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf()).slice(0, 12), [events]);
   const filteredFeedback = feedback.filter(item => `${item.message} ${item.category ?? ""}`.toLowerCase().includes(search.toLowerCase()));
+  const filteredStudents = students.filter(item => `${item.uid} ${item.email ?? ""} ${item.universityHint ?? ""} ${item.status}`.toLowerCase().includes(search.toLowerCase()));
+  const pendingStudents = students.filter(item => item.status === "pending").length;
+
+  const reviewStudent = async (item: StudentVerificationItem, status: "verified" | "rejected") => {
+    if (!user) return;
+    let rejectionReason: string | undefined;
+    if (status === "rejected") {
+      rejectionReason = window.prompt("Rejection reason (optional)") ?? undefined;
+    }
+    setStudentBusyId(item.id);
+    try {
+      if (data.live) {
+        await reviewStudentVerification({
+          inboxId: item.id,
+          uid: item.uid,
+          status,
+          rejectionReason,
+          reviewerUid: user.uid,
+        });
+      }
+      setStudents(current => current.map(row => row.id === item.id ? {
+        ...row,
+        status,
+        rejectionReason: status === "rejected" ? (rejectionReason ?? "") : undefined,
+        reviewedAt: new Date(),
+        reviewedBy: user.uid,
+      } : row));
+    } catch {
+      setNotice("Could not update student verification. Check Firestore rules and try again.");
+    } finally {
+      setStudentBusyId("");
+    }
+  };
 
   if (isFlousyFirebaseConfigured && !user) return <LoginGate onLogin={setUser} />;
   if (accessDenied) return <div className="dashboard-login"><AnimatedBackground /><div className="dashboard-login-panel"><div className="dashboard-login-head"><div className="dashboard-brand-mark"><ShieldCheck size={17} /> FLOUSY / PRIVATE</div><ThemeToggle /></div><h1>Access denied.</h1><p>This account is authenticated but is not provisioned as a Flousy owner. Add its UID to <code>admin_users</code> in Firestore.</p><button className="dashboard-primary-button" onClick={() => flousyAuth && signOut(flousyAuth)}>Sign out <LogOut size={16} /></button></div></div>;
   return <div className="dashboard-shell"><AnimatedBackground />
     <aside className={`dashboard-sidebar ${mobileNav ? "open" : ""}`}><div className="dashboard-sidebar-brand"><div className="dashboard-logo"><Sparkles size={18} /></div><div><strong>FLOUSY</strong><span>owner console</span></div><button className="dashboard-mobile-close" onClick={() => setMobileNav(false)}><X size={17} /></button></div>
       <div className="dashboard-sidebar-section">Workspace</div>
-      {[["overview", BarChart3, "Overview"], ["funnel", Users, "Funnel & retention"], ["feedback", Inbox, "Feedback inbox"]].map(([view, Icon, label]) => <button key={view as string} className={`dashboard-nav-item ${activeView === view ? "active" : ""}`} onClick={() => { setActiveView(view as typeof activeView); setMobileNav(false); }}><Icon size={17} />{label as string}{view === "feedback" && feedback.filter(item => item.status === "new").length > 0 && <span className="dashboard-nav-count">{feedback.filter(item => item.status === "new").length}</span>}</button>)}
+      {[["overview", BarChart3, "Overview"], ["funnel", Users, "Funnel & retention"], ["feedback", Inbox, "Feedback inbox"], ["students", GraduationCap, "Student verification"]].map(([view, Icon, label]) => <button key={view as string} className={`dashboard-nav-item ${activeView === view ? "active" : ""}`} onClick={() => { setActiveView(view as typeof activeView); setMobileNav(false); }}><Icon size={17} />{label as string}{view === "feedback" && feedback.filter(item => item.status === "new").length > 0 && <span className="dashboard-nav-count">{feedback.filter(item => item.status === "new").length}</span>}{view === "students" && pendingStudents > 0 && <span className="dashboard-nav-count">{pendingStudents}</span>}</button>)}
       <div className="dashboard-sidebar-section">Signals</div><div className="dashboard-signal"><span className="dashboard-live-dot" />{data.live ? "Live connection" : "Preview dataset"}<small>{data.live ? "Firestore synced" : "No Firebase env yet"}</small></div>
       <div className="dashboard-sidebar-bottom"><div className="dashboard-sidebar-section">Owner</div><div className="dashboard-owner"><div className="dashboard-owner-avatar">M</div><div><strong>{user?.email?.split("@")[0] ?? "Mahmoud"}</strong><span>product owner</span></div></div>{user && <button className="dashboard-nav-item" onClick={() => flousyAuth && signOut(flousyAuth)}><LogOut size={16} />Sign out</button>}</div>
     </aside>
     {mobileNav && <button className="dashboard-backdrop" onClick={() => setMobileNav(false)} aria-label="Close navigation" />}
-    <main className="dashboard-main"><header className="dashboard-topbar"><button className="dashboard-menu-button" onClick={() => setMobileNav(true)}><Menu size={19} /></button><div className="dashboard-breadcrumb"><span>Flousy</span><b>/</b><strong>{activeView === "overview" ? "Control room" : activeView === "funnel" ? "Funnel & retention" : "Feedback inbox"}</strong></div><div className="dashboard-top-actions"><ThemeToggle /><div className="dashboard-status"><span className="dashboard-live-dot" /> {data.live ? "Live" : "Preview"}</div><button className="dashboard-icon-button" onClick={() => void refresh()} disabled={loading} title="Refresh"><RefreshCw size={16} className={loading ? "animate-spin" : ""} /></button></div></header>
-      <div className="dashboard-content"><div className="dashboard-heading"><div><div className="dashboard-kicker">Preproduction / testing period</div><h1>{activeView === "overview" ? "What is Flousy learning?" : activeView === "funnel" ? "The journey, end to end." : "Listen closely."}</h1><p>{activeView === "overview" ? "A decision-ready view of acquisition, activation, and product health." : activeView === "funnel" ? "See where people make it through—and where the product asks too much." : "Every note is a signal. Keep the useful ones close."}</p></div><div className="dashboard-heading-actions"><select value={days} onChange={e => setDays(Number(e.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="dashboard-secondary-button" onClick={() => exportCsv(data.events)}><Download size={15} />Export</button></div></div>
+    <main className="dashboard-main"><header className="dashboard-topbar"><button className="dashboard-menu-button" onClick={() => setMobileNav(true)}><Menu size={19} /></button><div className="dashboard-breadcrumb"><span>Flousy</span><b>/</b><strong>{activeView === "overview" ? "Control room" : activeView === "funnel" ? "Funnel & retention" : activeView === "students" ? "Student verification" : "Feedback inbox"}</strong></div><div className="dashboard-top-actions"><ThemeToggle /><div className="dashboard-status"><span className="dashboard-live-dot" /> {data.live ? "Live" : "Preview"}</div><button className="dashboard-icon-button" onClick={() => void refresh()} disabled={loading} title="Refresh"><RefreshCw size={16} className={loading ? "animate-spin" : ""} /></button></div></header>
+      <div className="dashboard-content"><div className="dashboard-heading"><div><div className="dashboard-kicker">Preproduction / testing period</div><h1>{activeView === "overview" ? "What is Flousy learning?" : activeView === "funnel" ? "The journey, end to end." : activeView === "students" ? "Student pricing gate." : "Listen closely."}</h1><p>{activeView === "overview" ? "A decision-ready view of acquisition, activation, and product health." : activeView === "funnel" ? "See where people make it through—and where the product asks too much." : activeView === "students" ? "Approve university emails and ID uploads that unlock student SKUs." : "Every note is a signal. Keep the useful ones close."}</p></div><div className="dashboard-heading-actions"><select value={days} onChange={e => setDays(Number(e.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="dashboard-secondary-button" onClick={() => exportCsv(data.events)}><Download size={15} />Export</button></div></div>
       {notice && <div className="dashboard-notice"><CircleAlert size={16} />{notice}<button onClick={() => setNotice("")}><X size={14} /></button></div>}
       {activeView === "overview" && <><div className="dashboard-stat-grid"><StatCard label="People reached" value={formatCompact(uniqueUsers)} change="+18.4% vs prior period" icon={Users} /><StatCard label="Store visits" value={formatCompact(data.events.filter(e => e.name === "store_visit").length)} change="+12.1% vs prior period" icon={Eye} tone="violet" /><StatCard label="Install → signup" value={`${installs ? Math.round((completed / installs) * 100) : 0}%`} change="Activation checkpoint" icon={Smartphone} tone="orange" /><StatCard label="Plans generated" value={formatCompact(plans)} change="The value moment" icon={Sparkles} tone="cyan" /></div><div className="dashboard-grid dashboard-grid-main"><ChartCard title="Acquisition pulse" eyebrow="Daily movement" className="dashboard-chart-large"><ResponsiveContainer width="100%" height={250}><AreaChart data={trend}><defs><linearGradient id="visits" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={accent} stopOpacity={.3}/><stop offset="100%" stopColor={accent} stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8, color: "#f4f7f6" }}/><Area type="monotone" dataKey="visits" stroke={accent} fill="url(#visits)" strokeWidth={2}/><Area type="monotone" dataKey="installs" stroke={violet} fill="none" strokeWidth={2}/></AreaChart></ResponsiveContainer><div className="dashboard-chart-legend"><span><i style={{ background: accent }} />Store visits</span><span><i style={{ background: violet }} />Installs</span></div></ChartCard><ChartCard title="Where it runs" eyebrow="Platform mix" className="dashboard-chart-small"><div className="dashboard-donut-wrap"><ResponsiveContainer width="100%" height={190}><PieChart><Pie data={platformData} innerRadius={57} outerRadius={78} paddingAngle={4} dataKey="value"><Cell fill={accent}/><Cell fill={violet}/><Cell fill={orange}/></Pie><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/></PieChart></ResponsiveContainer><div className="dashboard-donut-center"><strong>{formatCompact(data.events.length)}</strong><span>events</span></div></div><div className="dashboard-platform-list">{platformData.map((item, index) => <div key={item.name}><span><i style={{ background: [accent, violet, orange][index] }} />{item.name}</span><b>{item.value}%</b></div>)}</div></ChartCard></div><div className="dashboard-grid dashboard-grid-bottom"><ChartCard title="Event stream" eyebrow="Latest product signals" className="dashboard-table-card"><EventTable events={eventRows} /></ChartCard><ChartCard title="At a glance" eyebrow="Quality of signal"><div className="dashboard-signal-stack"><div><span>Portfolio visits</span><strong>{formatCompact(portfolioVisits)}</strong></div><div><span>Portfolio sessions</span><strong>{formatCompact(portfolioSessions)}</strong></div><div><span>Feedback waiting</span><strong>{feedback.filter(item => item.status === "new").length}</strong></div><div><span>Returning on day 1</span><strong>{uniqueUsers ? Math.round((data.events.filter(e => e.name === "day_1_return").length / uniqueUsers) * 100) : 0}%</strong></div><div><span>Arabic audience</span><strong>{data.events.length ? Math.round((data.events.filter(e => e.locale === "ar").length / data.events.length) * 100) : 0}%</strong></div><div><span>Data freshness</span><strong>{data.live ? "Live" : "Preview"}</strong></div></div></ChartCard></div></>}
       {activeView === "funnel" && <><div className="dashboard-grid dashboard-grid-funnel"><ChartCard title="Activation funnel" eyebrow="The first successful loop" className="dashboard-chart-large"><div className="dashboard-funnel">{funnel.map((step, index) => <div className="dashboard-funnel-row" key={step.name}><div className="dashboard-funnel-label"><span>{String(index + 1).padStart(2, "0")}</span><b>{step.label}</b><small>{step.rate}% of visits</small></div><div className="dashboard-funnel-track"><div style={{ width: `${Math.max(7, step.rate)}%` }} /></div><strong>{step.count}</strong></div>)}</div></ChartCard><ChartCard title="Return behavior" eyebrow="Retention moments"><ResponsiveContainer width="100%" height={300}><LineChart data={trend}><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/><Line type="monotone" dataKey="active" stroke={cyan} strokeWidth={2} dot={false}/></LineChart></ResponsiveContainer><div className="dashboard-retention-callout"><span className="dashboard-live-dot" /><div><strong>{uniqueUsers ? Math.round((data.events.filter(e => e.name === "day_7_return").length / uniqueUsers) * 100) : 0}% week-one return</strong><small>Keep watching this as onboarding changes ship.</small></div></div></ChartCard></div><ChartCard title="Event conversion map" eyebrow="Compare any event"><div className="dashboard-event-controls"><div className="dashboard-search"><Search size={15}/><select value={selectedEvent} onChange={e => setSelectedEvent(e.target.value)}><option value="all">All events</option><option value="portfolio_visit">portfolio_visit</option>{FUNNEL_EVENTS.map(name => <option key={name} value={name}>{name}</option>)}</select></div><span>{events.length} matching events</span></div><EventTable events={eventRows} /></ChartCard></>}
       {activeView === "feedback" && <><div className="dashboard-feedback-summary"><StatCard label="All feedback" value={String(feedback.length)} change="Captured in-app" icon={Inbox} tone="violet" /><StatCard label="New to review" value={String(feedback.filter(item => item.status === "new").length)} change="Needs your attention" icon={CircleAlert} tone="orange" /><StatCard label="With media" value={String(feedback.filter(item => item.hasPhotos || item.hasAudio).length)} change="Screenshots or audio" icon={Eye} /></div><ChartCard title="Feedback inbox" eyebrow="From the app"><div className="dashboard-feedback-tools"><div className="dashboard-search"><Search size={15}/><input placeholder="Search feedback" value={search} onChange={e => setSearch(e.target.value)} /></div><span>{filteredFeedback.length} notes</span></div><div className="dashboard-feedback-list">{filteredFeedback.map(item => <article className="dashboard-feedback-item" key={item.id}><div className="dashboard-feedback-item-top"><span className={`dashboard-feedback-tag ${item.category === "Bug" ? "bug" : item.category === "Idea" ? "idea" : "ux"}`}>{item.category ?? "Other"}</span><time>{formatDate(item.createdAt)}</time></div><p>{item.message}</p><div className="dashboard-feedback-item-bottom"><span>{item.uid ?? "anonymous"}</span><div>{(item.hasPhotos || item.hasAudio) && <span className="dashboard-media-chip"><Eye size={13}/>media attached</span>}<select value={item.status ?? "new"} onChange={e => setFeedback(current => current.map(feedbackItem => feedbackItem.id === item.id ? { ...feedbackItem, status: e.target.value as FeedbackItem["status"] } : feedbackItem))}><option value="new">New</option><option value="reviewing">Reviewing</option><option value="resolved">Resolved</option></select></div></div></article>)}{!filteredFeedback.length && <div className="dashboard-empty"><Inbox size={24}/><strong>No feedback matches.</strong><span>New in-app feedback will appear here.</span></div>}</div></ChartCard></>}
+      {activeView === "students" && <><div className="dashboard-feedback-summary"><StatCard label="All requests" value={String(students.length)} change="Email + document" icon={GraduationCap} tone="violet" /><StatCard label="Pending review" value={String(pendingStudents)} change="Needs your decision" icon={CircleAlert} tone="orange" /><StatCard label="Verified" value={String(students.filter(item => item.status === "verified").length)} change="Student pricing unlocked" icon={Check} tone="cyan" /></div><ChartCard title="Student verification" eyebrow="Inbox"><div className="dashboard-feedback-tools"><div className="dashboard-search"><Search size={15}/><input placeholder="Search students" value={search} onChange={e => setSearch(e.target.value)} /></div><span>{filteredStudents.length} requests</span></div><div className="dashboard-feedback-list">{filteredStudents.map(item => <article className="dashboard-feedback-item" key={item.id}><div className="dashboard-feedback-item-top"><span className={`dashboard-feedback-tag ${item.status === "pending" ? "bug" : item.status === "verified" ? "idea" : "ux"}`}>{item.status}</span><time>{formatDate(item.createdAt)}</time></div><p><strong>{item.uid}</strong>{item.email ? ` · ${item.email}` : ""}{item.universityHint ? ` · ${item.universityHint}` : ""}{item.method ? ` · via ${item.method}` : ""}</p>{item.documentDownloadUrl && <div style={{ margin: "10px 0" }}><a href={item.documentDownloadUrl} target="_blank" rel="noreferrer"><img src={item.documentDownloadUrl} alt="Student ID" style={{ maxWidth: "100%", maxHeight: 220, borderRadius: 10, objectFit: "cover" }} /></a></div>}{item.rejectionReason && <p style={{ opacity: .75 }}>Reason: {item.rejectionReason}</p>}<div className="dashboard-feedback-item-bottom"><span>{item.reviewedBy ? `Reviewed by ${item.reviewedBy}` : "Awaiting review"}</span><div style={{ display: "flex", gap: 8 }}><button className="dashboard-secondary-button" disabled={studentBusyId === item.id || item.status === "verified"} onClick={() => void reviewStudent(item, "verified")}><Check size={14}/>Approve</button><button className="dashboard-secondary-button" disabled={studentBusyId === item.id || item.status === "rejected"} onClick={() => void reviewStudent(item, "rejected")}><X size={14}/>Reject</button></div></div></article>)}{!filteredStudents.length && <div className="dashboard-empty"><GraduationCap size={24}/><strong>No student requests.</strong><span>Email and ID submissions will appear here.</span></div>}</div></ChartCard></>}
       </div></main>
   </div>;
 };
