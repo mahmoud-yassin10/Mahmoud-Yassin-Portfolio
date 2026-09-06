@@ -7,50 +7,14 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Skills from "@/components/Skills";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-type CertificationItem = {
-  title: string;
-  organization: string;
-  details: string;
-  period: string;
-  achievements: string[];
-  icon: typeof Award;
-};
-
-const certifications: CertificationItem[] = [
-  {
-    title: "Junior Presidential Leadership Program (JPLP)",
-    organization: "National Training Academy (NTA)",
-    details: "Top 1.37% of 7,315 applicants",
-    period: "Aug 2025 - Sep 2025",
-    icon: Award,
-    achievements: [
-      "Selected as 1 of 100 students nationwide from 7,315+ applicants",
-      "21-day intensive leadership curriculum",
-      "Training in critical thinking, strategic planning, innovation, entrepreneurship",
-      "Developed skills in teamwork, emotional intelligence, and work-readiness",
-      "Selected as 1 of 5 role models for televised ONTV interview"
-    ]
-  },
-  {
-    title: "Online Courses & Certifications",
-    organization: "Harvard edX, MITx, and more",
-    details: "Self-directed technical education",
-    period: "2024 - Present",
-    icon: BookOpen,
-    achievements: [
-      "CS50's Introduction to Computer Science (Harvard edX, Sep 2024 - Nov 2024)",
-      "CS50's Introduction to Programming with Python (Harvard edX, Nov 2024 - Jan 2025)",
-      "CS50's Introduction to AI with Python (Harvard edX, Jan 2025 - Mar 2025)",
-      "Data Science Series: R Basics, Visualization, Probability, Inference, ML (Harvard edX, 2025)",
-      "Machine Learning with Python (MITx, Sep 2025 - Dec 2025)",
-      "iSchool Full Software & AI Curriculum",
-      "CLS Python Course - Intensive Training"
-    ]
-  }
-];
+const certificationIcons = [Award, BookOpen];
 
 const PortfolioPage = () => {
+  const { t, dict } = useLanguage();
+  const certifications = dict.education.items.slice(1);
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <AnimatedBackground />
@@ -64,12 +28,12 @@ const PortfolioPage = () => {
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Certifications & Programs
+              {t("portfolio.certifications")}
             </h2>
 
             <div className="max-w-4xl mx-auto space-y-6">
               {certifications.map((certification, index) => {
-                const Icon = certification.icon;
+                const Icon = certificationIcons[index] ?? Award;
                 return (
                   <Card
                     key={certification.title}
@@ -91,7 +55,7 @@ const PortfolioPage = () => {
                             </span>
                           </div>
                           <CardDescription className="text-base">
-                            <span className="text-accent font-semibold">{certification.organization}</span>
+                            <span className="text-accent font-semibold">{certification.institution}</span>
                             <br />
                             {certification.details}
                           </CardDescription>
@@ -114,7 +78,6 @@ const PortfolioPage = () => {
             </div>
           </div>
         </section>
-
       </main>
       <Footer />
     </div>

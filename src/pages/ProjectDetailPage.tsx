@@ -9,6 +9,8 @@ import { getContactPageHrefWithSimilar, getServicesInquiryHrefWithSimilar } from
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { localizeProject } from "@/i18n/projectsAr";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 function hostnameOnly(url: string) {
   try {
@@ -20,7 +22,9 @@ function hostnameOnly(url: string) {
 
 const ProjectDetailPage = () => {
   const { slug } = useParams();
-  const project = slug ? getProjectBySlug(slug) : undefined;
+  const { t, lang } = useLanguage();
+  const rawProject = slug ? getProjectBySlug(slug) : undefined;
+  const project = rawProject ? localizeProject(rawProject, lang) : undefined;
   const externalHref = project?.externalLink ?? project?.externalLinkPlaceholder ?? "#";
   const isExternal = /^https?:\/\//i.test(externalHref);
   const canOpenExternal = Boolean(externalHref && externalHref !== "#");
@@ -37,14 +41,14 @@ const ProjectDetailPage = () => {
             <div className="container mx-auto px-4">
               <div className="text-center space-y-6">
                 <h2 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Project not found
+                  {t("project.notFound")}
                 </h2>
                 <Button
                   size="lg"
                   className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
                   asChild
                 >
-                  <Link to="/work">Back to projects</Link>
+                  <Link to="/work">{t("project.backProjects")}</Link>
                 </Button>
               </div>
             </div>
@@ -88,13 +92,12 @@ const ProjectDetailPage = () => {
                 <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-accent/15 blur-3xl" aria-hidden />
                 <div className="relative flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
                   <div className="space-y-3 max-w-xl">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Like what you see?</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{t("project.likeEyebrow")}</p>
                     <h3 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                      Want something like this?
+                      {t("project.likeTitle")}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Reach out for a general chat, or send a structured project request — I&apos;ll carry this site as a
-                      reference so we&apos;re aligned on scope and direction.
+                      {t("project.likeBody")}
                     </p>
                     {liveUrl ? (
                       <p className="flex items-center gap-2 rounded-lg border border-border/80 bg-background/60 px-3 py-2 text-xs text-muted-foreground backdrop-blur-sm">
@@ -112,21 +115,21 @@ const ProjectDetailPage = () => {
                         asChild
                       >
                         <a href={externalHref} target={isExternal ? "_blank" : "_self"} rel={isExternal ? "noreferrer" : undefined}>
-                          <ExternalLink className="mr-2 h-5 w-5 shrink-0" />
-                          Open live site
+                          <ExternalLink className="me-2 h-5 w-5 shrink-0" />
+                          {t("project.openLive")}
                         </a>
                       </Button>
                     ) : null}
                     <Button size="lg" variant="secondary" className="w-full border border-primary/25 bg-card/80 hover:bg-card sm:flex-1 lg:flex-none" asChild>
                       <Link to={referralContactTo}>
-                        <Mail className="mr-2 h-5 w-5 shrink-0" />
-                        Want something like it — contact
+                        <Mail className="me-2 h-5 w-5 shrink-0" />
+                        {t("project.likeContact")}
                       </Link>
                     </Button>
                     <Button size="lg" variant="outline" className="w-full border-primary/40 bg-background/50 backdrop-blur-sm sm:flex-1 lg:flex-none" asChild>
                       <a href={referralInquiryHref}>
-                        <Send className="mr-2 h-5 w-5 shrink-0" />
-                        Request a project like this
+                        <Send className="me-2 h-5 w-5 shrink-0" />
+                        {t("project.likeRequest")}
                       </a>
                     </Button>
                   </div>
@@ -135,13 +138,13 @@ const ProjectDetailPage = () => {
 
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Stack</CardTitle>
+                  <CardTitle className="text-2xl">{t("project.stack")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {project.tech.map((tech) => (
                       <Badge key={tech} variant="outline" className="border-primary/30">
-                        <Code2 className="w-3 h-3 mr-1" />
+                        <Code2 className="w-3 h-3 me-1" />
                         {tech}
                       </Badge>
                     ))}
@@ -154,10 +157,10 @@ const ProjectDetailPage = () => {
                   <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-2">
                       <Terminal className="h-6 w-6 text-accent shrink-0" aria-hidden />
-                      Languages and runtime
+                      {t("project.runtime")}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground font-normal">
-                      Programming languages and core tooling used to build this project.
+                      {t("project.runtimeHint")}
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -177,10 +180,10 @@ const ProjectDetailPage = () => {
                   <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-2">
                       <Globe2 className="h-6 w-6 text-accent shrink-0" aria-hidden />
-                      Content and UI languages
+                      {t("project.contentLangs")}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground font-normal">
-                      Languages available in the interface and on-page content.
+                      {t("project.contentLangsHint")}
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -197,7 +200,7 @@ const ProjectDetailPage = () => {
 
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Skills Used</CardTitle>
+                  <CardTitle className="text-2xl">{t("project.skillsUsed")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -212,7 +215,7 @@ const ProjectDetailPage = () => {
 
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Overview</CardTitle>
+                  <CardTitle className="text-2xl">{t("project.overview")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-base text-muted-foreground leading-relaxed">{project.longDescription}</p>
@@ -224,10 +227,10 @@ const ProjectDetailPage = () => {
                   <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-2">
                       <ListChecks className="h-6 w-6 text-accent shrink-0" aria-hidden />
-                      Features
+                      {t("project.features")}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground font-normal">
-                      Capabilities and product surface area shipped on this project.
+                      {t("project.featuresHint")}
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -246,7 +249,7 @@ const ProjectDetailPage = () => {
               <div className="grid gap-6 md:grid-cols-2">
                 <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                   <CardHeader>
-                    <CardTitle className="text-2xl">Highlights</CardTitle>
+                    <CardTitle className="text-2xl">{t("project.highlights")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -262,7 +265,7 @@ const ProjectDetailPage = () => {
 
                 <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                   <CardHeader>
-                    <CardTitle className="text-2xl">What I did</CardTitle>
+                    <CardTitle className="text-2xl">{t("project.whatIDid")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -284,7 +287,7 @@ const ProjectDetailPage = () => {
                   className="border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                   asChild
                 >
-                  <Link to="/work">Back to work</Link>
+                  <Link to="/work">{t("project.backWork")}</Link>
                 </Button>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import type { Project } from "@/data/projects";
 import { clientProjects } from "@/data/projects";
 import { isLiveSiteUrl } from "@/components/ProjectLivePreview";
-import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 function previewImageUrl(siteUrl: string) {
   return `https://s0.wp.com/mshots/v1/${encodeURIComponent(siteUrl)}?w=480`;
@@ -13,6 +13,7 @@ function previewImageUrl(siteUrl: string) {
 function Tile({ project }: { project: Project }) {
   const liveUrl = project.externalLink?.trim();
   const [showImage, setShowImage] = useState(Boolean(liveUrl));
+  const { t } = useLanguage();
 
   return (
     <Link
@@ -22,7 +23,7 @@ function Tile({ project }: { project: Project }) {
         "shadow-sm shadow-black/5 transition-all duration-300",
         "hover:border-primary/45 hover:shadow-md hover:shadow-primary/5"
       )}
-      aria-label={`${project.title} — view case study`}
+      aria-label={t("services.showcaseTile", { title: project.title })}
     >
       {liveUrl && showImage ? (
         <img
@@ -52,12 +53,13 @@ const SHOWCASE_COUNT = 6;
 
 /** Recent client websites with a public http(s) URL — thumbnails + links to `/projects/:slug`. */
 export function WebsiteShowcaseMiniGrid() {
+  const { t } = useLanguage();
   const items = clientProjects.filter((p) => isLiveSiteUrl(p.externalLink)).slice(0, SHOWCASE_COUNT);
 
   return (
     <div
       className="grid grid-cols-2 gap-2 sm:gap-2.5 sm:grid-cols-3"
-      aria-label="Recent website projects"
+      aria-label={t("services.showcaseAria")}
     >
       {items.map((project) => (
         <Tile key={project.slug} project={project} />

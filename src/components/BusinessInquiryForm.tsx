@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
 import { getProjectBySlug } from "@/data/projects";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type PrimaryNeed = "website" | "kashier" | "both" | "unsure" | "";
 
@@ -344,60 +345,60 @@ function getValidationErrors(data: InquiryState, paymentRequiredFlag: boolean): 
   const e: Record<string, string> = {};
 
   if (!data.businessType) {
-    e["fieldset-business-type"] = "Select what best describes your business.";
+    e["fieldset-business-type"] = "inquiry.err.businessType";
   }
   if (data.businessType === "other") {
     if (!data.businessTypeOther.trim()) {
-      e["business-type-other"] = "Briefly describe your type of business.";
+      e["business-type-other"] = "inquiry.err.businessOther";
     } else if (data.businessTypeOther.trim().length < 2) {
-      e["business-type-other"] = "Add a bit more detail (at least 2 characters).";
+      e["business-type-other"] = "inquiry.err.businessOtherShort";
     }
   }
 
   if (!data.primaryNeed) {
-    e["fieldset-need"] = "Select what you are building.";
+    e["fieldset-need"] = "inquiry.err.need";
   }
 
   if (data.primaryNeed === "website") {
-    if (!data.websiteSiteType) e["fieldset-web-type"] = "Choose a website type.";
-    if (!data.websiteScope) e["fieldset-web-scope"] = "Choose an approximate scope.";
+    if (!data.websiteSiteType) e["fieldset-web-type"] = "inquiry.err.webType";
+    if (!data.websiteScope) e["fieldset-web-scope"] = "inquiry.err.webScope";
   }
   if (data.primaryNeed === "kashier" && !data.kashierFocus) {
-    e["fieldset-kashier-focus"] = "Select what you need from Kashier.";
+    e["fieldset-kashier-focus"] = "inquiry.err.kashier";
   }
   if (data.primaryNeed === "both" && !data.bothStartingPoint) {
-    e["fieldset-both-start"] = "Choose where you want to start.";
+    e["fieldset-both-start"] = "inquiry.err.both";
   }
   if (data.primaryNeed === "unsure" && !data.consultFocus) {
-    e["fieldset-consult"] = "Select a focus for the consult.";
+    e["fieldset-consult"] = "inquiry.err.consult";
   }
 
-  if (!data.projectStage) e["fieldset-stage"] = "Select where the project is today.";
-  if (!data.timeline) e["fieldset-timeline"] = "Select when you want to move forward.";
+  if (!data.projectStage) e["fieldset-stage"] = "inquiry.err.stage";
+  if (!data.timeline) e["fieldset-timeline"] = "inquiry.err.timeline";
   if (data.timeline === "flexible" && !data.timelineFlexibleNote.trim()) {
-    e["timeline-flex-note"] = "Describe what flexible timing means for you.";
+    e["timeline-flex-note"] = "inquiry.err.flexible";
   }
 
   if (paymentRequiredFlag && data.paymentMethods.length === 0) {
-    e["fieldset-payment"] = "Select at least one payment method.";
+    e["fieldset-payment"] = "inquiry.err.payment";
   }
 
   if (!data.company.trim()) {
-    e["biz-company"] = "Enter your company or brand name.";
+    e["biz-company"] = "inquiry.err.company";
   }
 
   const phoneDigits = nationalPhoneDigits(data.phoneNational);
   if (!data.phoneNational.trim()) {
-    e["biz-phone"] = "Enter your phone number.";
+    e["biz-phone"] = "inquiry.err.phone";
   } else if (phoneDigits.length < 6) {
-    e["biz-phone"] = "Enter a valid phone number (include area code if applicable).";
+    e["biz-phone"] = "inquiry.err.phoneInvalid";
   }
 
-  if (!data.name.trim()) e["biz-name"] = "Enter your name.";
-  else if (data.name.trim().length < 2) e["biz-name"] = "Name must be at least 2 characters.";
+  if (!data.name.trim()) e["biz-name"] = "inquiry.err.name";
+  else if (data.name.trim().length < 2) e["biz-name"] = "inquiry.err.nameShort";
 
-  if (!data.email.trim()) e["biz-email"] = "Enter your work email.";
-  else if (!emailLooksValid(data.email)) e["biz-email"] = "Enter a valid email address.";
+  if (!data.email.trim()) e["biz-email"] = "inquiry.err.email";
+  else if (!emailLooksValid(data.email)) e["biz-email"] = "inquiry.err.emailInvalid";
 
   return e;
 }
@@ -435,7 +436,9 @@ const McqBlock = ({
   fieldsetId?: string;
   showError?: boolean;
   errorMessage?: string;
-}) => (
+}) => {
+  const { t } = useLanguage();
+  return (
   <fieldset
     id={fieldsetId}
     className={cn(
@@ -450,7 +453,7 @@ const McqBlock = ({
     </legend>
     {showError && errorMessage ? (
       <p className="text-sm text-destructive" role="alert">
-        {errorMessage}
+        {t(errorMessage)}
       </p>
     ) : null}
     <RadioGroup value={value} onValueChange={onChange} className="gap-3">
@@ -464,11 +467,26 @@ const McqBlock = ({
       ))}
     </RadioGroup>
   </fieldset>
-);
+  );
+};
 
 const BusinessInquiryForm = () => {
   const [searchParams] = useSearchParams();
+  const { t } = useLanguage();
   const similarPrefilledRef = useRef(false);
+
+  const localized = <T extends { value: string; label: string }>(options: T[], prefix: string) =>
+    options.map((opt) => ({ ...opt, label: t(`${prefix}.${opt.value}`) }));
+  const businessTypeUi = localized(businessTypeOptions, "inquiry.opt.business");
+  const primaryNeedUi = localized([...primaryNeedOptions], "inquiry.opt.need");
+  const websiteSiteTypeUi = localized(websiteSiteTypeOptions, "inquiry.opt.webType");
+  const websiteScopeUi = localized(websiteScopeOptions, "inquiry.opt.webScope");
+  const kashierFocusUi = localized(kashierFocusOptions, "inquiry.opt.kashier");
+  const bothStartingPointUi = localized(bothStartingPointOptions, "inquiry.opt.both");
+  const consultFocusUi = localized(consultFocusOptions, "inquiry.opt.consult");
+  const projectStageUi = localized(projectStageOptions, "inquiry.opt.stage");
+  const timelineUi = localized(timelineOptions, "inquiry.opt.timeline");
+  const paymentUi = paymentOptionDefs.map((p) => ({ ...p, label: t(`inquiry.opt.pay.${p.id}`) }));
 
   const [data, setData] = useState<InquiryState>(initialState);
   const [botField, setBotField] = useState("");
@@ -529,8 +547,8 @@ const BusinessInquiryForm = () => {
     const national = data.phoneNational.trim();
     if (!national) {
       toast({
-        title: "Nothing to copy",
-        description: "Enter your phone number first.",
+        title: t("inquiry.nothingCopy"),
+        description: t("inquiry.enterPhoneFirst"),
         variant: "destructive"
       });
       return;
@@ -539,13 +557,13 @@ const BusinessInquiryForm = () => {
     try {
       await navigator.clipboard.writeText(full);
       toast({
-        title: "Copied",
-        description: "Phone number copied to clipboard."
+        title: t("inquiry.copied"),
+        description: t("inquiry.phoneCopied")
       });
     } catch {
       toast({
-        title: "Copy failed",
-        description: "Could not copy. Please try manually.",
+        title: t("inquiry.copyFailed"),
+        description: t("inquiry.copyManual"),
         variant: "destructive"
       });
     }
@@ -560,8 +578,8 @@ const BusinessInquiryForm = () => {
       setValidationAttempted(true);
       const first = firstValidationError(errs);
       toast({
-        title: "Complete required fields",
-        description: first?.message ?? "Review the sections marked below.",
+        title: t("inquiry.toastIncomplete"),
+        description: first?.message ? t(first.message) : t("inquiry.toastReview"),
         variant: "destructive"
       });
       if (first) scrollToId(first.id);
@@ -570,8 +588,8 @@ const BusinessInquiryForm = () => {
 
     if (!accessKey) {
       toast({
-        title: "Form not configured",
-        description: "The inquiry form cannot send email until the site key is configured.",
+        title: t("inquiry.toastNoKey"),
+        description: t("inquiry.toastNoKeyDesc"),
         variant: "destructive"
       });
       return;
@@ -639,8 +657,8 @@ const BusinessInquiryForm = () => {
       const result = await submitWeb3Forms(payload);
       if (result.success) {
         toast({
-          title: "Request sent",
-          description: "Thanks — you'll hear back at the email you provided."
+          title: t("inquiry.toastSent"),
+          description: t("inquiry.toastSentDesc")
         });
         setValidationAttempted(false);
         setData(initialState);
@@ -649,8 +667,8 @@ const BusinessInquiryForm = () => {
       }
     } catch (err) {
       toast({
-        title: "Could not send",
-        description: err instanceof Error ? err.message : "Please try again later.",
+        title: t("inquiry.toastFail"),
+        description: err instanceof Error ? err.message : t("inquiry.toastFailDesc"),
         variant: "destructive"
       });
     } finally {
@@ -663,28 +681,26 @@ const BusinessInquiryForm = () => {
       id="business-inquiry"
       className="max-w-3xl mx-auto scroll-mt-24 rounded-2xl border border-border bg-card/50 p-8 backdrop-blur-sm"
     >
-      <h3 className="text-2xl font-bold text-foreground mb-2">Request a project</h3>
+      <h3 className="text-2xl font-bold text-foreground mb-2">{t("inquiry.title")}</h3>
       <p className="text-muted-foreground mb-2">
-        Pick your focus first — the questions adjust for websites, Kashier-only, or both together. Then share your details
-        and timeline.
+        {t("inquiry.intro")}
       </p>
       <p className="text-sm text-muted-foreground mb-6">
-        <span className="text-destructive font-medium">*</span> Required fields must be completed before you can send the
-        request.
+        <span className="text-destructive font-medium">*</span> {t("inquiry.requiredNote")}
       </p>
 
       <div className="mb-6 flex flex-col gap-4 rounded-xl border border-primary/25 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-3">
           <Briefcase className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden />
           <div>
-            <p className="text-sm font-medium text-foreground">Want to see previous work first?</p>
+            <p className="text-sm font-medium text-foreground">{t("inquiry.seeWorkTitle")}</p>
             <p className="text-sm text-muted-foreground">
-              Browse the Work page for live client deliveries and deeper case studies before you submit a request.
+              {t("inquiry.seeWorkBody")}
             </p>
           </div>
         </div>
         <Button asChild variant="secondary" className="shrink-0 border border-primary/30 w-full sm:w-auto">
-          <Link to="/work">View previous work</Link>
+          <Link to="/work">{t("inquiry.seeWorkCta")}</Link>
         </Button>
       </div>
 
@@ -701,7 +717,7 @@ const BusinessInquiryForm = () => {
         </div>
 
         <McqBlock
-          title="What best describes your business?"
+          title={t("inquiry.qBusiness")}
           required
           name="business-type"
           fieldsetId="fieldset-business-type"
@@ -713,7 +729,7 @@ const BusinessInquiryForm = () => {
               businessTypeOther: v === "other" ? data.businessTypeOther : ""
             })
           }
-          options={businessTypeOptions}
+          options={businessTypeUi}
           showError={Boolean(fieldErrors["fieldset-business-type"])}
           errorMessage={fieldErrors["fieldset-business-type"]}
         />
@@ -726,18 +742,18 @@ const BusinessInquiryForm = () => {
             )}
           >
             <Label htmlFor="business-type-other">
-              Describe your business <span className="text-destructive">*</span>
+              {t("inquiry.otherBusiness")} <span className="text-destructive">*</span>
             </Label>
             {fieldErrors["business-type-other"] ? (
               <p className="text-sm text-destructive" role="alert">
-                {fieldErrors["business-type-other"]}
+                {t(fieldErrors["business-type-other"])}
               </p>
             ) : null}
             <Input
               id="business-type-other"
               value={data.businessTypeOther}
               onChange={(e) => setData({ ...data, businessTypeOther: e.target.value })}
-              placeholder="e.g. logistics, nonprofit, manufacturing, SaaS…"
+              placeholder={t("inquiry.otherBusinessPh")}
               className={cn(fieldErrors["business-type-other"] ? "border-destructive ring-2 ring-destructive/25" : "")}
               aria-invalid={Boolean(fieldErrors["business-type-other"])}
               aria-required
@@ -747,13 +763,13 @@ const BusinessInquiryForm = () => {
         )}
 
         <McqBlock
-          title="What are we building?"
+          title={t("inquiry.qNeed")}
           required
           name="need"
           fieldsetId="fieldset-need"
           value={data.primaryNeed}
           onChange={setPrimaryNeed}
-          options={[...primaryNeedOptions]}
+          options={primaryNeedUi}
           showError={Boolean(fieldErrors["fieldset-need"])}
           errorMessage={fieldErrors["fieldset-need"]}
         />
@@ -761,24 +777,24 @@ const BusinessInquiryForm = () => {
         {data.primaryNeed === "website" && (
           <>
             <McqBlock
-              title="Website — what type?"
+              title={t("inquiry.qWebType")}
               required
               name="web-type"
               fieldsetId="fieldset-web-type"
               value={data.websiteSiteType}
               onChange={(v) => setData({ ...data, websiteSiteType: v })}
-              options={websiteSiteTypeOptions}
+              options={websiteSiteTypeUi}
               showError={Boolean(fieldErrors["fieldset-web-type"])}
               errorMessage={fieldErrors["fieldset-web-type"]}
             />
             <McqBlock
-              title="Website — rough scope?"
+              title={t("inquiry.qWebScope")}
               required
               name="web-scope"
               fieldsetId="fieldset-web-scope"
               value={data.websiteScope}
               onChange={(v) => setData({ ...data, websiteScope: v })}
-              options={websiteScopeOptions}
+              options={websiteScopeUi}
               showError={Boolean(fieldErrors["fieldset-web-scope"])}
               errorMessage={fieldErrors["fieldset-web-scope"]}
             />
@@ -787,13 +803,13 @@ const BusinessInquiryForm = () => {
 
         {data.primaryNeed === "kashier" && (
           <McqBlock
-            title="Kashier — what do you need most?"
+            title={t("inquiry.qKashier")}
             required
             name="kashier-focus"
             fieldsetId="fieldset-kashier-focus"
             value={data.kashierFocus}
             onChange={(v) => setData({ ...data, kashierFocus: v })}
-            options={kashierFocusOptions}
+            options={kashierFocusUi}
             showError={Boolean(fieldErrors["fieldset-kashier-focus"])}
             errorMessage={fieldErrors["fieldset-kashier-focus"]}
           />
@@ -801,13 +817,13 @@ const BusinessInquiryForm = () => {
 
         {data.primaryNeed === "both" && (
           <McqBlock
-            title="Website + Kashier — where should we start?"
+            title={t("inquiry.qBoth")}
             required
             name="both-start"
             fieldsetId="fieldset-both-start"
             value={data.bothStartingPoint}
             onChange={(v) => setData({ ...data, bothStartingPoint: v })}
-            options={bothStartingPointOptions}
+            options={bothStartingPointUi}
             showError={Boolean(fieldErrors["fieldset-both-start"])}
             errorMessage={fieldErrors["fieldset-both-start"]}
           />
@@ -815,26 +831,26 @@ const BusinessInquiryForm = () => {
 
         {data.primaryNeed === "unsure" && (
           <McqBlock
-            title="Consult — what should we focus on first?"
+            title={t("inquiry.qConsult")}
             required
             name="consult"
             fieldsetId="fieldset-consult"
             value={data.consultFocus}
             onChange={(v) => setData({ ...data, consultFocus: v })}
-            options={consultFocusOptions}
+            options={consultFocusUi}
             showError={Boolean(fieldErrors["fieldset-consult"])}
             errorMessage={fieldErrors["fieldset-consult"]}
           />
         )}
 
         <McqBlock
-          title="Where is the project today?"
+          title={t("inquiry.qStage")}
           required
           name="stage"
           fieldsetId="fieldset-stage"
           value={data.projectStage}
           onChange={(v) => setData({ ...data, projectStage: v })}
-          options={projectStageOptions}
+          options={projectStageUi}
           showError={Boolean(fieldErrors["fieldset-stage"])}
           errorMessage={fieldErrors["fieldset-stage"]}
         />
@@ -847,11 +863,11 @@ const BusinessInquiryForm = () => {
           )}
         >
           <legend className="px-1 text-sm font-medium text-foreground">
-            When do you want to move forward?<span className="text-destructive"> *</span>
+            {t("inquiry.qTimeline")}<span className="text-destructive"> *</span>
           </legend>
           {fieldErrors["fieldset-timeline"] ? (
             <p className="text-sm text-destructive" role="alert">
-              {fieldErrors["fieldset-timeline"]}
+              {t(fieldErrors["fieldset-timeline"])}
             </p>
           ) : null}
           <RadioGroup
@@ -865,7 +881,7 @@ const BusinessInquiryForm = () => {
             }
             className="gap-3"
           >
-            {timelineOptions.map((opt) => (
+            {timelineUi.map((opt) => (
               <div key={opt.value} className="flex items-start gap-3">
                 <RadioGroupItem value={opt.value} id={`time-${opt.value}`} className="mt-1" />
                 <Label htmlFor={`time-${opt.value}`} className="font-normal leading-snug cursor-pointer">
@@ -882,18 +898,18 @@ const BusinessInquiryForm = () => {
               )}
             >
               <Label htmlFor="timeline-flex-note">
-                Describe what &quot;flexible&quot; looks like for you<span className="text-destructive"> *</span>
+                {t("inquiry.qFlexible")}<span className="text-destructive"> *</span>
               </Label>
               {fieldErrors["timeline-flex-note"] ? (
                 <p className="text-sm text-destructive mt-1" role="alert">
-                  {fieldErrors["timeline-flex-note"]}
+                  {t(fieldErrors["timeline-flex-note"])}
                 </p>
               ) : null}
               <Textarea
                 id="timeline-flex-note"
                 value={data.timelineFlexibleNote}
                 onChange={(e) => setData({ ...data, timelineFlexibleNote: e.target.value })}
-                placeholder="Example: aiming for next quarter once budget is approved; open to phased delivery…"
+                placeholder={t("inquiry.qFlexiblePh")}
                 rows={3}
                 className={cn(
                   "mt-2",
@@ -915,24 +931,23 @@ const BusinessInquiryForm = () => {
             )}
           >
             <legend className="px-1 text-sm font-medium text-foreground">
-              Payment methods{" "}
+              {t("inquiry.qPayment")}{" "}
               {paymentRequired ? (
                 <span className="text-destructive">*</span>
               ) : (
-                <span className="text-muted-foreground font-normal">(optional)</span>
+                <span className="text-muted-foreground font-normal">{t("inquiry.optional")}</span>
               )}
             </legend>
             {fieldErrors["fieldset-payment"] ? (
               <p className="text-sm text-destructive" role="alert">
-                {fieldErrors["fieldset-payment"]}
+                {t(fieldErrors["fieldset-payment"])}
               </p>
             ) : null}
             <p className="text-sm text-muted-foreground leading-relaxed border-l-2 border-accent pl-3">
-              Select <strong className="text-foreground font-medium">every</strong> option your customers use or that you want
-              to offer — check all that apply.
+              {t("inquiry.paymentHelp")}
             </p>
             <div className="space-y-3">
-              {paymentOptionDefs.map((p) => (
+              {paymentUi.map((p) => (
                 <div key={p.id} className="flex items-start gap-3 rounded-lg bg-background/40 p-3">
                   <Checkbox
                     id={`pay-${p.id}`}
@@ -952,11 +967,11 @@ const BusinessInquiryForm = () => {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="biz-company">
-              Company / brand <span className="text-destructive">*</span>
+              {t("inquiry.company")} <span className="text-destructive">*</span>
             </Label>
             {fieldErrors["biz-company"] ? (
               <p className="text-sm text-destructive mt-1" role="alert">
-                {fieldErrors["biz-company"]}
+                {t(fieldErrors["biz-company"])}
               </p>
             ) : null}
             <Input
@@ -964,7 +979,7 @@ const BusinessInquiryForm = () => {
               autoComplete="organization"
               value={data.company}
               onChange={(e) => setData({ ...data, company: e.target.value })}
-              placeholder="Business name"
+              placeholder={t("inquiry.companyPh")}
               className={cn(
                 "mt-1.5",
                 fieldErrors["biz-company"] ? "border-destructive ring-2 ring-destructive/25" : ""
@@ -975,11 +990,11 @@ const BusinessInquiryForm = () => {
           </div>
           <div id="biz-phone">
             <Label htmlFor="biz-phone-national">
-              Phone <span className="text-destructive">*</span>
+              {t("inquiry.phone")} <span className="text-destructive">*</span>
             </Label>
             {fieldErrors["biz-phone"] ? (
               <p className="text-sm text-destructive mt-1" role="alert">
-                {fieldErrors["biz-phone"]}
+                {t(fieldErrors["biz-phone"])}
               </p>
             ) : null}
             <div className="mt-1.5 flex items-center gap-2">
@@ -996,7 +1011,7 @@ const BusinessInquiryForm = () => {
                     fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
                   )}
                   aria-invalid={Boolean(fieldErrors["biz-phone"])}
-                  aria-label="Country calling code"
+                  aria-label={t("inquiry.countryCode")}
                 >
                   <SelectValue placeholder="Code">
                     {(() => {
@@ -1035,7 +1050,7 @@ const BusinessInquiryForm = () => {
                 inputMode="tel"
                 value={data.phoneNational}
                 onChange={(e) => setData({ ...data, phoneNational: e.target.value })}
-                placeholder="Number"
+                placeholder={t("inquiry.numberPh")}
                 className={cn(
                   "h-9 min-w-0 flex-1 text-sm",
                   fieldErrors["biz-phone"] ? "border-destructive ring-2 ring-destructive/25" : ""
@@ -1051,7 +1066,7 @@ const BusinessInquiryForm = () => {
                 className="h-9 w-9 shrink-0 touch-manipulation rounded-full text-muted-foreground hover:text-foreground"
                 onClick={handleCopyPhone}
                 disabled={!data.phoneNational.trim()}
-                aria-label="Copy full phone number"
+                aria-label={t("inquiry.copyPhone")}
                 title="Copy phone number"
               >
                 <Clipboard className="h-4 w-4" aria-hidden />
@@ -1061,13 +1076,13 @@ const BusinessInquiryForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="biz-instagram">Instagram handle (optional)</Label>
+          <Label htmlFor="biz-instagram">{t("inquiry.instagram")}</Label>
           <Input
             id="biz-instagram"
             autoComplete="username"
             value={data.instagram}
             onChange={(e) => setData({ ...data, instagram: e.target.value })}
-            placeholder="@yourbrand or username"
+            placeholder={t("inquiry.instagramPh")}
             className="mt-1.5"
           />
         </div>
@@ -1075,11 +1090,11 @@ const BusinessInquiryForm = () => {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="biz-name">
-              Your name <span className="text-destructive">*</span>
+              {t("inquiry.yourName")} <span className="text-destructive">*</span>
             </Label>
             {fieldErrors["biz-name"] ? (
               <p className="text-sm text-destructive mt-1" role="alert">
-                {fieldErrors["biz-name"]}
+                {t(fieldErrors["biz-name"])}
               </p>
             ) : null}
             <Input
@@ -1087,7 +1102,7 @@ const BusinessInquiryForm = () => {
               autoComplete="name"
               value={data.name}
               onChange={(e) => setData({ ...data, name: e.target.value })}
-              placeholder="Full name"
+              placeholder={t("inquiry.fullNamePh")}
               className={cn(
                 "mt-1.5",
                 fieldErrors["biz-name"] ? "border-destructive ring-2 ring-destructive/25" : ""
@@ -1098,11 +1113,11 @@ const BusinessInquiryForm = () => {
           </div>
           <div>
             <Label htmlFor="biz-email">
-              Work email <span className="text-destructive">*</span>
+              {t("inquiry.workEmail")} <span className="text-destructive">*</span>
             </Label>
             {fieldErrors["biz-email"] ? (
               <p className="text-sm text-destructive mt-1" role="alert">
-                {fieldErrors["biz-email"]}
+                {t(fieldErrors["biz-email"])}
               </p>
             ) : null}
             <Input
@@ -1111,7 +1126,7 @@ const BusinessInquiryForm = () => {
               autoComplete="email"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
-              placeholder="you@business.com"
+              placeholder={t("inquiry.workEmailPh")}
               className={cn(
                 "mt-1.5",
                 fieldErrors["biz-email"] ? "border-destructive ring-2 ring-destructive/25" : ""
@@ -1124,12 +1139,12 @@ const BusinessInquiryForm = () => {
         </div>
 
         <div>
-          <Label htmlFor="biz-details">Anything else I should know? (optional)</Label>
+          <Label htmlFor="biz-details">{t("inquiry.anythingElse")}</Label>
           <Textarea
             id="biz-details"
             value={data.details}
             onChange={(e) => setData({ ...data, details: e.target.value })}
-            placeholder="Goals, links to your site or Kashier receipts, constraints…"
+            placeholder={t("inquiry.detailsPh")}
             rows={4}
             className="mt-1.5"
           />
@@ -1141,8 +1156,8 @@ const BusinessInquiryForm = () => {
           className="w-full bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
           disabled={isSubmitting}
         >
-          <Send className="mr-2 h-5 w-5" />
-          {isSubmitting ? "Sending..." : "Send request"}
+          <Send className="me-2 h-5 w-5" />
+          {isSubmitting ? t("inquiry.sending") : t("inquiry.send")}
         </Button>
       </form>
     </div>

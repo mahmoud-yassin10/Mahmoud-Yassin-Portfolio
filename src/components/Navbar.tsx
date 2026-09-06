@@ -3,12 +3,15 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAudience } from "@/context/AudienceContext";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { profile, clearAudience } = useAudience();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -45,23 +48,24 @@ const Navbar = () => {
 
   const navLinks = profile?.id === "client"
     ? [
-        { name: "Services", to: "/services" },
-        { name: "Work", to: "/work" },
-        { name: "Contact", to: "/contact" }
+        { name: t("nav.services"), to: "/services" },
+        { name: t("nav.work"), to: "/work" },
+        { name: t("nav.contact"), to: "/contact" }
       ]
     : profile?.id === "admissions"
       ? [
-          { name: "About", to: "/portfolio" },
-          { name: "Work", to: "/work" },
-          { name: "Contact", to: "/contact" }
+          { name: t("nav.about"), to: "/portfolio" },
+          { name: t("nav.work"), to: "/work" },
+          { name: t("nav.contact"), to: "/contact" }
         ]
       : [
-          { name: "Work", to: "/work" },
-          { name: "Services", to: "/services" },
-          { name: "Contact", to: "/contact" }
+          { name: t("nav.work"), to: "/work" },
+          { name: t("nav.services"), to: "/services" },
+          { name: t("nav.contact"), to: "/contact" }
         ];
 
   const navSurfaceActive = isScrolled || isMobileMenuOpen;
+  const audienceLabel = profile ? t(`audience.${profile.id}.shortLabel`) : t("nav.chooseView");
 
   return (
     <>
@@ -91,47 +95,47 @@ const Navbar = () => {
               MY
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                   to={link.to}
                   className="text-foreground hover:text-primary transition-colors font-medium"
-                  aria-label={link.name === "Services" ? "Services page" : `Go to ${link.name}`}
+                  aria-label={t("nav.goTo", { name: link.name })}
                 >
                   {link.name}
                 </Link>
               ))}
+              <LanguageToggle />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
                 className="rounded-full"
-                aria-label="Toggle theme"
+                aria-label={t("nav.theme")}
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
               <button type="button" className="audience-switcher" onClick={clearAudience}>
                 <span className="audience-switcher-dot" />
-                {profile?.shortLabel ?? "Choose view"}
+                {audienceLabel}
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
+              <LanguageToggle />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
                 className="rounded-full"
-                aria-label="Toggle theme"
+                aria-label={t("nav.theme")}
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
               <button type="button" className="audience-switcher" onClick={clearAudience}>
                 <span className="audience-switcher-dot" />
-                {profile?.shortLabel ?? "Choose view"}
+                {audienceLabel}
               </button>
               <Button
                 variant="ghost"
@@ -139,14 +143,13 @@ const Navbar = () => {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="rounded-full"
                 aria-expanded={isMobileMenuOpen}
-                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-label={isMobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden mt-4 pb-4 animate-fade-in">
               <div className="flex flex-col gap-4">
@@ -154,8 +157,8 @@ const Navbar = () => {
                   <Link
                     key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
                     to={link.to}
-                    className="text-left text-foreground hover:text-primary transition-colors font-medium py-2"
-                    aria-label={link.name === "Services" ? "Services page" : `Go to ${link.name}`}
+                    className="text-start text-foreground hover:text-primary transition-colors font-medium py-2"
+                    aria-label={t("nav.goTo", { name: link.name })}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.name}

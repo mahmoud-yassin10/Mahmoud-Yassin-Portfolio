@@ -1,35 +1,33 @@
 import { ArrowDownRight, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAudience } from "@/context/AudienceContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const AudiencePath = () => {
   const { profile } = useAudience();
+  const { t, dict } = useLanguage();
   if (!profile) return null;
 
-  const path = profile.id === "recruiter"
-    ? ["Selected work", "Experience", "Technical range"]
-    : profile.id === "admissions"
-      ? ["About me", "Education", "Leadership & recognition"]
-      : ["Services", "Selected work", "Start a conversation"];
+  const copy = dict.audience[profile.id];
 
   return (
-    <section className="audience-path-section" aria-label={`${profile.shortLabel} portfolio route`}>
+    <section className="audience-path-section" aria-label={t("path.aria", { label: copy.shortLabel })}>
       <div className="container mx-auto px-4">
         <div className="audience-path">
           <div className="audience-path-intro">
-            <p className="audience-hero-eyebrow">{profile.sectionLabel}</p>
-            <h2>{profile.routeDescription}</h2>
+            <p className="audience-hero-eyebrow">{copy.sectionLabel}</p>
+            <h2>{copy.routeDescription}</h2>
             <div className="audience-path-route">
-              {path.map((item, index) => (
+              {copy.path.map((item, index) => (
                 <span key={item} className="audience-path-route-item">
                   <CheckCircle2 size={15} aria-hidden /> {item}
-                  {index < path.length - 1 ? <ArrowRight size={14} aria-hidden /> : null}
+                  {index < copy.path.length - 1 ? <ArrowRight size={14} aria-hidden /> : null}
                 </span>
               ))}
             </div>
           </div>
           <div className="audience-proof-grid">
-            {profile.proofPoints.map((point) => (
+            {copy.proof.map((point) => (
               <div className="audience-proof" key={point.label}>
                 <strong>{point.value}</strong>
                 <span>{point.label}</span>
@@ -37,7 +35,7 @@ const AudiencePath = () => {
             ))}
           </div>
           <Link className="audience-path-cue" to={profile.id === "client" ? "/services" : profile.id === "admissions" ? "/portfolio" : "/work"}>
-            Follow this route <ArrowDownRight size={18} aria-hidden />
+            {t("path.follow")} <ArrowDownRight size={18} aria-hidden />
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 /** Multiple thumbnail APIs — free tiers can be flaky; we cycle on failure. */
 export function buildScreenshotCandidates(siteUrl: string): string[] {
@@ -61,6 +62,7 @@ export function ProjectLivePreview({
   className,
   livePreviewRevealDelayMs
 }: ProjectLivePreviewProps) {
+  const { t } = useLanguage();
   const url = useMemo(() => {
     const raw = (previewUrl ?? liveUrl)?.trim() ?? "";
     return /^https?:\/\//i.test(raw) ? raw : "";
@@ -152,15 +154,15 @@ export function ProjectLivePreview({
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/90 shadow-sm" />
         </span>
         <div className="flex min-h-9 min-w-0 flex-1 items-center rounded-lg border border-border/60 bg-background/90 px-3 py-1.5 shadow-inner">
-          <Globe className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-          <span className="truncate font-mono text-[11px] text-muted-foreground sm:text-xs">{hostname || "Live site"}</span>
+          <Globe className="me-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="truncate font-mono text-[11px] text-muted-foreground sm:text-xs">{hostname || t("project.liveSite")}</span>
         </div>
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/15 hover:text-primary"
-          aria-label={`Open ${title} live site in a new tab`}
+          aria-label={t("project.openLiveAria", { title })}
         >
           <ExternalLink className="h-4 w-4" />
         </a>
@@ -215,7 +217,7 @@ export function ProjectLivePreview({
               target="_blank"
               rel="noopener noreferrer"
               className="absolute inset-0 z-10 rounded-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
-              aria-label={`Open ${title} live site in a new tab`}
+              aria-label={t("project.openLiveAria", { title })}
             />
           </div>
         ) : null}

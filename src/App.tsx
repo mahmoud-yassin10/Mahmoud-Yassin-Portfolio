@@ -21,6 +21,7 @@ import WorkPage from "./pages/WorkPage";
 import FlousyDashboard from "./pages/FlousyDashboard";
 import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
 import { AudienceProvider } from "@/context/AudienceContext";
+import { LanguageProvider } from "@/i18n/LanguageContext";
 import AudienceGate from "@/components/AudienceGate";
 import AudienceTransition from "@/components/AudienceTransition";
 import HubPage from "./pages/HubPage";
@@ -39,7 +40,8 @@ const PortfolioRouteAnalytics = () => {
 };
 
 const App = () => (
-  <AudienceProvider>
+  <LanguageProvider>
+    <AudienceProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
       <Toaster />
@@ -77,7 +79,8 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
-  </AudienceProvider>
+    </AudienceProvider>
+  </LanguageProvider>
 );
 
 export default App;

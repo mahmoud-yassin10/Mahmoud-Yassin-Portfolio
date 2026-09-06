@@ -1,5 +1,6 @@
 import { useAudience } from "@/context/AudienceContext";
 import { Activity, ArrowRight, BriefcaseBusiness, GraduationCap, Handshake, Sparkles } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const icons = {
   recruiter: BriefcaseBusiness,
@@ -9,6 +10,7 @@ const icons = {
 
 const AudienceTransition = () => {
   const { isTransitioning, transitionTarget } = useAudience();
+  const { t } = useLanguage();
   const Icon = transitionTarget ? icons[transitionTarget.id] : Sparkles;
 
   return (
@@ -22,11 +24,11 @@ const AudienceTransition = () => {
       <div className="audience-transition-orbit audience-transition-orbit-two" aria-hidden />
       <div className="audience-transition-inner">
         <div className="audience-transition-mark"><Icon size={24} strokeWidth={1.6} /></div>
-        <p className="audience-transition-kicker"><Activity size={13} /> Reconfiguring perspective</p>
-        <h2>{transitionTarget ? transitionTarget.shortLabel : "Your view"}</h2>
+        <p className="audience-transition-kicker"><Activity size={13} /> {t("transition.kicker")}</p>
+        <h2>{transitionTarget ? t(`audience.${transitionTarget.id}.shortLabel`) : t("transition.fallback")}</h2>
         <div className="audience-transition-status">
           <span className="audience-transition-pulse" />
-          <span>Loading the right work</span>
+          <span>{t("transition.loading")}</span>
           <ArrowRight size={14} />
         </div>
         <div className="audience-transition-progress" aria-hidden><span /></div>

@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { type ProjectTileData } from "@/data/projects";
 import { getServicesInquiryHref, servicesPageOfferings } from "@/data/servicesOfferings";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const ServicesPage = () => {
   const location = useLocation();
+  const { t, dict } = useLanguage();
   const servicesInquiryHref = getServicesInquiryHref();
 
   useEffect(() => {
@@ -33,26 +35,29 @@ const ServicesPage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Services
+                {t("services.title")}
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                I focus on{" "}
-                <strong className="text-foreground font-medium">website development</strong>,{" "}
-                <strong className="text-foreground font-medium">Kashier</strong> (payments and POS), and projects that{" "}
-                <strong className="text-foreground font-medium">combine both</strong>. Scroll down for the full business
-                inquiry questionnaire and contact options.
+                {t("services.introLead")}
+                <strong className="text-foreground font-medium">{t("services.introWebsite")}</strong>
+                {t("services.introMid")}
+                <strong className="text-foreground font-medium">{t("services.introKashier")}</strong>
+                {t("services.introKashierNote")}
+                <strong className="text-foreground font-medium">{t("services.introBoth")}</strong>
+                {t("services.introEnd")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
               {servicesPageOfferings.map((service, index) => {
+                const copy = dict.offerings[service.id as keyof typeof dict.offerings];
                 const project: ProjectTileData = {
-                  title: service.title,
-                  description: service.description,
-                  tech: service.bullets,
-                  period: "Available",
+                  title: copy.title,
+                  description: copy.description,
+                  tech: copy.bullets,
+                  period: t("services.available"),
                   link: servicesInquiryHref,
-                  type: "Service"
+                  type: t("services.serviceType")
                 };
 
                 const isWebsiteFirst = index === 0;
@@ -71,14 +76,14 @@ const ServicesPage = () => {
                         variant="secondary"
                         className="absolute -top-2.5 left-4 z-10 border border-primary/40 bg-background/95 shadow-sm"
                       >
-                        Core offering
+                        {t("services.coreOffering")}
                       </Badge>
                     ) : null}
                     <div className={cn("flex flex-col flex-1 min-h-0", isWebsiteFirst && "rounded-[14px] bg-background")}>
                       <ProjectTile
                         project={project}
                         index={index}
-                        buttonLabel="Request this"
+                        buttonLabel={t("services.requestThis")}
                         linkRel={undefined}
                         linkTarget="_self"
                         alignButton

@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { ClientWorkTile } from "@/components/ClientWorkTile";
 import { ProjectTile } from "@/components/Projects";
 import { clientProjects, technicalProjects } from "@/data/projects";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { localizeProject } from "@/i18n/projectsAr";
 
 type WorkTab = "client" | "projects";
 
 const WorkPage = () => {
   const [activeTab, setActiveTab] = useState<WorkTab>("client");
+  const { t, lang } = useLanguage();
   const isClientTab = activeTab === "client";
-  const items = isClientTab ? clientProjects : technicalProjects;
+  const items = (isClientTab ? clientProjects : technicalProjects).map((project) => localizeProject(project, lang));
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -22,7 +25,7 @@ const WorkPage = () => {
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Work
+              {t("work.title")}
             </h2>
 
             <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
@@ -32,7 +35,7 @@ const WorkPage = () => {
                 onClick={() => setActiveTab("client")}
                 className="rounded-full"
               >
-                Client Work
+                {t("work.clientTab")}
               </Button>
               <Button
                 type="button"
@@ -40,13 +43,13 @@ const WorkPage = () => {
                 onClick={() => setActiveTab("projects")}
                 className="rounded-full"
               >
-                Projects
+                {t("work.projectsTab")}
               </Button>
             </div>
 
             {isClientTab ? (
               <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                Click the preview or &quot;Live site&quot; to open the real URL; use &quot;View case study&quot; for details.
+                {t("work.clientHint")}
               </p>
             ) : null}
 

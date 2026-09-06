@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { technicalProjects, type ProjectTileData } from "@/data/projects";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { localizeProject } from "@/i18n/projectsAr";
 
 type ProjectTileProps = {
   project: ProjectTileData;
@@ -18,12 +20,15 @@ type ProjectTileProps = {
 export const ProjectTile = ({
   project,
   index,
-  buttonLabel = "View project",
+  buttonLabel,
   linkRel = "noopener noreferrer",
   linkTarget = "_blank",
   forceButton = false,
   alignButton = false
 }: ProjectTileProps) => {
+  const { t, dict } = useLanguage();
+  const resolvedButton = buttonLabel ?? t("projects.viewProject");
+  const typeLabel = dict.projects.types[project.type as keyof typeof dict.projects.types] ?? project.type;
   const internalTo = project.slug ? `/projects/${project.slug}` : undefined;
   const linkHref = internalTo ?? project.link;
   const hasLink = Boolean(linkHref && linkHref !== "#");
@@ -46,7 +51,7 @@ export const ProjectTile = ({
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
           <Badge variant="secondary" className="mb-2">
-            {project.type}
+            {typeLabel}
           </Badge>
           <span className="text-sm text-muted-foreground">{project.period}</span>
         </div>
@@ -71,7 +76,7 @@ export const ProjectTile = ({
         <div className="flex flex-wrap gap-2 mb-4">
           {project.tech.map((tech, i) => (
             <Badge key={i} variant="outline" className="border-primary/30">
-              <Code2 className="w-3 h-3 mr-1" />
+              <Code2 className="w-3 h-3 me-1" />
               {tech}
             </Badge>
           ))}
@@ -85,13 +90,13 @@ export const ProjectTile = ({
             >
               {internalTo ? (
                 <Link to={internalTo}>
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  {buttonLabel}
+                  <ExternalLink className="me-2 h-4 w-4" />
+                  {resolvedButton}
                 </Link>
               ) : (
                 <a href={linkHref || "#"} target={linkTarget} rel={linkRel}>
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  {buttonLabel}
+                  <ExternalLink className="me-2 h-4 w-4" />
+                  {resolvedButton}
                 </a>
               )}
             </Button>
@@ -108,14 +113,16 @@ type ProjectsProps = {
   ctaLabel?: string;
 };
 
-const Projects = ({ limit, ctaHref, ctaLabel = "View all projects" }: ProjectsProps) => {
-  const visibleProjects =
-    typeof limit === "number" ? technicalProjects.slice(0, limit) : technicalProjects;
+const Projects = ({ limit, ctaHref, ctaLabel }: ProjectsProps) => {
+  const { t, lang } = useLanguage();
+  const source = typeof limit === "number" ? technicalProjects.slice(0, limit) : technicalProjects;
+  const visibleProjects = source.map((project) => localizeProject(project, lang));
+  const resolvedCta = ctaLabel ?? t("projects.viewAll");
   return (
     <section id="projects" className="py-20 relative">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Technical Projects
+          {t("projects.title")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
@@ -137,7 +144,7 @@ const Projects = ({ limit, ctaHref, ctaLabel = "View all projects" }: ProjectsPr
               className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
               asChild
             >
-              <Link to={ctaHref}>{ctaLabel}</Link>
+              <Link to={ctaHref}>{resolvedCta}</Link>
             </Button>
           </div>
         )}

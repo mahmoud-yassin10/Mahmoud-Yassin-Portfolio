@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Project } from "@/data/projects";
 import { isLiveSiteUrl, ProjectLivePreview } from "@/components/ProjectLivePreview";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type ClientWorkTileProps = {
   project: Project;
@@ -12,9 +13,11 @@ type ClientWorkTileProps = {
 };
 
 export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
+  const { t, dict } = useLanguage();
   const externalTrim = project.externalLink?.trim();
   const liveUrl = isLiveSiteUrl(externalTrim) ? externalTrim : undefined;
   const internalTo = `/projects/${project.slug}`;
+  const typeLabel = dict.projects.types[project.type as keyof typeof dict.projects.types] ?? project.type;
 
   const cardStyle = {
     animationDelay: `${index * 0.1}s`,
@@ -40,7 +43,7 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
 
       <CardHeader className={liveUrl ? "flex-1" : "flex-1 rounded-t-xl"}>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <Badge variant="secondary">{project.type}</Badge>
+          <Badge variant="secondary">{typeLabel}</Badge>
           <span className="text-sm text-muted-foreground shrink-0">{project.period}</span>
         </div>
         <CardTitle className="text-2xl transition-colors group-hover:text-primary">{project.title}</CardTitle>
@@ -51,7 +54,7 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
         <div className="flex flex-wrap gap-2 mb-4">
           {project.tech.map((tech, i) => (
             <Badge key={i} variant="outline" className="border-primary/30">
-              <Code2 className="w-3 h-3 mr-1" />
+              <Code2 className="w-3 h-3 me-1" />
               {tech}
             </Badge>
           ))}
@@ -63,14 +66,14 @@ export const ClientWorkTile = ({ project, index }: ClientWorkTileProps) => {
             asChild
           >
             <Link to={internalTo}>
-              <ArrowRight className="mr-2 h-4 w-4" />
-              View case study
+              <ArrowRight className="me-2 h-4 w-4" />
+              {t("clientTile.caseStudy")}
             </Link>
           </Button>
           {liveUrl ? (
             <Button variant="outline" className="w-full flex-1 border-primary/40 sm:w-auto" asChild>
               <a href={liveUrl} target="_blank" rel="noopener noreferrer">
-                Live site
+                {t("clientTile.liveSite")}
               </a>
             </Button>
           ) : null}

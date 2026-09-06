@@ -2,9 +2,11 @@ import { Download, Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServicesPageHref } from "@/data/servicesOfferings";
 import { useAudience } from "@/context/AudienceContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Hero = () => {
   const { profile } = useAudience();
+  const { t } = useLanguage();
   // Works on localhost ("/") and GitHub Pages ("/<repo>/")
   const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
   const servicesPageHref = getServicesPageHref();
@@ -31,29 +33,29 @@ const Hero = () => {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 items-center gap-12 animate-fade-in-up">
           <div className="space-y-6 text-center lg:text-left">
             <div className="space-y-3">
-              <p className="audience-hero-eyebrow">{profile?.eyebrow ?? "Software engineer · student founder"}</p>
+              <p className="audience-hero-eyebrow">{profile ? t(`audience.${profile.id}.eyebrow`) : t("hero.fallbackEyebrow")}</p>
               <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
                 Mahmoud Yassin
               </h1>
               <h2 className="text-2xl md:text-4xl font-semibold text-foreground audience-hero-title">
-                {profile?.title ?? "Building useful things with code, curiosity, and care."}
+                {profile ? t(`audience.${profile.id}.title`) : t("hero.fallbackTitle")}
               </h2>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
-                {profile?.description ?? "Building impactful apps from Port Said, Egypt — combining AI, Flutter development, and leadership to create solutions that matter."}
+                {profile ? t(`audience.${profile.id}.description`) : t("hero.fallbackDescription")}
               </p>
             </div>
 
             <div
               className="grid w-full max-w-lg grid-cols-1 gap-3 pt-4 mx-auto lg:mx-0 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center lg:gap-x-4 lg:gap-y-3"
               role="group"
-              aria-label="Primary links and social profiles"
+              aria-label={t("hero.linksAria")}
             >
               <Button
                 size="lg"
                 className="group relative h-12 w-full min-h-[44px] justify-center touch-manipulation overflow-hidden bg-gradient-to-r from-primary to-accent text-base shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] lg:h-11 lg:min-h-[44px]"
                 asChild
               >
-                <a href={profile?.primaryHref ?? servicesPageHref}>{profile?.primaryCta ?? "View services"}</a>
+                <a href={profile?.primaryHref ?? servicesPageHref}>{profile ? t(`audience.${profile.id}.primaryCta`) : t("hero.fallbackCta")}</a>
               </Button>
 
               <Button
@@ -64,14 +66,14 @@ const Hero = () => {
               >
                 <a href={secondaryHref} target={profile?.id === "client" ? undefined : "_blank"} rel={profile?.id === "client" ? undefined : "noreferrer"}>
                   <Download className="h-5 w-5 shrink-0" aria-hidden />
-                  {profile?.secondaryCta ?? "Download CV"}
+                  {profile ? t(`audience.${profile.id}.secondaryCta`) : t("hero.fallbackSecondary")}
                 </a>
               </Button>
 
               <div
                 className="flex shrink-0 items-center justify-center gap-2 justify-self-center rounded-2xl border border-primary/25 bg-card/50 p-1.5 backdrop-blur-sm lg:justify-self-end"
                 role="group"
-                aria-label="GitHub and LinkedIn"
+                aria-label={t("hero.socialAria")}
               >
                 <Button
                   size="icon"
@@ -79,7 +81,7 @@ const Hero = () => {
                   className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 lg:h-10 lg:w-10"
                   asChild
                 >
-                  <a href={githubHref} target="_blank" rel="noreferrer" aria-label="Open GitHub profile">
+                  <a href={githubHref} target="_blank" rel="noreferrer" aria-label={t("hero.github")}>
                     <Github className="h-5 w-5" aria-hidden />
                   </a>
                 </Button>
@@ -89,7 +91,7 @@ const Hero = () => {
                   className="h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation rounded-xl border-2 border-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground active:scale-95 lg:h-10 lg:w-10"
                   asChild
                 >
-                  <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile">
+                  <a href={linkedinHref} target="_blank" rel="noreferrer" aria-label={t("hero.linkedin")}>
                     <Linkedin className="h-5 w-5" aria-hidden />
                   </a>
                 </Button>
@@ -104,7 +106,7 @@ const Hero = () => {
                 <source srcSet={photoSrcWebp} type="image/webp" />
                 <img
                   src={photoSrcJpg}
-                  alt="Mahmoud Yassin portrait"
+                  alt={t("hero.photoAlt")}
                   className="w-full h-full object-cover aspect-[1280/853]"
                   loading="lazy"
                   decoding="async"

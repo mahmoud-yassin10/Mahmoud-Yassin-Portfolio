@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { submitWeb3Forms } from "@/lib/web3forms";
 import { getProjectBySlug } from "@/data/projects";
 import { useAudience } from "@/context/AudienceContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 function emailLooksValidContact(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -16,12 +17,12 @@ function emailLooksValidContact(value: string) {
 
 function getContactFieldErrors(formData: { name: string; email: string; message: string }) {
   const e: Record<string, string> = {};
-  if (!formData.name.trim()) e.name = "Enter your name.";
-  else if (formData.name.trim().length < 2) e.name = "Name must be at least 2 characters.";
-  if (!formData.email.trim()) e.email = "Enter your email.";
-  else if (!emailLooksValidContact(formData.email)) e.email = "Enter a valid email address.";
-  if (!formData.message.trim()) e.message = "Enter a message.";
-  else if (formData.message.trim().length < 10) e.message = "Message must be at least 10 characters.";
+  if (!formData.name.trim()) e.name = "contact.errName";
+  else if (formData.name.trim().length < 2) e.name = "contact.errNameShort";
+  if (!formData.email.trim()) e.email = "contact.errEmail";
+  else if (!emailLooksValidContact(formData.email)) e.email = "contact.errEmailInvalid";
+  if (!formData.message.trim()) e.message = "contact.errMessage";
+  else if (formData.message.trim().length < 10) e.message = "contact.errMessageShort";
   return e;
 }
 
@@ -29,6 +30,7 @@ const CONTACT_FIELD_ORDER = ["name", "email", "message"] as const;
 
 const Contact = () => {
   const { audience } = useAudience();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const similarPrefilledRef = useRef(false);
 
@@ -55,11 +57,11 @@ const Contact = () => {
       if (prev.message.trim()) return prev;
       const site = refProject.externalLink?.trim();
       const msg = site
-        ? `I'm interested in a website or experience similar to "${refProject.title}" (${site}).\n\n`
-        : `I'm interested in something similar to "${refProject.title}".\n\n`;
+        ? t("contact.similarWithSite", { title: refProject.title, site })
+        : t("contact.similarNoSite", { title: refProject.title });
       return { ...prev, message: msg };
     });
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const fieldErrors = validationAttempted ? getContactFieldErrors(formData) : {};
 
@@ -73,9 +75,9 @@ const Contact = () => {
     if (Object.keys(errs).length > 0) {
       setValidationAttempted(true);
       toast({
-        title: "Complete required fields",
+        title: t("contact.toastIncomplete"),
         description:
-          CONTACT_FIELD_ORDER.map((id) => errs[id]).filter(Boolean)[0] ?? "Review the highlighted fields.",
+          CONTACT_FIELD_ORDER.map((id) => (errs[id] ? t(errs[id]) : "")).filter(Boolean)[0] ?? t("contact.toastReview"),
         variant: "destructive"
       });
       for (const id of CONTACT_FIELD_ORDER) {
@@ -89,8 +91,8 @@ const Contact = () => {
 
     if (!accessKey) {
       toast({
-        title: "Form not configured",
-        description: "Please set VITE_WEB3FORMS_KEY to enable sending.",
+        title: t("contact.toastNoKey"),
+        description: t("contact.toastNoKeyDesc"),
         variant: "destructive"
       });
       return;
@@ -119,8 +121,8 @@ const Contact = () => {
 
       if (data.success) {
         toast({
-          title: "Message sent!",
-          description: "Thank you for reaching out. I'll get back to you soon."
+          title: t("contact.toastSent"),
+          description: t("contact.toastSentDesc")
         });
         setValidationAttempted(false);
         setFormData({ name: "", email: "", message: "" });
@@ -129,8 +131,8 @@ const Contact = () => {
       }
     } catch (err) {
       toast({
-        title: "Submission failed",
-        description: err instanceof Error ? err.message : "Please try again later.",
+        title: t("contact.toastFail"),
+        description: err instanceof Error ? err.message : t("contact.toastFailDesc"),
         variant: "destructive"
       });
     } finally {
@@ -147,7 +149,7 @@ const Contact = () => {
   const contactInfo = [
     {
       icon: Phone,
-      label: "Phone",
+      label: t("contact.phone"),
       value: "+20 112 214 4543",
       href: "tel:+201122144543"
     },
@@ -169,13 +171,13 @@ const Contact = () => {
     try {
       await navigator.clipboard.writeText(assembledEmail);
       toast({
-        title: "Email copied",
-        description: "Address is ready to paste.",
+        title: t("contact.copiedTitle"),
+        description: t("contact.copiedDesc"),
       });
     } catch (err) {
       toast({
-        title: "Copy failed",
-        description: "Could not copy email. Please try manually.",
+        title: t("contact.copyFailTitle"),
+        description: t("contact.copyFailDesc"),
         variant: "destructive"
       });
     }
@@ -185,21 +187,21 @@ const Contact = () => {
     <section id="contact" className="py-20 relative">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          {audience === "client" ? "Let’s build something useful" : audience === "admissions" ? "Thank you for looking closer" : "Let’s talk about the work"}
+          {audience === "client" ? t("contact.titleClient") : audience === "admissions" ? t("contact.titleAdmissions") : t("contact.titleRecruiter")}
         </h2>
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact Info */}
           <div className="space-y-6 animate-fade-in">
             <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 border border-border">
-              <h3 className="text-2xl font-bold mb-6 text-foreground">Contact Information</h3>
+              <h3 className="text-2xl font-bold mb-6 text-foreground">{t("contact.info")}</h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-border">
                   <div className="p-3 bg-primary/10 rounded-xl">
                     <Mail className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="text-sm text-muted-foreground">{t("contact.email")}</p>
                     {emailRevealed ? (
                       <a
                         href={`mailto:${assembledEmail}`}
@@ -208,7 +210,7 @@ const Contact = () => {
                         {assembledEmail}
                       </a>
                     ) : (
-                      <p className="text-foreground font-medium">Click reveal to view</p>
+                      <p className="text-foreground font-medium">{t("contact.revealHint")}</p>
                     )}
                   </div>
                   {emailRevealed && (
@@ -217,8 +219,8 @@ const Contact = () => {
                       size="icon"
                       onClick={handleCopyEmail}
                       className="rounded-full"
-                      aria-label="Copy email address"
-                      title="Copy email"
+                      aria-label={t("contact.copyEmail")}
+                      title={t("contact.copyEmailTitle")}
                     >
                       <Clipboard className="w-4 h-4" />
                     </Button>
@@ -230,7 +232,7 @@ const Contact = () => {
                       onClick={handleRevealEmail}
                       className="whitespace-nowrap"
                     >
-                      Reveal email
+                      {t("contact.reveal")}
                     </Button>
                   )}
                 </div>
@@ -269,7 +271,7 @@ const Contact = () => {
                     <Instagram className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Store (Instagram)</p>
+                    <p className="text-sm text-muted-foreground">{t("contact.store")}</p>
                     <p className="text-foreground font-medium group-hover:text-primary transition-colors">
                       @{instagramUser}
                     </p>
@@ -288,10 +290,10 @@ const Contact = () => {
               noValidate
             >
               <p className="text-sm text-muted-foreground">
-                <span className="text-destructive font-medium">*</span> All fields are required before sending.
+                <span className="text-destructive font-medium">*</span> {t("contact.requiredNote")}
               </p>
               <div className="hidden">
-                <label htmlFor="website">Leave this empty</label>
+                <label htmlFor="website">{t("contact.honeypot")}</label>
                 <input
                   id="website"
                   name="website"
@@ -305,11 +307,11 @@ const Contact = () => {
 
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2 text-foreground">
-                  Name <span className="text-destructive">*</span>
+                  {t("contact.name")} <span className="text-destructive">*</span>
                 </label>
                 {fieldErrors.name ? (
                   <p className="text-sm text-destructive mb-2" role="alert">
-                    {fieldErrors.name}
+                    {t(fieldErrors.name)}
                   </p>
                 ) : null}
                 <Input
@@ -317,7 +319,7 @@ const Contact = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Your name"
+                  placeholder={t("contact.namePh")}
                   className={cn("w-full", fieldErrors.name && "border-destructive ring-2 ring-destructive/25")}
                   autoComplete="name"
                   aria-invalid={Boolean(fieldErrors.name)}
@@ -327,11 +329,11 @@ const Contact = () => {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2 text-foreground">
-                  Email <span className="text-destructive">*</span>
+                  {t("contact.email")} <span className="text-destructive">*</span>
                 </label>
                 {fieldErrors.email ? (
                   <p className="text-sm text-destructive mb-2" role="alert">
-                    {fieldErrors.email}
+                    {t(fieldErrors.email)}
                   </p>
                 ) : null}
                 <Input
@@ -339,7 +341,7 @@ const Contact = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your.email@example.com"
+                  placeholder={t("contact.emailPh")}
                   className={cn("w-full", fieldErrors.email && "border-destructive ring-2 ring-destructive/25")}
                   inputMode="email"
                   autoComplete="email"
@@ -350,18 +352,18 @@ const Contact = () => {
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium mb-2 text-foreground">
-                  Message <span className="text-destructive">*</span>
+                  {t("contact.message")} <span className="text-destructive">*</span>
                 </label>
                 {fieldErrors.message ? (
                   <p className="text-sm text-destructive mb-2" role="alert">
-                    {fieldErrors.message}
+                    {t(fieldErrors.message)}
                   </p>
                 ) : null}
                 <Textarea
                   id="message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Your message..."
+                  placeholder={t("contact.messagePh")}
                   rows={5}
                   className={cn("w-full", fieldErrors.message && "border-destructive ring-2 ring-destructive/25")}
                   aria-invalid={Boolean(fieldErrors.message)}
@@ -375,8 +377,8 @@ const Contact = () => {
                 size="lg"
                 disabled={isSubmitting}
               >
-                <Send className="mr-2 h-5 w-5" />
-                {isSubmitting ? "Sending..." : "Send Message"}
+                <Send className="me-2 h-5 w-5" />
+                {isSubmitting ? t("contact.sending") : t("contact.send")}
               </Button>
             </form>
           </div>

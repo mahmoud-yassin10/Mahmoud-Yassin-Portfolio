@@ -15,10 +15,12 @@ import Awards from "@/components/Awards";
 import Skills from "@/components/Skills";
 import AudiencePath from "@/components/AudiencePath";
 import { useAudience } from "@/context/AudienceContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Home = () => {
   const location = useLocation();
   const { audience } = useAudience();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (location.hash !== "#services") return;
@@ -38,7 +40,7 @@ const Home = () => {
         <AudiencePath />
         {audience === "recruiter" ? (
           <>
-            <Projects limit={4} ctaHref="/work" ctaLabel="View all work" />
+            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.viewAllWork")} />
             <Experience />
             <Skills />
           </>
@@ -49,13 +51,13 @@ const Home = () => {
             <Education />
             <Initiatives />
             <Awards />
-            <Projects limit={4} ctaHref="/work" ctaLabel="Explore selected projects" />
+            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.exploreProjects")} />
           </>
         ) : null}
         {audience === "client" ? (
           <>
             <HomeServicesSection />
-            <Projects limit={4} ctaHref="/work" ctaLabel="View selected work" />
+            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.viewSelectedWork")} />
           </>
         ) : null}
         <Contact />
