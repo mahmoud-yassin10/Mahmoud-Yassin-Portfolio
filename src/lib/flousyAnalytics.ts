@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where,
   writeBatch,
   type DocumentData,
@@ -49,10 +50,27 @@ export type FeedbackItem = {
   id: string;
   message: string;
   category?: string;
+  kind?: string;
   createdAt: Date;
   uid?: string;
   hasPhotos?: boolean;
   hasAudio?: boolean;
+  status?: "new" | "reviewing" | "resolved";
+};
+
+export type SmsFalseDetectionItem = {
+  id: string;
+  message: string;
+  smsBody: string;
+  smsSender: string;
+  amount: number | null;
+  isExpense: boolean;
+  merchant: string;
+  categoryId: string;
+  txnId: string;
+  origin: string;
+  createdAt: Date;
+  uid?: string;
   status?: "new" | "reviewing" | "resolved";
 };
 
@@ -75,6 +93,7 @@ export type DashboardData = {
   events: AnalyticsEvent[];
   feedback: FeedbackItem[];
   studentVerifications: StudentVerificationItem[];
+  smsFalseDetections: SmsFalseDetectionItem[];
   live: boolean;
 };
 
@@ -145,6 +164,34 @@ const mapEvent = (id: string, data: DocumentData): AnalyticsEvent => ({
   metadata: data.metadata ?? undefined,
 });
 
+const mapFeedback = (id: string, data: DocumentData): FeedbackItem => ({
+  id,
+  message: String(data.message ?? ""),
+  category: data.category ? String(data.category) : undefined,
+  kind: data.kind ? String(data.kind) : undefined,
+  createdAt: toDate(data.createdAt),
+  uid: data.uid ? String(data.uid) : undefined,
+  hasPhotos: Boolean(data.hasPhotos),
+  hasAudio: Boolean(data.hasAudio),
+  status: data.status ?? "new",
+});
+
+const mapSmsFalseDetection = (id: string, data: DocumentData): SmsFalseDetectionItem => ({
+  id,
+  message: String(data.message ?? ""),
+  smsBody: String(data.smsBody ?? ""),
+  smsSender: String(data.smsSender ?? ""),
+  amount: typeof data.amount === "number" ? data.amount : null,
+  isExpense: Boolean(data.isExpense),
+  merchant: String(data.merchant ?? ""),
+  categoryId: String(data.categoryId ?? ""),
+  txnId: String(data.txnId ?? ""),
+  origin: String(data.origin ?? ""),
+  createdAt: toDate(data.createdAt),
+  uid: data.uid ? String(data.uid) : undefined,
+  status: data.status ?? "new",
+});
+
 const mapStudentVerification = (id: string, data: DocumentData): StudentVerificationItem => ({
   id,
   uid: String(data.uid ?? id),
@@ -167,6 +214,24 @@ export async function loadLiveDashboardData(days = 30): Promise<DashboardData> {
   const eventQuery = query(eventCollection, where("createdAt", ">=", since), orderBy("createdAt", "desc"), limit(5000));
   const eventSnapshot = await getDocs(eventQuery);
   const feedbackSnapshot = await getDocs(query(collection(flousyDb, "feedback_inbox"), orderBy("createdAt", "desc"), limit(100)));
+  const allFeedback = feedbackSnapshot.docs.map((docSnap) => mapFeedback(docSnap.id, docSnap.data()));
+  const feedback = allFeedback.filter((item) => item.kind !== "sms_false_detection");
+  let smsFalseDetections: SmsFalseDetectionItem[] = [];
+  try {
+    const smsSnapshot = await getDocs(
+      query(collection(flousyDb, "sms_false_detection_inbox"), orderBy("createdAt", "desc"), limit(100)),
+    );
+    smsFalseDetections = smsSnapshot.docs.map((docSnap) => mapSmsFalseDetection(docSnap.id, docSnap.data()));
+  } catch {
+    smsFalseDetections = allFeedback
+      .filter((item) => item.kind === "sms_false_detection")
+      .map((item) => mapSmsFalseDetection(item.id, {
+        message: item.message,
+        createdAt: item.createdAt,
+        uid: item.uid,
+        status: item.status,
+      }));
+  }
   let studentVerifications: StudentVerificationItem[] = [];
   try {
     const studentSnapshot = await getDocs(
@@ -186,17 +251,9 @@ export async function loadLiveDashboardData(days = 30): Promise<DashboardData> {
   return {
     live: true,
     events: eventSnapshot.docs.map((docSnap) => mapEvent(docSnap.id, docSnap.data())),
-    feedback: feedbackSnapshot.docs.map((docSnap) => ({
-      id: docSnap.id,
-      message: String(docSnap.data().message ?? ""),
-      category: docSnap.data().category ? String(docSnap.data().category) : undefined,
-      createdAt: toDate(docSnap.data().createdAt),
-      uid: docSnap.data().uid ? String(docSnap.data().uid) : undefined,
-      hasPhotos: Boolean(docSnap.data().hasPhotos),
-      hasAudio: Boolean(docSnap.data().hasAudio),
-      status: docSnap.data().status ?? "new",
-    })),
+    feedback,
     studentVerifications,
+    smsFalseDetections,
   };
 }
 
@@ -220,6 +277,20 @@ export async function reviewStudentVerification(options: {
   batch.update(doc(flousyDb, "student_verification_inbox", inboxId), patch);
   batch.update(doc(flousyDb, "users", uid, "student_verification", "current"), patch);
   await batch.commit();
+}
+
+export async function reviewSmsFalseDetection(options: {
+  inboxId: string;
+  status: "new" | "reviewing" | "resolved";
+}) {
+  if (!flousyDb) throw new Error("Firebase is not configured.");
+  const patch = { status: options.status };
+  await updateDoc(doc(flousyDb, "sms_false_detection_inbox", options.inboxId), patch);
+  try {
+    await updateDoc(doc(flousyDb, "feedback_inbox", options.inboxId), patch);
+  } catch {
+    // Feedback copy is optional; dedicated inbox is the source of truth.
+  }
 }
 
 export async function isFlousyAdmin(uid: string) {

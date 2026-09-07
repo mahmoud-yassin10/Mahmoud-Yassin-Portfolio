@@ -801,3 +801,16 @@ html:not(.dark) .dashboard-login .dashboard-login-foot { color: #71809e; }
   text-shadow: none;
 }
 .dashboard-login-form .dashboard-primary-button:disabled { filter: saturate(.72); cursor: not-allowed; }
+.dashboard-sms-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  background: rgba(164, 242, 109, .06);
+  border: 1px solid #2b3740;
+  border-radius: 10px;
+  padding: 12px;
+  color: #d4dfdb;
+  margin: 10px 0 0;
+}
