@@ -61,12 +61,14 @@ export type FeedbackItem = {
 export type SmsFalseDetectionItem = {
   id: string;
   message: string;
+  reportType: "not_an_expense" | "wrong_category";
   smsBody: string;
   smsSender: string;
   amount: number | null;
   isExpense: boolean;
   merchant: string;
   categoryId: string;
+  correctedCategoryId: string;
   txnId: string;
   origin: string;
   createdAt: Date;
@@ -179,12 +181,14 @@ const mapFeedback = (id: string, data: DocumentData): FeedbackItem => ({
 const mapSmsFalseDetection = (id: string, data: DocumentData): SmsFalseDetectionItem => ({
   id,
   message: String(data.message ?? ""),
+  reportType: data.reportType === "wrong_category" ? "wrong_category" : "not_an_expense",
   smsBody: String(data.smsBody ?? ""),
   smsSender: String(data.smsSender ?? ""),
   amount: typeof data.amount === "number" ? data.amount : null,
   isExpense: Boolean(data.isExpense),
   merchant: String(data.merchant ?? ""),
   categoryId: String(data.categoryId ?? ""),
+  correctedCategoryId: String(data.correctedCategoryId ?? ""),
   txnId: String(data.txnId ?? ""),
   origin: String(data.origin ?? ""),
   createdAt: toDate(data.createdAt),
