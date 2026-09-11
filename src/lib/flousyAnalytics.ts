@@ -61,7 +61,7 @@ export type FeedbackItem = {
 export type SmsFalseDetectionItem = {
   id: string;
   message: string;
-  reportType: "not_an_expense" | "wrong_category";
+  reportType: "not_an_expense" | "wrong_category" | "legacy";
   smsBody: string;
   smsSender: string;
   amount: number | null;
@@ -181,7 +181,17 @@ const mapFeedback = (id: string, data: DocumentData): FeedbackItem => ({
 const mapSmsFalseDetection = (id: string, data: DocumentData): SmsFalseDetectionItem => ({
   id,
   message: String(data.message ?? ""),
-  reportType: data.reportType === "wrong_category" ? "wrong_category" : "not_an_expense",
+  // reportType/correctedCategoryId only exist on reports submitted after the
+  // report-type schema shipped — older documents have neither field. Without
+  // this branch they'd silently read as "not_an_expense", which is a guess
+  // dressed up as data. "legacy" says plainly that we don't know which kind
+  // this was.
+  reportType:
+    data.reportType === "wrong_category"
+      ? "wrong_category"
+      : data.reportType === "not_an_expense"
+        ? "not_an_expense"
+        : "legacy",
   smsBody: String(data.smsBody ?? ""),
   smsSender: String(data.smsSender ?? ""),
   amount: typeof data.amount === "number" ? data.amount : null,
