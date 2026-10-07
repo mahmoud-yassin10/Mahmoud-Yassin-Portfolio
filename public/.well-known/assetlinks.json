@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mahmoud.flousy",
+      "sha256_cert_fingerprints": [
+        "AB:26:87:FD:73:71:EC:72:1B:19:5E:EA:9C:B6:B0:C6:65:75:DD:28:C4:A5:28:4D:98:EB:5B:3F:E5:DF:BC:07"
+      ]
+    }
+  }
+]

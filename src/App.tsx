@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import ContactPage from "./pages/ContactPage";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
+import FlousyInvite from "./pages/FlousyInvite";
 import FlousyLanding from "./pages/FlousyLanding";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -68,6 +69,8 @@ const App = () => (
           <Route path="/hub/assignments" element={<HubPage />} />
           <Route path="/hub/sessions" element={<HubPage />} />
           <Route path="/hub/submissions" element={<HubPage />} />
+          <Route path="/flousy/invite/:code" element={<FlousyInvite />} />
+          <Route path="/flousy/invite" element={<FlousyInvite />} />
           <Route path="/flousy/dashboard" element={<FlousyDashboard />} />
           <Route path="/flousy/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/flousy/terms-and-conditions" element={<TermsAndConditions />} />
