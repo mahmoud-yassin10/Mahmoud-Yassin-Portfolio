@@ -1,6 +1,6 @@
 # Portfolio design
 
-The visual direction is an AI-inspired software engineering portfolio. Keep the user's original blue animated particle field. Use the generated blue neural sculpture as conceptual artwork, the actual SquashVAR court output for the featured case study, and the existing portrait for identity.
+The visual direction is an AI-inspired software engineering portfolio. Keep the user's original blue animated particle field. Use the existing portrait as the main hero visual, the generated blue neural sculpture only as a subtle footer accent, and the actual SquashVAR court output for the featured case study.
 
 Design variance: 7. Motion intensity: 5. Visual density: 4. Native CSS with the existing Tailwind and shadcn foundation; no new animation runtime.
 

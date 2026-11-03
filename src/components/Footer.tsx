@@ -7,6 +7,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { getPortfolioNavigation } from "@/data/portfolioNavigation";
 import PortfolioBrand from "@/components/PortfolioBrand";
 
+const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+
 export default function Footer() {
   const { t, lang } = useLanguage();
   const { audience } = useAudience();
@@ -19,6 +21,6 @@ export default function Footer() {
       </nav>
       <div className="portfolio-nav-tools"><LanguageToggle /><PortfolioThemeToggle /></div>
     </div>
-    <div className="portfolio-footer-bottom"><p>{t("footer.rights", { year: new Date().getFullYear() })}</p><button type="button" className="portfolio-text-link" onClick={() => window.scrollTo({top:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"})}>{lang === "ar" ? "ارجع لفوق" : "Back to top"}<ArrowUp size={16} aria-hidden /></button></div>
+    <div className="portfolio-footer-bottom"><p>{t("footer.rights", { year: new Date().getFullYear() })}</p><img className="footer-neural-accent" src={`${base}/images/portfolio/neural-sculpture.webp`} alt="" width="48" height="48" loading="lazy" decoding="async" /><button type="button" className="portfolio-text-link" onClick={() => window.scrollTo({top:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"})}>{lang === "ar" ? "ارجع لفوق" : "Back to top"}<ArrowUp size={16} aria-hidden /></button></div>
   </footer>;
 }

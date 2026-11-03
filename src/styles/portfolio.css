@@ -88,9 +88,8 @@ html.editorial main > section:first-child:not(#hero) { padding-top: 136px; }
 .portfolio-text-link svg { color: hsl(var(--primary)); transition: transform .2s; }
 .portfolio-text-link:hover svg { transform: translate(3px,-3px); }
 .ai-hero-art { position: relative; min-width: 0; animation: portfolio-arrive .9s .1s cubic-bezier(.2,.8,.2,1) both; }
-.neural-sculpture { display: block; width: 100%; height: clamp(300px,32vw,430px); object-fit: contain; filter: drop-shadow(0 0 35px hsl(220 85% 45% / .13)); }
-.hero-profile { display: flex; align-items: center; gap: 13px; padding: 12px 15px; margin: 0 auto; max-width: 410px; border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card) / .94); }
-.hero-profile > img { width: 47px; height: 47px; border-radius: 8px; object-fit: cover; object-position: 60% 30%; }
+.hero-portrait { display: block; width: 100%; height: auto; aspect-ratio: 3/2; object-fit: cover; border-radius: 14px; border: 1px solid hsl(var(--border)); }
+.hero-profile { display: flex; align-items: center; gap: 13px; padding: 14px 18px; margin: 12px 0 0; max-width: none; border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card) / .94); }
 .hero-profile > div:not(.hero-socials) { display: flex; flex: 1; flex-direction: column; gap: 3px; }
 .hero-profile strong { font-size: 13px; font-weight: 700; }
 .hero-profile span { color: hsl(var(--muted-foreground)); font-size: 11px; }
@@ -226,8 +225,6 @@ html.editorial :is(input,textarea,[contenteditable=true]) { cursor: text; }
   .ai-hero-copy { max-width: 620px; }
   .ai-hero h1 { font-size: clamp(40px,7.5vw,62px); }
   .ai-hero-art { max-width: 470px; width: 100%; margin-inline: auto; }
-  .neural-sculpture { height: 340px; }
-  .hero-profile { max-width: 400px; }
   .proof-band dl { grid-template-columns: 1fr 1fr; gap: 25px 30px; }
   .flagship-project { grid-template-columns: 1fr; }
   .flagship-visual img { min-height: 0; height: auto; aspect-ratio: 16/9; }
@@ -254,9 +251,7 @@ html.editorial :is(input,textarea,[contenteditable=true]) { cursor: text; }
   .hero-actions { gap: 15px; }
   .portfolio-button { min-height: 46px; padding: 12px 17px; font-size: 12px; }
   .hero-actions .portfolio-text-link { font-size: 11px; gap: 5px; }
-  .neural-sculpture { height: 266px; }
   .hero-profile { padding: 10px 12px; gap: 10px; }
-  .hero-profile > img { width: 41px; height: 41px; }
   .hero-profile strong { font-size: 12px; }
   .hero-profile span { font-size: 10px; }
   .hero-socials { gap: 9px; }
@@ -318,3 +313,11 @@ html.editorial .case-study section ol > li { background: hsl(var(--card) / .95);
 /* Existing route entrance classes must never delay readable portfolio content. */
 html.editorial :is(.animate-fade-in,.animate-fade-in-up) { animation: none; opacity: 1; transform: none; }
 .section-anchor { position: absolute; top: 0; scroll-margin-top: 108px; }
+
+/* Keep the portrait central; AI artwork is a small secondary footer detail. */
+.portfolio-footer-bottom { position: relative; }
+.footer-neural-accent { display: block; width: 48px; height: 48px; object-fit: contain; opacity: .4; pointer-events: none; }
+@media(max-width:600px) {
+  .footer-neural-accent { position: absolute; inset-inline-end: 4px; bottom: 0; width: 40px; height: 40px; }
+  .portfolio-footer-bottom > p { padding-inline-end: 48px; }
+}

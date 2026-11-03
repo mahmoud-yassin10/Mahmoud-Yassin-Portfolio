@@ -20,9 +20,8 @@ export default function Hero() {
           </div>
         </div>
         <div className="ai-hero-art">
-          <img className="neural-sculpture" src={`${base}/images/portfolio/neural-sculpture.webp`} alt="" width="960" height="960" decoding="async" />
+          <img className="hero-portrait" src={`${base}/ME-NTA.webp`} alt={t("hero.photoAlt")} width="1200" height="800" loading="eager" decoding="async" />
           <div className="hero-profile">
-            <img src={`${base}/ME-NTA.webp`} alt={t("hero.photoAlt")} width="64" height="64" />
             <div><strong>{arabic ? "محمود ياسين" : "Mahmoud Yassin"}</strong><span>{arabic ? "فضول. بحث. بناء." : "Curiosity. Research. Building."}</span></div>
             <div className="hero-socials">
               <a href="https://github.com/mahmoud-yassin10" target="_blank" rel="noreferrer" aria-label={t("hero.github")}><Github size={19} /></a>
