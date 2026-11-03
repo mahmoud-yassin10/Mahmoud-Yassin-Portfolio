@@ -34,3 +34,8 @@ Optional removal of the dead Index page, public/joudy bundles and stale docs cop
 ## Visual redesign requested after the admissions release
 
 The user requested an AI-inspired redesign while preserving the original animated background, a visible dated timeline, matching header/footer, clearer organization, section tracking, a custom scrollbar, additional interaction and a desktop cursor effect. The new design uses self-hosted Manrope/Cairo, the original particle field, a generated neural sculpture, actual SquashVAR court output, a shared navigation/brand/theme system, native disclosure controls, and responsive timeline/navigation. The duplicate project grid on Home was removed; all five projects remain reachable from Selected Work and Work. Editorial serif/paper styling was retired. Research status, supplied PDF, Google Play links, activity claims and contact details remain intact.
+
+
+## SquashVAR case-study cleanup
+
+The SquashVAR project route, legacy slug alias and Research now share a dedicated research case-study page. It replaces the repeated opening copy and generic stack/runtime/language/skills card sequence with a concise project header, actual prototype output, overview and attribution, keyboard-accessible pipeline tabs, separate detector/impact tables, visible limitations and a resource section. A sticky navigator follows the current section. Extra per-surface results use a disclosure. English/Arabic, manuscript status, public PDF/source links, the portrait homepage and the original particle background are preserved. Detector-table settings and the ±25-frame impact matching tolerance were checked against the supplied manuscript.

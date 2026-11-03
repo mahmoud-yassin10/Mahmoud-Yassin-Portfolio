@@ -1,3 +1,4 @@
+import SquashVARCaseStudy from "./SquashVARCaseStudy";
 import { caseStudiesAr } from "@/data/caseStudiesAr";
 import { Code2, ExternalLink, Globe2, ListChecks, Mail, Send, Terminal } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
@@ -64,6 +65,8 @@ const ProjectDetailPage = () => {
       </div>
     );
   }
+
+  if (audience === "admissions" && project.slug === "squashvar") return <SquashVARCaseStudy />;
 
   const caseStudy = audience === "admissions" && slug ? (lang === "ar" ? caseStudiesAr.find((study) => study.slug === project.slug) : getCaseStudy(project.slug)) : undefined;
   const referralContactTo = getContactPageHrefWithSimilar(project.slug);
