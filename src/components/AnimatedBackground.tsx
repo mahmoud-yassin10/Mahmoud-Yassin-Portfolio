@@ -12,7 +12,7 @@ const AnimatedBackground = () => {
     if (!ctx) return;
 
     const setCanvasSize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       // Make canvas slightly larger than viewport to avoid clipped glow at edges
       canvas.style.position = 'fixed';
       canvas.style.top = `-${BLEED}px`;
@@ -54,7 +54,7 @@ const AnimatedBackground = () => {
 
     // Create particles
     const initRect = canvas.getBoundingClientRect();
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 56; i++) {
       particles.push({
         x: Math.random() * initRect.width,
         y: Math.random() * initRect.height,
@@ -66,91 +66,72 @@ const AnimatedBackground = () => {
 
     let rafId = 0;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const root = document.documentElement;
+    let isDark = root.classList.contains("dark");
+    const themeObserver = new MutationObserver(() => { isDark = root.classList.contains("dark"); });
+    themeObserver.observe(root, { attributes: true, attributeFilter: ["class"] });
+    const dotColor = () => (isDark ? "59, 130, 246" : "37, 99, 235");
+    const LINK_DISTANCE = 150;
+    const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
+    let lastTime = 0;
 
-    const animate = () => {
-      const rect = canvas.getBoundingClientRect();
-      const widthCss = rect.width;
-      const heightCss = rect.height;
+    // Cheap per-frame work: no layout reads, no shadowBlur, no allocations, squared distances.
+    const animate = (time = 0) => {
+      const step = lastTime ? Math.min((time - lastTime) / 16.67, 3) : 1;
+      lastTime = time;
+      const widthCss = prevDisplayWidth;
+      const heightCss = prevDisplayHeight;
+      const rgb = dotColor();
 
-      // Ensure backing store and transform stay in sync with zoom/resize
-      const dprNow = window.devicePixelRatio || 1;
-      const needResize =
-        Math.round(widthCss * dprNow) !== canvas.width ||
-        Math.round(heightCss * dprNow) !== canvas.height;
-
-      if (needResize) {
-        const oldW = prevDisplayWidth;
-        const oldH = prevDisplayHeight;
-
-        setCanvasSize();
-        prevDisplayWidth = canvas.getBoundingClientRect().width;
-        prevDisplayHeight = canvas.getBoundingClientRect().height;
-
-        const scaleX = oldW ? prevDisplayWidth / oldW : 1;
-        const scaleY = oldH ? prevDisplayHeight / oldH : 1;
-        particles.forEach((p) => {
-          p.x *= scaleX;
-          p.y *= scaleY;
-        });
-      }
-
-      // Clear the full canvas in device pixels to avoid edge boxes
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      // Update and draw particles
-      particles.forEach((particle, i) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-
-        // Wrap around edges in CSS pixel space
+      for (let i = 0; i < particles.length; i++) {
+        const particle = particles[i];
+        particle.x += particle.vx * step;
+        particle.y += particle.vy * step;
         if (particle.x < 0) particle.x = widthCss;
         if (particle.x > widthCss) particle.x = 0;
         if (particle.y < 0) particle.y = heightCss;
         if (particle.y > heightCss) particle.y = 0;
 
-        // Draw particle
-        const isDark = document.documentElement.classList.contains("dark");
+        ctx.fillStyle = `rgba(${rgb}, 0.14)`;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius * 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(${rgb}, ${isDark ? 0.75 : 0.6})`;
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = isDark
-          ? `rgba(59, 130, 246, ${0.5 + Math.random() * 0.4})`
-          : `rgba(37, 99, 235, ${0.4 + Math.random() * 0.3})`;
         ctx.fill();
-        
-        // Add glow effect
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = isDark ? 'rgba(59, 130, 246, 0.6)' : 'rgba(37, 99, 235, 0.5)';
-        ctx.fill();
-        ctx.shadowBlur = 0;
 
-        // Draw connections
-        particles.slice(i + 1).forEach((otherParticle) => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 150) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const other = particles[j];
+          const dx = particle.x - other.x;
+          const dy = particle.y - other.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < LINK_DISTANCE_SQ) {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            const opacity = (1 - distance / 150) * 0.35;
-            ctx.strokeStyle = isDark
-              ? `rgba(59, 130, 246, ${opacity})`
-              : `rgba(37, 99, 235, ${opacity})`;
-            ctx.lineWidth = 1.5;
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(${rgb}, ${((1 - Math.sqrt(distSq) / LINK_DISTANCE) * 0.35).toFixed(3)})`;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
           }
-        });
-      });
+        }
+      }
 
-      if (!reducedMotion.matches) rafId = requestAnimationFrame(animate);
+      if (!reducedMotion.matches && !document.hidden) rafId = requestAnimationFrame(animate);
     };
 
-    animate();
-    const handleMotionChange = () => { cancelAnimationFrame(rafId); animate(); };
+    const handleVisibility = () => {
+      if (!document.hidden && !reducedMotion.matches) { lastTime = 0; cancelAnimationFrame(rafId); rafId = requestAnimationFrame(animate); }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    rafId = requestAnimationFrame(animate);
+    const handleMotionChange = () => { cancelAnimationFrame(rafId); lastTime = 0; animate(); };
     reducedMotion.addEventListener("change", handleMotionChange);
 
     let resizeTimeout: number;
@@ -212,6 +193,8 @@ const AnimatedBackground = () => {
       if (dprInterval) clearInterval(dprInterval);
       clearTimeout(resizeTimeout);
       cancelAnimationFrame(rafId);
+      themeObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 

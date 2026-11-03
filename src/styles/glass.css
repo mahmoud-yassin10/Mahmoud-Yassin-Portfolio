@@ -1,7 +1,7 @@
 /* Liquid glass layer for the portfolio routes. Loaded after portfolio.css, so it only restyles surfaces;
    layouts stay in portfolio.css and squashvar.css. Flousy and Hub never get html.editorial. */
 html.editorial {
-  --glass-blur: blur(26px) saturate(1.7);
+  --glass-blur: blur(14px) saturate(1.4);
   --accent-blue: 219 95% 66%;
   /* A fixed-position backdrop would be clipped by overflow containers; clip does not create one. */
 }
@@ -11,14 +11,14 @@ html.editorial.dark {
   --glass-fill: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.03));
   --glass-fill-strong: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
   --glass-border: rgba(255,255,255,.2);
-  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -1px 0 rgba(255,255,255,.05), 0 18px 46px rgba(4,12,40,.5), 0 0 42px rgba(59,130,246,.12);
+  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -1px 0 rgba(255,255,255,.05), 0 10px 26px rgba(4,12,40,.42);
   --glass-text: rgba(255,255,255,.92);
 }
 html.editorial:not(.dark) {
   --glass-fill: linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.34));
   --glass-fill-strong: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.5));
   --glass-border: rgba(255,255,255,.95);
-  --glass-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 rgba(120,150,220,.12), 0 14px 38px rgba(40,70,160,.16), 0 0 30px rgba(59,130,246,.08);
+  --glass-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 rgba(120,150,220,.12), 0 8px 22px rgba(40,70,160,.14);
   --glass-text: inherit;
 }
 
@@ -43,8 +43,12 @@ html.editorial :is(
 ) {
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
+}
+/* Real blur is expensive over an animated canvas, so only the always-visible chrome gets it.
+   Everything else keeps the glass look through its fill, bright edge and highlight. */
+html.editorial :is(.portfolio-topbar, .portfolio-footer > .portfolio-nav-shell, .hero-profile, .mobile-section-navigator, .sq-section-nav) {
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
 }
 html.editorial.dark :is(.glass-surface, .portfolio-topbar, .hero-profile, .proof-band dl > div, .project-card, .sq-research-context, .sq-result-panel) { color: var(--glass-text); }
 html.editorial .portfolio-topbar { border-radius: 999px; }
@@ -70,7 +74,6 @@ html.editorial .portfolio-button {
   background: linear-gradient(180deg, hsl(219 100% 72% / .96), hsl(222 95% 54% / .94));
   color: #fff; border: 1px solid rgba(255,255,255,.38); border-radius: 14px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 10px 26px rgba(31,91,255,.42), 0 0 0 0 rgba(59,130,246,.0);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   transition: transform .2s, box-shadow .2s, filter .2s;
 }
 html.editorial .portfolio-button:hover { filter: brightness(1.08); transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 14px 34px rgba(31,91,255,.55), 0 0 28px rgba(59,130,246,.45); }
@@ -101,9 +104,9 @@ html.editorial .mobile-section-navigator { border-radius: 999px; }
 
 /* Project bento. */
 .project-bento { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); grid-auto-rows: auto; gap: 18px; }
-.project-card { position: relative; display: flex; flex-direction: column; border-radius: 26px; overflow: hidden; color: inherit; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.project-card { position: relative; display: flex; flex-direction: column; border-radius: 26px; overflow: hidden; color: inherit; transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s; }
 .project-card.is-featured { grid-column: span 2; grid-row: span 2; }
-.project-card:hover { transform: translateY(-5px); border-color: hsl(var(--primary) / .55); box-shadow: var(--glass-shadow), 0 0 44px hsl(var(--primary) / .25); }
+.project-card:hover { transform: translateY(-5px); border-color: hsl(var(--primary) / .55); box-shadow: var(--glass-shadow), 0 0 26px hsl(var(--primary) / .25); }
 .project-card-preview { position: relative; height: 150px; margin: 10px 10px 0; border-radius: 18px; overflow: hidden; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 120%, hsl(222 80% 40% / .8), hsl(224 60% 10% / .9)); }
 .project-card.is-featured .project-card-preview { height: 300px; }
 .project-card-preview::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 38%, rgba(255,255,255,.2) 50%, transparent 62%); transform: translateX(-120%); transition: transform .8s; pointer-events: none; }
@@ -145,7 +148,7 @@ html.editorial[dir="rtl"] .journey-head { left: auto; right: var(--head); margin
 .is-done .journey-dot, .is-active .journey-dot { background: hsl(var(--primary)); }
 .journey-rail-label { font-size: 11px; white-space: nowrap; }
 .journey-stage { position: relative; display: grid; }
-.journey-panel { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 28px; padding: 26px 30px; border-radius: 28px; will-change: opacity, transform; }
+.journey-panel { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 28px; padding: 26px 30px; border-radius: 28px; will-change: opacity, transform; contain: layout paint; }
 .journey-panel [style*="--d"] { --r: clamp(0, calc((var(--t) - var(--d)) * 7), 1); opacity: var(--r); transform: translateY(calc((1 - var(--r)) * 14px)); }
 .journey-period { font-size: 12px; font-weight: 650; color: hsl(var(--primary)); margin: 0 0 6px; }
 .journey-panel h3 { font-size: 26px; font-weight: 700; margin: 0; }
@@ -184,7 +187,7 @@ html.editorial[dir="rtl"] .activity-tab:hover { transform: translateX(-4px); }
 .honor-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 14px; }
 .honor-tile { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 150px; padding: 18px; border-radius: 24px; overflow: hidden; outline-offset: 3px; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
 .honor-tile::before { content: ""; position: absolute; inset: 0; background: radial-gradient(180px circle at var(--mx) var(--my), hsl(219 100% 78% / .38), transparent 62%); opacity: 0; transition: opacity .3s; pointer-events: none; }
-.honor-tile:hover, .honor-tile:focus-visible { transform: translateY(-6px) scale(1.03); border-color: hsl(var(--primary) / .7); box-shadow: var(--glass-shadow), 0 0 40px hsl(var(--primary) / .45); }
+.honor-tile:hover, .honor-tile:focus-visible { transform: translateY(-6px) scale(1.03); border-color: hsl(var(--primary) / .7); box-shadow: var(--glass-shadow), 0 0 26px hsl(var(--primary) / .45); }
 .honor-tile:hover::before, .honor-tile:focus-visible::before { opacity: 1; }
 .honor-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; color: hsl(var(--primary)); background: hsl(var(--primary) / .14); border: 1px solid hsl(var(--primary) / .3); transition: all .3s; }
 .honor-tile:hover .honor-icon, .honor-tile:focus-visible .honor-icon { color: #fff; background: linear-gradient(180deg, hsl(219 100% 72% / .95), hsl(222 95% 54% / .95)); box-shadow: 0 0 20px hsl(219 100% 62% / .7); }
@@ -282,3 +285,6 @@ html.editorial .case-study > section.rounded-2xl { border-radius: 26px; }
 @media (max-width: 760px) { .project-case-phones { min-height: 340px; } .project-case-phones img { height: 320px; } }
 
 @keyframes journey-in { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+
+/* Tailwind blur utilities on older cards are the same cost as the glass blur: switch them off on portfolio routes. */
+html.editorial :is(.backdrop-blur, .backdrop-blur-sm, .backdrop-blur-md) { -webkit-backdrop-filter: none; backdrop-filter: none; }
