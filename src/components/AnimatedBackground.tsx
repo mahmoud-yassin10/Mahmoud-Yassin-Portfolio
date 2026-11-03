@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { isProductRoute } from "@/lib/themeScope";
 
 const BLEED = 96; // extend canvas beyond viewport to hide edge artifacts
-const AnimatedBackground = () => {
+const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -215,6 +217,23 @@ const AnimatedBackground = () => {
       ref={canvasRef}
       className="fixed pointer-events-none opacity-60"
       style={{ zIndex: 0 }}
+    />
+  );
+};
+
+/** Portfolio pages get a still, quiet backdrop. Flousy and Hub keep the particle field. */
+const AnimatedBackground = () => {
+  const { pathname } = useLocation();
+  if (isProductRoute(pathname)) return <ParticleBackground />;
+  return (
+    <div
+      aria-hidden
+      className="fixed inset-0 pointer-events-none"
+      style={{
+        zIndex: 0,
+        background:
+          "radial-gradient(60rem 40rem at 85% -10%, hsl(var(--primary) / 0.07), transparent 60%), radial-gradient(50rem 36rem at -10% 30%, hsl(var(--accent) / 0.05), transparent 60%)"
+      }}
     />
   );
 };

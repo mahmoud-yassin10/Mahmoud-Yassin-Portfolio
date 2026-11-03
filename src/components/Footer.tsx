@@ -1,3 +1,4 @@
+import { ADMISSIONS_ONLY } from "@/context/AudienceContext";
 import { Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -10,7 +11,7 @@ const Footer = () => {
   const instagramUser = storeInstagram?.replace(/^@/, "") ?? "";
 
   const footerLinks = [
-    { name: t("nav.services"), to: "/services" },
+    ...(!ADMISSIONS_ONLY ? [{ name: t("nav.services"), to: "/services" }] : []),
     { name: t("nav.work"), to: "/work" },
     { name: t("nav.portfolio"), to: "/portfolio" },
     { name: t("nav.contact"), to: "/contact" }
@@ -38,7 +39,7 @@ const Footer = () => {
             ))}
           </div>
 
-          {instagramUser ? (
+          {instagramUser && !ADMISSIONS_ONLY ? (
             <div className="flex justify-center">
               <a
                 href={`https://instagram.com/${instagramUser}`}

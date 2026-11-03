@@ -86,136 +86,131 @@ const buildSkillsUsed = (project: ProjectSeed) => {
 const projectSeeds: ProjectSeed[] = [
   {
     title: "Flousy \u2014 AI Financial Planner",
-    description: "AI-powered financial planning app helping Egyptian families navigate inflation. Features expense tracking, category budgets, goal setting, bill reminders, and bilingual (AR/EN) UI. Publishing soon on Play Store.",
-    tech: ["Flutter", "Firebase Auth", "AI/ML", "Git", "Dart"],
+    description: "A bilingual (Arabic / English) personal-finance app for Egyptian users: transactions imported from bank SMS, AI-built monthly budgets, goals and debts, and decision tools like Safe to Spend and Can I Spend?",
+    tech: ["Flutter", "Dart", "Firebase", "Gemini", "Cloud Functions"],
     period: "Jan 2025 \u2013 Present",
     link: `${base}/projects/flousy-ai-financial-planner`,
     type: "Mobile App",
     slug: "flousy-ai-financial-planner",
-    longDescription: "AI-powered financial planning app designed for Egyptian families navigating inflation. It combines expense tracking, budgets, goals, and bill reminders with a bilingual interface to make day-to-day planning simple and actionable.",
-    skillsUsed: ["Flutter", "Dart", "Firebase Authentication", "Firestore", "UI/UX", "State management"],
+    longDescription: "Flousy moves from recording money toward advising what is affordable. It imports Egyptian bank SMS messages on Android, builds and re-evaluates monthly budgets with Gemini through Cloud Functions, and answers the questions people ask before spending. One developer built the Flutter app, the Firebase backend and the planner.",
+    skillsUsed: ["Flutter", "Dart", "Firebase", "Cloud Functions", "LLM structured output", "Localization and RTL"],
     responsibilities: [
-      "Defined core product scope and UX flows",
-      "Built Flutter UI and navigation structure",
-      "Implemented authentication and data models",
-      "Integrated budgeting, goals, and reminders",
-      "Tested and debugged critical flows"
+      "Designed the product and every user flow",
+      "Built the Flutter app and Firebase backend",
+      "Built Android SMS import with confirmation and false-detection reporting",
+      "Built the Gemini-backed budget planner and its fallbacks",
+      "Built Safe to Spend and Can I Spend? from user feedback"
     ],
     highlights: [
-      "Bilingual AR/EN interface",
-      "Expense tracking with budgets and goals",
-      "Preparing for Play Store release"
+      "306 transactions tracked (reported)",
+      "About 100 users (reported)",
+      "Android release on Google Play (reported)"
     ],
-    programmingLanguages: ["Dart"],
+    programmingLanguages: ["Dart", "TypeScript"],
     contentLanguages: ["English", "Arabic"],
     features: [
-      "Expense tracking and categorized spending",
-      "Category budgets and savings goals",
-      "Bill reminders and recurring costs",
-      "AI-assisted financial planning workflows",
-      "Firebase Authentication sign-in",
-      "Bilingual interface (Arabic / English)",
-      "Mobile-first Flutter UI optimized for everyday use"
+      "Transaction tracking and Android bank-SMS import",
+      "Monthly budgets built and re-evaluated by AI",
+      "Debts, installments, subscriptions and savings goals",
+      "Safe to Spend and Can I Spend? decision tools",
+      "Voice capture and reminders",
+      "Arabic / English interface with RTL support"
     ],
     externalLinkPlaceholder: "#",
     externalLink: "https://flousy.mahmoud-yassin.com",
     livePreviewRevealDelayMs: 3000
   },
   {
-    title: "AI VAR for Squash",
-    description: "Computer vision-based officiating system detecting 'in' vs 'out' shots on front and side walls, tracking ball bounces and player movement. Research paper in progress for sports-technology journal.",
-    tech: ["Python", "OpenCV", "ML/CV", "Video Analysis"],
-    period: "Aug 2025 \u2013 Present",
-    link: `${base}/projects/ai-var-for-squash`,
+    title: "SquashVAR",
+    description: "A single-camera, geometry-aware assistant referee for squash. It detects and tracks the ball, maps it onto a calibrated court, finds impacts, and returns IN, OUT or NO_DECISION. Revised manuscript submitted and awaiting review.",
+    tech: ["Python", "YOLOv8", "BoT-SORT", "OpenCV"],
+    period: "Sep 2025 \u2013 Present",
+    link: `${base}/projects/squashvar`,
     type: "Research",
-    slug: "ai-var-for-squash",
-    longDescription: "Computer vision research prototype for automated officiating in squash. It tracks ball trajectories, bounces, and player movement to classify in/out events and create reviewable clips.",
-    skillsUsed: ["Python", "OpenCV", "Computer Vision", "Machine Learning", "Video analysis"],
+    slug: "squashvar",
+    longDescription: "Research prototype for evidence-based squash officiating from one ordinary camera. A fine-tuned YOLOv8-S detector and BoT-SORT tracker follow the ball, four calibrated court planes convert pixels to centimeters, and an impact detector compares mapped impacts with the court lines. Near a line the system abstains with NO_DECISION instead of forcing a call. It is a research prototype, not a production officiating system.",
+    skillsUsed: ["Python", "Computer Vision", "Object detection", "Multi-object tracking", "Homography and camera calibration", "Evaluation design"],
     responsibilities: [
-      "Collected and labeled match footage",
-      "Built detection and tracking pipeline",
-      "Designed evaluation metrics",
-      "Optimized accuracy and latency",
-      "Prepared research documentation"
+      "Fine-tuned and evaluated the ball detector",
+      "Built tracking, court calibration and impact detection",
+      "Designed the IN / OUT / NO_DECISION policy",
+      "Wrote the evaluation scripts and overlays",
+      "Revised the manuscript after journal review"
     ],
     highlights: [
-      "Automated in/out classification prototype",
-      "Reviewable clips for officiating",
-      "Research paper in progress"
+      "YOLOv8-S detector: 0.911 mAP@50 (1280 px) and 0.937 precision (1920 px)",
+      "Abstains near a line instead of forcing a call",
+      "Revised manuscript submitted, awaiting review"
     ],
     programmingLanguages: ["Python"],
     contentLanguages: ["English"],
     features: [
-      "Video ingestion and frame processing",
-      "Ball detection and trajectory reasoning",
-      "Front-wall and side-wall shot classification",
-      "Bounce and player movement cues for review",
-      "Exportable review clips for officiating workflows",
-      "Configurable evaluation and accuracy experiments"
+      "Ball detection with a fine-tuned YOLOv8-S model",
+      "Multi-frame tracking with BoT-SORT",
+      "Four calibrated court planes with planar homographies",
+      "Impact detection from velocity, direction change and surface proximity",
+      "IN / OUT / NO_DECISION policy with a +/- 2 cm abstention band",
+      "Evaluation scripts and overlay rendering"
     ],
     externalLinkPlaceholder: "#"
   },
   {
     title: "Solar Share",
-    description: "Peer-to-peer solar energy marketplace enabling households to share surplus renewable power. Won Best Idea at Ignited Hackathon with +2M virtual funding. Promotes community sustainability.",
-    tech: ["JavaScript", "Firebase", "Prototype", "Maps API"],
+    description: "A peer-to-peer solar-energy sharing prototype that connects households with surplus solar power to nearby households. Ignited Hackathon Best Idea Award.",
+    tech: ["Flutter", "Dart", "JavaScript", "Firebase"],
     period: "Sep 2024 \u2013 May 2025",
     link: `${base}/projects/solar-share`,
     type: "Platform",
     slug: "solar-share",
-    longDescription: "Prototype marketplace for households to share or sell surplus solar energy. Focused on discovery, listings, and a clear transaction flow to promote community sustainability.",
-    skillsUsed: ["JavaScript", "Firebase", "Maps API", "Prototyping", "UI design"],
+    longDescription: "Competition prototype for neighborhood-scale solar sharing. I defined the requirements, built the Flutter and JavaScript / Firebase prototype, and prepared the live demo and technical pitch. It is a prototype and award-winning concept, not an operating energy network.",
+    skillsUsed: ["Flutter", "Dart", "JavaScript", "Firebase", "Prototyping", "Pitching"],
     responsibilities: [
-      "Designed user flows and wireframes",
-      "Built front-end prototype and screens",
-      "Integrated map-based discovery",
-      "Prepared pitch and demo materials"
+      "Developed the concept and defined requirements",
+      "Built the prototype",
+      "Prepared the live demo and technical pitch"
     ],
     highlights: [
-      "Won Best Idea at Ignited Hackathon",
-      "Secured +2M virtual funding",
-      "Promoted community energy sharing"
+      "Ignited Hackathon Best Idea Award (2025)",
+      "Prototype only: no real electricity exchange"
     ],
-    programmingLanguages: ["JavaScript", "HTML", "CSS"],
+    programmingLanguages: ["Dart", "JavaScript"],
     contentLanguages: ["English"],
     features: [
-      "Household listings and surplus-energy offers",
-      "Map-based discovery (Maps API)",
-      "Firebase-backed data and auth prototype",
-      "Guided listing and browse flows",
-      "Hackathon pitch and demo-ready screens"
+      "Peer-to-peer sharing concept for nearby households",
+      "Flutter app and JavaScript / Firebase implementation",
+      "Demo-ready flow prepared for the competition"
     ],
     externalLinkPlaceholder: "#"
   },
   {
     title: "Flood Lens",
-    description: "NASA Space Apps Port Said 1st place + Global Nominee - flood-risk mapping using NASA rainfall + SAR + terrain data.",
-    tech: ["NASA Space Apps", "Computer Vision", "ML", "GIS", "React"],
+    description: "A flood-risk visualization prototype built at NASA Space Apps: 1st place in Port Said and Global Nominee. It combines rainfall, satellite water and terrain data into a map, and is not a validated flood-prediction system.",
+    tech: ["React", "TypeScript", "Leaflet", "Python", "NASA data"],
     period: "Oct 2025",
     link: `${base}/projects/flood-lens`,
     type: "Web App",
     slug: "flood-lens",
-    longDescription: "Web app that merges NASA rainfall data (IMERG), SAR imagery (OPERA), and terrain models (DEM) to map flood risk across regions. Built for NASA Space Apps to enable fast, global risk visualization.",
-    skillsUsed: ["React", "GIS", "NASA APIs", "Data visualization", "Computer Vision"],
+    longDescription: "Web prototype that brings NASA GPM IMERG rainfall, Sentinel-1 / OPERA radar water observations and SRTM terrain into one map with a rule-based 0 to 100 risk index. The demo used seeded data to stay usable, and there is no labelled benchmark, so accuracy is unknown. I led a five-person team and built the interface and data pipeline.",
+    skillsUsed: ["React", "TypeScript", "Leaflet", "Python", "Geospatial data", "Data visualization"],
     responsibilities: [
-      "Integrated NASA datasets and sources",
-      "Built risk scoring and mapping logic",
-      "Created interactive UI and charts",
-      "Coordinated research and presentation"
+      "Led a five-person team",
+      "Built the web interface and data pipeline",
+      "Built the rule-based risk index",
+      "Prepared the technical pitch"
     ],
     highlights: [
       "NASA Space Apps Port Said 1st place",
-      "Global nominee",
-      "Interactive flood-risk map"
+      "Global Nominee",
+      "Risk visualization prototype with seeded demo data"
     ],
-    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    programmingLanguages: ["TypeScript", "Python"],
     contentLanguages: ["English"],
     features: [
-      "IMERG rainfall and NASA data fusion",
-      "SAR (OPERA) and terrain (DEM) inputs for risk context",
-      "Interactive mapping and regional flood-risk visualization",
-      "Charts and explainable risk scoring UI",
-      "React-based explorer suitable for judge demos"
+      "City search and flood-risk map",
+      "IMERG rainfall aggregated over 3, 24 and 72 hours",
+      "SAR water-extent overlay (OPERA / Sentinel-1)",
+      "Rule-based risk index with Low / Medium / High bands",
+      "PDF impact summaries"
     ],
     externalLinkPlaceholder: "#",
     externalLink: "https://mahmoud-yassin10.github.io/flood-lens-nasa/"
@@ -259,36 +254,36 @@ const projectSeeds: ProjectSeed[] = [
   {
     title: "True Tutor — Learning Platform",
     description:
-      "Full student, parent, and admin experience: English exam coaching (SAT, ACT, IELTS, EST), live classes, practice, progress analytics, weekly parent updates, registration, and resource hubs.",
-    tech: ["EdTech", "Portals", "Web App"],
-    period: "Live",
+      "A live test-prep platform for SAT, ACT, EST and IELTS: quizzes, mocks, protected video lectures, progress tools, AI vocabulary help, and WhatsApp and Telegram automation. I joined it in February 2026 and have been its sole active developer since May 2026.",
+    tech: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Cloudflare R2", "Vercel"],
+    period: "Feb 2026 – Present",
     link: `${base}/projects/true-tutor-learning-platform`,
     type: "Client Work",
     slug: "true-tutor-learning-platform",
     longDescription:
-      "A comprehensive learning hub alongside the main marketing site: separate entry points for parents, students, and admins, onboarding that walks families from registration through assessment and a personalized plan, and rich marketing content—stats, instructor story, FAQs, testimonials, and free video/PDF starters—for English exam preparation.",
-    skillsUsed: ["Multi-role UX", "Registration flows", "Content architecture", "Accessibility", "Analytics-ready layout"],
+      "Production learning platform with student, parent, admin and staff portals. I joined an existing codebase and built or extended quiz publishing, EST templates, drafts, Reading Radar, Lecture Radar, AI vocabulary explanations, WhatsApp registration and reports, student-facing screens, and video and deployment fixes. Platform-wide totals describe the whole platform, not only my work.",
+    skillsUsed: ["Next.js", "TypeScript", "PostgreSQL and Prisma", "Authorization and access rules", "Messaging automation", "Production debugging"],
     responsibilities: [
-      "Designed portal entry points and role-aware navigation",
-      "Built long-form landing sections (how it works, resources, FAQ, testimonials)",
-      "Implemented multi-step registration aligned with academic and exam fields",
-      "Integrated parent-facing trust signals and WhatsApp contact paths",
-      "Ensured bilingual-friendly structure and readable typography"
+      "Built and extended quiz publishing, drafts and EST templates",
+      "Built Reading Radar, Lecture Radar and AI vocabulary tools",
+      "Built WhatsApp registration and report workflows",
+      "Fixed video, PDF, webhook and deployment problems",
+      "Maintain the platform as its sole active developer"
     ],
     highlights: [
-      "Student, parent, and admin pathways",
-      "Free lecture and PDF previews for trust and SEO",
-      "Registration and consult CTAs tuned for mobile families"
+      "5,732 student accounts on the platform (Oct 16, 2026)",
+      "87,241 quiz attempts started, all time",
+      "121 commits in an April 30 to May 15, 2026 sprint"
     ],
-    programmingLanguages: ["TypeScript", "JavaScript", "HTML", "CSS"],
+    programmingLanguages: ["TypeScript", "JavaScript", "SQL"],
     contentLanguages: ["English", "Arabic"],
     features: [
-      "Dedicated student, parent, and admin entry points",
-      "Multi-step registration and academic profile capture",
-      "How-it-works, FAQ, and testimonial sections",
-      "Free video lectures and PDF study starters",
-      "WhatsApp and consult CTAs for family onboarding",
-      "Stats, instructor profile, and trust-led English exam positioning"
+      "Role-based student, parent, admin and staff portals",
+      "Quiz publishing with group, history and access rules",
+      "Reading Radar and Lecture Radar learning tools",
+      "Protected video lectures and PDF materials",
+      "WhatsApp and Telegram automation",
+      "Course progress and mistakes practice"
     ],
     externalLinkPlaceholder: "#",
     externalLink: "https://new.thetruetutor.com"
@@ -511,11 +506,23 @@ export const projects: Project[] = projectSeeds.map((project) => ({
   externalLinkPlaceholder: project.externalLinkPlaceholder ?? "#"
 }));
 
-export const getProjectBySlug = (slug: string) =>
-  projects.find((project) => project.slug === slug);
+/** Old slugs that still resolve, so previously shared links keep working. */
+const legacySlugs: Record<string, string> = {
+  "ai-var-for-squash": "squashvar"
+};
+
+export const getProjectBySlug = (slug: string) => {
+  const canonical = legacySlugs[slug] ?? slug;
+  return projects.find((project) => project.slug === canonical);
+};
 
 /** Home page & Work → Projects tab (excludes client deliveries). */
 export const technicalProjects = projects.filter((p) => !isClientWork(p));
 
 /** Work → Client Work tab — detail pages `/projects/:slug`, live link on each case study. */
 export const clientProjects = projects.filter(isClientWork);
+
+/** Evidence-backed projects selected for the temporary admissions release. */
+export const admissionsProjects = [
+  "squashvar", "flousy-ai-financial-planner", "true-tutor-learning-platform", "flood-lens", "solar-share"
+].map((slug) => projects.find((project) => project.slug === slug)!);

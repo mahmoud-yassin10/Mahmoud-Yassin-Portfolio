@@ -1,3 +1,6 @@
+import { useAudience } from "@/context/AudienceContext";
+import AdmissionsActivities from "@/components/AdmissionsActivities";
+import AdmissionsHonors from "@/components/AdmissionsHonors";
 import { Award, BookOpen } from "lucide-react";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Awards from "@/components/Awards";
@@ -12,7 +15,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 const certificationIcons = [Award, BookOpen];
 
 const PortfolioPage = () => {
-  const { t, dict } = useLanguage();
+  const { audience } = useAudience();
+  const { t, dict, lang } = useLanguage();
   const certifications = dict.education.items.slice(1);
 
   return (
@@ -20,6 +24,14 @@ const PortfolioPage = () => {
       <AnimatedBackground />
       <Navbar />
       <main id="main-content" className="relative z-10">
+        {audience === "admissions" ? <>
+          <header className="container mx-auto px-4 max-w-6xl pt-32">
+            <h1 className="text-4xl md:text-5xl">{lang === "ar" ? "الأنشطة والجوائز والتعليم" : "Activities, honors and education"}</h1>
+          </header>
+          <AdmissionsActivities />
+          <AdmissionsHonors />
+          <Education />
+        </> : <>
         <Experience />
         <Education />
         <Awards />
@@ -78,6 +90,7 @@ const PortfolioPage = () => {
             </div>
           </div>
         </section>
+        </>}
       </main>
       <Footer />
     </div>

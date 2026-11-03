@@ -28,7 +28,8 @@ function getContactFieldErrors(formData: { name: string; email: string; message:
 
 const CONTACT_FIELD_ORDER = ["name", "email", "message"] as const;
 
-const Contact = () => {
+const Contact = ({ standalone = false }: { standalone?: boolean }) => {
+  const Heading = standalone ? "h1" : "h2";
   const { audience } = useAudience();
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
@@ -186,9 +187,9 @@ const Contact = () => {
   return (
     <section id="contact" className="py-20 relative">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <Heading className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           {audience === "client" ? t("contact.titleClient") : audience === "admissions" ? t("contact.titleAdmissions") : t("contact.titleRecruiter")}
-        </h2>
+        </Heading>
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact Info */}

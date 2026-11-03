@@ -1,9 +1,10 @@
+import { useAudience } from "@/context/AudienceContext";
 import { ExternalLink, Code2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { technicalProjects, type ProjectTileData } from "@/data/projects";
+import { admissionsProjects, technicalProjects, type ProjectTileData } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { localizeProject } from "@/i18n/projectsAr";
 
@@ -45,7 +46,7 @@ export const ProjectTile = ({
 
   return (
     <Card
-      className="group hover:shadow-2xl hover:scale-105 transition-all duration-300 bg-card/50 backdrop-blur-sm border-border animate-fade-in"
+      className="group hover:border-primary/50 transition-colors duration-300 bg-card/50 backdrop-blur-sm border-border animate-fade-in"
       style={cardStyle}
     >
       <CardHeader>
@@ -115,7 +116,9 @@ type ProjectsProps = {
 
 const Projects = ({ limit, ctaHref, ctaLabel }: ProjectsProps) => {
   const { t, lang } = useLanguage();
-  const source = typeof limit === "number" ? technicalProjects.slice(0, limit) : technicalProjects;
+  const { audience } = useAudience();
+  const selectedProjects = audience === "admissions" ? admissionsProjects : technicalProjects;
+  const source = typeof limit === "number" ? selectedProjects.slice(0, limit) : selectedProjects;
   const visibleProjects = source.map((project) => localizeProject(project, lang));
   const resolvedCta = ctaLabel ?? t("projects.viewAll");
   return (

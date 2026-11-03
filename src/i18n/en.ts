@@ -51,16 +51,16 @@ export const en = {
     admissions: {
       label: "I’m reviewing an application",
       shortLabel: "Admissions",
-      eyebrow: "Student founder · scholar · community builder",
-      title: "Curiosity with a track record of turning learning into impact.",
-      description: "Follow the projects, academic foundation, and leadership experiences shaping how I think and what I build next.",
-      primaryCta: "See my journey",
-      secondaryCta: "Download CV",
-      sectionLabel: "A closer look at the person behind the application",
-      routeDescription: "Explore the academic foundation, initiative, and curiosity that shape what I build next.",
-      path: ["About me", "Education", "Leadership & recognition"],
+      eyebrow: "4.0 GPA · Salutatorian · Port Said, Egypt",
+      title: "I build tools that help people decide, and know when not to answer.",
+      description: "Squash, software and research have taught me the same lesson: the useful answer is the one a person can act on. Here is what I built, and what it showed me.",
+      primaryCta: "See what I built",
+      secondaryCta: "Explore projects",
+      sectionLabel: "The short version",
+      routeDescription: "Four numbers first, then the work behind them.",
+      path: ["Three projects", "Activities", "Honors"],
       proof: [
-        { value: "4.0", label: "predicted GPA" },
+        { value: "4.0", label: "GPA" },
         { value: "Top 1.37%", label: "JPLP selection" },
         { value: "300+", label: "students engaged" }
       ]
@@ -107,17 +107,17 @@ export const en = {
   about: {
     title: "About Me",
     p1Before: "I'm a ",
-    p1Highlight: "predicted valedictorian",
+    p1Highlight: "salutatorian",
     p1After:
       " with a 4.0 GPA from Port Said, Egypt, passionate about using technology to solve real-world problems. As a software engineer and student founder, I've built AI-powered applications and led initiatives that have impacted thousands of students across Egypt."
   },
   aboutParagraphs: [
-    "I'm a predicted valedictorian with a 4.0 GPA from Port Said, Egypt, passionate about using technology to solve real-world problems. As a software engineer and student founder, I've built AI-powered applications and led initiatives that have impacted thousands of students across Egypt.",
+    "I'm the salutatorian with a 4.0 GPA from Port Said, Egypt, passionate about using technology to solve real-world problems. As a software engineer and student founder, I've built AI-powered applications and led initiatives that have impacted thousands of students across Egypt.",
     "With expertise in Flutter/Dart, Python, JavaScript, and Firebase, I've created solutions ranging from Flousy (an AI financial planner helping Egyptian families navigate inflation) to an AI VAR system for Squash using computer vision. My technical foundation is strengthened by Harvard's CS50 series, MIT's Machine Learning course, and hands-on project experience with real users.",
     "I'm a Junior Presidential Leadership Program graduate — selected from 7,315 applicants (top 1.37%) for intensive leadership training by Egypt's National Training Academy. This experience, combined with my role as Computer Science Club President and Financial Head of Launchpad, has taught me how to lead teams, manage resources, and turn ideas into reality.",
     "Beyond tech, I'm a Top-50 U17 Squash player in Egypt, Karate Black Belt (First Dan), and award-winning percussionist. These experiences taught me resilience, discipline, and the importance of continuous improvement — values I bring to every project I build. I believe technology should empower communities, and I'm committed to creating impactful solutions that make a difference."
   ],
-  aboutHighlights: ["predicted valedictorian", "Flutter/Dart, Python, JavaScript, and Firebase", "Junior Presidential Leadership Program graduate"],
+  aboutHighlights: ["salutatorian", "Flutter/Dart, Python, JavaScript, and Firebase", "Junior Presidential Leadership Program graduate"],
   experience: {
     title: "Experience",
     items: [
@@ -169,11 +169,11 @@ export const en = {
         title: "High School Diploma",
         institution: "Dr. Nermien Ismail Schools (NIS)",
         location: "Port Said, Egypt",
-        details: "GPA: 4.0 (Predicted Valedictorian)",
-        period: "Sep 2022 – May 2026",
+        details: "GPA: 4.0 (Salutatorian)",
+        period: "Class of 2026",
         achievements: [
           "Perfect 4.0 GPA across all subjects",
-          "Predicted Valedictorian of graduating class",
+          "Salutatorian of graduating class",
           "SAT: 1500 (780 Math, 720 English)",
           "IELTS: 8.5, C2",
           "Class President – Grade 12"
@@ -190,11 +190,11 @@ export const en = {
           "21-day intensive leadership curriculum",
           "Training in critical thinking, strategic planning, innovation, entrepreneurship",
           "Developed skills in teamwork, emotional intelligence, and work-readiness",
-          "Selected as 1 of 5 role models for televised ONTV interview"
+          "Selected for a national TV interview on ONTV"
         ]
       },
       {
-        title: "Online Courses & Certifications",
+        title: "Independent Coursework (including audited courses)",
         institution: "Harvard edX, MITx, and more",
         location: "Online",
         details: "Self-directed technical education",

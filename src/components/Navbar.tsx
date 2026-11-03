@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useAudience } from "@/context/AudienceContext";
+import { ADMISSIONS_ONLY, useAudience } from "@/context/AudienceContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -11,7 +11,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { profile, clearAudience } = useAudience();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -55,6 +55,7 @@ const Navbar = () => {
     : profile?.id === "admissions"
       ? [
           { name: t("nav.about"), to: "/portfolio" },
+          { name: lang === "ar" ? "البحث" : "Research", to: "/research" },
           { name: t("nav.work"), to: "/work" },
           { name: t("nav.contact"), to: "/contact" }
         ]
@@ -116,10 +117,10 @@ const Navbar = () => {
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
-              <button type="button" className="audience-switcher" onClick={clearAudience}>
+              {!ADMISSIONS_ONLY && <button type="button" className="audience-switcher" onClick={clearAudience}>
                 <span className="audience-switcher-dot" />
                 {audienceLabel}
-              </button>
+              </button>}
             </div>
 
             <div className="flex md:hidden items-center gap-2">
@@ -133,10 +134,10 @@ const Navbar = () => {
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
-              <button type="button" className="audience-switcher" onClick={clearAudience}>
+              {!ADMISSIONS_ONLY && <button type="button" className="audience-switcher" onClick={clearAudience}>
                 <span className="audience-switcher-dot" />
                 {audienceLabel}
-              </button>
+              </button>}
               <Button
                 variant="ghost"
                 size="icon"

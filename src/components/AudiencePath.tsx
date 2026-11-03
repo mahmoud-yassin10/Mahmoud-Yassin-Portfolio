@@ -1,11 +1,13 @@
+import { admissionsProofAr } from "@/data/admissionsAr";
 import { ArrowDownRight, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { admissionsProof } from "@/data/admissions";
 
 const AudiencePath = () => {
   const { profile } = useAudience();
-  const { t, dict } = useLanguage();
+  const { t, dict, lang } = useLanguage();
   if (!profile) return null;
 
   const copy = dict.audience[profile.id];
@@ -27,9 +29,9 @@ const AudiencePath = () => {
             </div>
           </div>
           <div className="audience-proof-grid">
-            {copy.proof.map((point) => (
+            {(profile.id === "admissions" ? (lang === "ar" ? admissionsProofAr : admissionsProof) : copy.proof).map((point) => (
               <div className="audience-proof" key={point.label}>
-                <strong>{point.value}</strong>
+                <strong><bdi>{point.value}</bdi></strong>
                 <span>{point.label}</span>
               </div>
             ))}

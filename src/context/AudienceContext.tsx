@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+// Temporary admissions-only release. Other profiles remain available in source.
+export const ADMISSIONS_ONLY = true;
+
 export type Audience = "recruiter" | "admissions" | "client";
 
 export type AudienceProfile = {
@@ -42,16 +45,16 @@ export const audienceProfiles: AudienceProfile[] = [
     id: "admissions",
     label: "I’m reviewing an application",
     shortLabel: "Admissions",
-    eyebrow: "Student founder · scholar · community builder",
-    title: "Curiosity with a track record of turning learning into impact.",
-    description: "Follow the projects, academic foundation, and leadership experiences shaping how I think and what I build next.",
+    eyebrow: "4.0 GPA · Salutatorian · Port Said, Egypt",
+    title: "I build tools that help people decide, and know when not to answer.",
+    description: "Squash, software and research have taught me the same lesson: the useful answer is the one a person can act on. Here is what I built, and what it showed me.",
     primaryCta: "See my journey",
-    primaryHref: "/portfolio",
+    primaryHref: "#stories",
     secondaryCta: "Download CV",
     iconName: "graduation",
     sectionLabel: "A closer look at the person behind the application",
     proofPoints: [
-      { value: "4.0", label: "predicted GPA" },
+      { value: "4.0", label: "GPA" },
       { value: "Top 1.37%", label: "JPLP selection" },
       { value: "300+", label: "students engaged" }
     ],
@@ -91,19 +94,21 @@ const AudienceContext = createContext<AudienceContextValue | undefined>(undefine
 const STORAGE_KEY = "mahmoud-portfolio-audience";
 
 export const AudienceProvider = ({ children }: { children: ReactNode }) => {
-  const [audience, setAudienceState] = useState<Audience | null>(null);
+  const [audience, setAudienceState] = useState<Audience | null>("admissions");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionTarget, setTransitionTarget] = useState<AudienceProfile | null>(null);
   const previousAudienceRef = useRef<Audience | null>(null);
   const transitionTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (ADMISSIONS_ONLY) return;
     const stored = window.localStorage.getItem(STORAGE_KEY) as Audience | null;
     if (stored && audienceProfiles.some((profile) => profile.id === stored)) setAudienceState(stored);
   }, []);
 
   const value = useMemo<AudienceContextValue>(() => {
     const setAudience = (nextAudience: Audience) => {
+      if (ADMISSIONS_ONLY) return;
       const fromAudience = audience ?? previousAudienceRef.current;
       if (fromAudience && fromAudience !== nextAudience) {
         if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
@@ -121,6 +126,7 @@ export const AudienceProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const clearAudience = () => {
+      if (ADMISSIONS_ONLY) return;
       previousAudienceRef.current = audience;
       setAudienceState(null);
       window.localStorage.removeItem(STORAGE_KEY);

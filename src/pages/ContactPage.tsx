@@ -9,7 +9,7 @@ const ContactPage = () => {
       <AnimatedBackground />
       <Navbar />
       <main id="main-content" className="relative z-10">
-        <Contact />
+        <Contact standalone />
       </main>
       <Footer />
     </div>

@@ -1,3 +1,4 @@
+import { useAudience } from "@/context/AudienceContext";
 import { useState } from "react";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
@@ -5,17 +6,19 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ClientWorkTile } from "@/components/ClientWorkTile";
 import { ProjectTile } from "@/components/Projects";
-import { clientProjects, technicalProjects } from "@/data/projects";
+import { admissionsProjects, clientProjects, technicalProjects } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { localizeProject } from "@/i18n/projectsAr";
 
 type WorkTab = "client" | "projects";
 
 const WorkPage = () => {
+  const { audience } = useAudience();
+  const isAdmissions = audience === "admissions";
   const [activeTab, setActiveTab] = useState<WorkTab>("client");
   const { t, lang } = useLanguage();
-  const isClientTab = activeTab === "client";
-  const items = (isClientTab ? clientProjects : technicalProjects).map((project) => localizeProject(project, lang));
+  const isClientTab = !isAdmissions && activeTab === "client";
+  const items = (isAdmissions ? admissionsProjects : isClientTab ? clientProjects : technicalProjects).map((project) => localizeProject(project, lang));
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -24,11 +27,11 @@ const WorkPage = () => {
       <main id="main-content" className="relative z-10">
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {t("work.title")}
-            </h2>
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {isAdmissions ? (lang === "ar" ? "المشاريع" : "Projects") : t("work.title")}
+            </h1>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
+            {!isAdmissions && <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
               <Button
                 type="button"
                 variant={isClientTab ? "default" : "outline"}
@@ -46,6 +49,8 @@ const WorkPage = () => {
                 {t("work.projectsTab")}
               </Button>
             </div>
+
+            }
 
             {isClientTab ? (
               <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">

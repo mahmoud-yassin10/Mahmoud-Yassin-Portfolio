@@ -1,3 +1,4 @@
+import ResearchPage from "./pages/ResearchPage";
 import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -5,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import ContactPage from "./pages/ContactPage";
 import DeleteAccount from "./pages/DeleteAccount";
 import DeleteData from "./pages/DeleteData";
@@ -21,7 +22,8 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import WorkPage from "./pages/WorkPage";
 import FlousyDashboard from "./pages/FlousyDashboard";
 import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
-import { AudienceProvider } from "@/context/AudienceContext";
+import { isProductRoute } from "@/lib/themeScope";
+import { ADMISSIONS_ONLY, AudienceProvider } from "@/context/AudienceContext";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import AudienceGate from "@/components/AudienceGate";
 import AudienceTransition from "@/components/AudienceTransition";
@@ -40,6 +42,17 @@ const PortfolioRouteAnalytics = () => {
   return null;
 };
 
+/** Switches on the editorial look for portfolio routes only. */
+const ThemeScope = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("editorial", !isProductRoute(pathname));
+  }, [pathname]);
+
+  return null;
+};
+
 const App = () => (
   <LanguageProvider>
     <AudienceProvider>
@@ -49,13 +62,15 @@ const App = () => (
       <Sonner />
       <Analytics />
         <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <AudienceGate />
-          <AudienceTransition />
+          {!ADMISSIONS_ONLY && <AudienceGate />}
+          {!ADMISSIONS_ONLY && <AudienceTransition />}
+        <ThemeScope />
         <PortfolioRouteAnalytics />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services" element={ADMISSIONS_ONLY ? <Navigate to="/work" replace /> : <ServicesPage />} />
+          <Route path="/research" element={<ResearchPage />} />
           <Route path="/work" element={<WorkPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/contact" element={<ContactPage />} />

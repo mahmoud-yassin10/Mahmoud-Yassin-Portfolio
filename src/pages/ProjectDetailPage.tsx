@@ -1,14 +1,18 @@
+import { caseStudiesAr } from "@/data/caseStudiesAr";
 import { Code2, ExternalLink, Globe2, ListChecks, Mail, Send, Terminal } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { isLiveSiteUrl, ProjectLivePreview } from "@/components/ProjectLivePreview";
-import { getProjectBySlug } from "@/data/projects";
+import { admissionsProjects, getProjectBySlug } from "@/data/projects";
 import { getContactPageHrefWithSimilar, getServicesInquiryHrefWithSimilar } from "@/data/servicesOfferings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CaseStudySections from "@/components/CaseStudySections";
+import { useAudience } from "@/context/AudienceContext";
+import { getCaseStudy } from "@/data/caseStudies";
 import { localizeProject } from "@/i18n/projectsAr";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -23,8 +27,10 @@ function hostnameOnly(url: string) {
 const ProjectDetailPage = () => {
   const { slug } = useParams();
   const { t, lang } = useLanguage();
+  const { audience } = useAudience();
   const rawProject = slug ? getProjectBySlug(slug) : undefined;
-  const project = rawProject ? localizeProject(rawProject, lang) : undefined;
+  const allowed = audience !== "admissions" || admissionsProjects.some((item) => item.slug === rawProject?.slug);
+  const project = rawProject && allowed ? localizeProject(rawProject, lang) : undefined;
   const externalHref = project?.externalLink ?? project?.externalLinkPlaceholder ?? "#";
   const isExternal = /^https?:\/\//i.test(externalHref);
   const canOpenExternal = Boolean(externalHref && externalHref !== "#");
@@ -40,9 +46,9 @@ const ProjectDetailPage = () => {
           <section className="py-20 relative">
             <div className="container mx-auto px-4">
               <div className="text-center space-y-6">
-                <h2 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground">
                   {t("project.notFound")}
-                </h2>
+                </h1>
                 <Button
                   size="lg"
                   className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
@@ -59,6 +65,7 @@ const ProjectDetailPage = () => {
     );
   }
 
+  const caseStudy = audience === "admissions" && slug ? (lang === "ar" ? caseStudiesAr.find((study) => study.slug === project.slug) : getCaseStudy(project.slug)) : undefined;
   const referralContactTo = getContactPageHrefWithSimilar(project.slug);
   const referralInquiryHref = getServicesInquiryHrefWithSimilar(project.slug);
 
@@ -71,13 +78,15 @@ const ProjectDetailPage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto space-y-10">
               <div className="text-center space-y-4">
-                <h2 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground">
                   {project.title}
-                </h2>
+                </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                   {project.description}
                 </p>
               </div>
+
+              {caseStudy ? <CaseStudySections study={caseStudy} /> : null}
 
               <ProjectLivePreview
                 liveUrl={liveUrl || undefined}
@@ -87,6 +96,7 @@ const ProjectDetailPage = () => {
                 livePreviewRevealDelayMs={project.livePreviewRevealDelayMs}
               />
 
+              {!caseStudy && audience !== "admissions" ? (
               <div className="relative overflow-hidden rounded-2xl border border-primary/35 bg-gradient-to-br from-primary/[0.12] via-card to-accent/[0.08] p-6 shadow-xl shadow-primary/10 md:p-8">
                 <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/20 blur-3xl" aria-hidden />
                 <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-accent/15 blur-3xl" aria-hidden />
@@ -135,6 +145,7 @@ const ProjectDetailPage = () => {
                   </div>
                 </div>
               </div>
+              ) : null}
 
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
@@ -213,6 +224,7 @@ const ProjectDetailPage = () => {
                 </CardContent>
               </Card>
 
+              {!caseStudy && <>
               <Card className="bg-card/50 backdrop-blur-sm border-border animate-fade-in">
                 <CardHeader>
                   <CardTitle className="text-2xl">{t("project.overview")}</CardTitle>
@@ -279,6 +291,8 @@ const ProjectDetailPage = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              </>}
 
               <div className="flex flex-col items-center gap-4 border-t border-border pt-8">
                 <Button

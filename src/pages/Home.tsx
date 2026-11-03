@@ -1,3 +1,4 @@
+import AdmissionsJourney from "@/components/AdmissionsJourney";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
@@ -7,13 +8,13 @@ import Hero from "@/components/Hero";
 import HomeServicesSection from "@/components/HomeServicesSection";
 import Navbar from "@/components/Navbar";
 import Projects from "@/components/Projects";
-import About from "@/components/About";
 import Experience from "@/components/Experience";
 import Education from "@/components/Education";
-import Initiatives from "@/components/Initiatives";
-import Awards from "@/components/Awards";
 import Skills from "@/components/Skills";
 import AudiencePath from "@/components/AudiencePath";
+import AdmissionsStories from "@/components/AdmissionsStories";
+import AdmissionsActivities from "@/components/AdmissionsActivities";
+import AdmissionsHonors from "@/components/AdmissionsHonors";
 import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -47,10 +48,11 @@ const Home = () => {
         ) : null}
         {audience === "admissions" ? (
           <>
-            <About />
+            <AdmissionsStories />
+            <AdmissionsActivities />
+            <AdmissionsHonors />
+            <AdmissionsJourney />
             <Education />
-            <Initiatives />
-            <Awards />
             <Projects limit={4} ctaHref="/work" ctaLabel={t("home.exploreProjects")} />
           </>
         ) : null}
