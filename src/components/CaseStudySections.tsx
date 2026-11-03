@@ -6,12 +6,12 @@ const Label = ({ children }: { children: string }) => (
   <h2 className="case-study-heading mb-5">{children}</h2>
 );
 
-const CaseStudySections = ({ study }: { study: CaseStudy }) => {
+const CaseStudySections = ({ study, showTagline = true }: { study: CaseStudy; showTagline?: boolean }) => {
   const { lang } = useLanguage();
   const arabic = lang === "ar";
   return (
   <div className="case-study space-y-16">
-    <p className="text-xl md:text-2xl font-medium leading-snug max-w-3xl">{study.tagline}</p>
+    {showTagline && <p className="text-xl md:text-2xl font-medium leading-snug max-w-3xl">{study.tagline}</p>}
 
     <dl className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {study.facts.map((fact) => (

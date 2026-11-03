@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CaseStudySections from "@/components/CaseStudySections";
+import ProjectCaseHero from "@/components/ProjectCaseHero";
 import { useAudience } from "@/context/AudienceContext";
 import { getCaseStudy } from "@/data/caseStudies";
 import { localizeProject } from "@/i18n/projectsAr";
@@ -80,6 +81,7 @@ const ProjectDetailPage = () => {
         <section className="py-20 relative">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto space-y-10">
+              {caseStudy ? <ProjectCaseHero project={project} study={caseStudy} /> : (
               <div className="text-center space-y-4">
                 <h1 className="text-4xl md:text-5xl font-bold text-center text-foreground">
                   {project.title}
@@ -88,16 +90,17 @@ const ProjectDetailPage = () => {
                   {project.description}
                 </p>
               </div>
+              )}
 
-              {caseStudy ? <CaseStudySections study={caseStudy} /> : null}
+              {caseStudy ? <CaseStudySections study={caseStudy} showTagline={false} /> : null}
 
-              <ProjectLivePreview
+              {!caseStudy ? <ProjectLivePreview
                 liveUrl={liveUrl || undefined}
                 livePreviewMode={project.livePreviewMode}
                 title={project.title}
                 variant="detail"
                 livePreviewRevealDelayMs={project.livePreviewRevealDelayMs}
-              />
+              /> : null}
 
               {!caseStudy && audience !== "admissions" ? (
               <div className="relative overflow-hidden rounded-2xl border border-primary/35 bg-gradient-to-br from-primary/[0.12] via-card to-accent/[0.08] p-6 shadow-xl shadow-primary/10 md:p-8">

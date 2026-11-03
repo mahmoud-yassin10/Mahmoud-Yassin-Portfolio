@@ -1,65 +1,45 @@
-import { GraduationCap, BookOpen, Award } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Award, BookOpenCheck, GraduationCap, Languages, Landmark } from "lucide-react";
+import CountUp from "@/components/CountUp";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const educationIcons = [GraduationCap, Award, BookOpen];
+const scores = [
+  { icon: Award, value: "4.0", label: "GPA, rank 2 of 30", labelAr: "GPA، الترتيب ٢ من ٣٠" },
+  { icon: BookOpenCheck, value: "1500", label: "SAT: 780 Math, 720 Reading & Writing", labelAr: "SAT: ٧٨٠ رياضيات، ٧٢٠ قراءة وكتابة" },
+  { icon: Languages, value: "8.5", label: "IELTS Academic", labelAr: "IELTS Academic" }
+];
 
 const Education = () => {
-  const { dict } = useLanguage();
-  const education = dict.education.items;
-
+  const { dict, lang } = useLanguage();
+  const arabic = lang === "ar";
+  const [school, leadership, courses] = dict.education.items;
   return (
     <section id="education" className="portfolio-section education-section relative">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold mb-12 text-foreground">
-          {dict.education.title}
-        </h2>
-
-        <div className="max-w-4xl mx-auto space-y-6">
-          {education.map((edu, index) => {
-            const Icon = educationIcons[index] ?? GraduationCap;
-            return (
-              <Card
-                key={index}
-                className="group transition-colors duration-300 bg-card/50 backdrop-blur-sm border-border animate-fade-in"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl  transition-transform">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
-                        <CardTitle className="text-2xl group-hover:text-primary transition-colors">
-                          {edu.title}
-                        </CardTitle>
-                        <span className="text-sm text-muted-foreground font-semibold">
-                          {edu.period}
-                        </span>
-                      </div>
-                      <CardDescription className="text-base">
-                        <span className="text-accent font-semibold">{edu.institution}</span>
-                        {edu.location && <span> • {edu.location}</span>}
-                        <br />
-                        {edu.details}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {edu.achievements.map((achievement, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="text-primary mt-1">▸</span>
-                        <span>{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            );
+      <div className="portfolio-container">
+        <header className="section-heading"><h2>{dict.education.title}</h2></header>
+        <div className="education-board">
+          <article className="education-school glass-surface">
+            <span className="education-icon"><GraduationCap size={26} strokeWidth={1.4} aria-hidden /></span>
+            <p className="education-meta">{school.period}</p>
+            <h3>{school.title}</h3>
+            <p className="education-institution">{school.institution}<span> · {school.location}</span></p>
+            <div className="education-chips">{school.achievements.filter((line) => /president|رئيس|valedictorian|salutatorian|التاني/i.test(line)).map((line) => <span key={line}>{line}</span>)}</div>
+          </article>
+          {scores.map((score) => {
+            const Icon = score.icon;
+            return <article key={score.label} className="education-score glass-surface">
+              <span className="education-icon"><Icon size={22} strokeWidth={1.5} aria-hidden /></span>
+              <strong><CountUp value={score.value} /></strong>
+              <small>{arabic ? score.labelAr : score.label}</small>
+            </article>;
           })}
+          <article className="education-extra glass-surface">
+            <span className="education-icon"><Landmark size={22} strokeWidth={1.5} aria-hidden /></span>
+            <div><h3>{leadership.title}</h3><p>{leadership.details}</p></div>
+          </article>
+          <article className="education-extra glass-surface">
+            <span className="education-icon"><BookOpenCheck size={22} strokeWidth={1.5} aria-hidden /></span>
+            <div><h3>{courses.title}</h3><p>{courses.achievements.slice(0, 4).join(" · ")}</p></div>
+          </article>
         </div>
       </div>
     </section>
