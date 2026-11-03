@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
+  SlidersHorizontal,
   Smartphone,
   Sparkles,
   Users,
@@ -38,7 +39,9 @@ import {
 } from "recharts";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { flousyAuth, isFlousyFirebaseConfigured } from "@/lib/flousyFirebase";
-import { FUNNEL_EVENTS, isFlousyAdmin, loadLiveDashboardData, reviewSmsFalseDetection, reviewStudentVerification, type AnalyticsEvent, type DashboardData, type FeedbackItem, type SmsFalseDetectionItem, type StudentVerificationItem } from "@/lib/flousyAnalytics";
+import { FUNNEL_EVENTS, isFlousyAdmin, loadBillingControls, loadLiveDashboardData, reviewSmsFalseDetection, reviewStudentVerification, saveBillingControls, type AnalyticsEvent, type BillingControls, type DashboardData, type FeedbackItem, type SmsFalseDetectionItem, type StudentVerificationItem } from "@/lib/flousyAnalytics";
+import { buildFunnel, northStar, retention } from "@/lib/flousyMetrics";
+import FlousyCreatorsPanel from "@/components/FlousyCreatorsPanel";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -64,6 +67,8 @@ function viewLabel(view: string) {
   if (view === "funnel") return "Funnel & retention";
   if (view === "students") return "Student verification";
   if (view === "sms") return "False SMS detections";
+  if (view === "plans") return "Plans & trials";
+  if (view === "creators") return "Creators & campaigns";
   return "Feedback inbox";
 }
 
@@ -72,6 +77,8 @@ function viewTitle(view: string) {
   if (view === "funnel") return "The journey, end to end.";
   if (view === "students") return "Student pricing gate.";
   if (view === "sms") return "Parser misses.";
+  if (view === "plans") return "What Free includes.";
+  if (view === "creators") return "Who brings people in.";
   return "Listen closely.";
 }
 
@@ -80,6 +87,8 @@ function viewSubtitle(view: string) {
   if (view === "funnel") return "See where people make it through—and where the product asks too much.";
   if (view === "students") return "Approve university emails and ID uploads that unlock student SKUs.";
   if (view === "sms") return "SMS text plus what Flousy captured when someone taps Not an expense or Report.";
+  if (view === "plans") return "Change the monthly Free caps, or turn on Pro for everyone until a date.";
+  if (view === "creators") return "Create invite codes for creators and campaigns, and see who joined and who got started.";
   return "Every note is a signal. Keep the useful ones close.";
 }
 
@@ -207,11 +216,83 @@ function smsReportTag(reportType: SmsFalseDetectionItem["reportType"]): { label:
   return { label: "Legacy report", tone: "ux" };
 }
 
+function BillingPanel({ live }: { live: boolean }) {
+  const [form, setForm] = useState<BillingControls | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadBillingControls().then((value) => {
+      if (!cancelled) setForm(value);
+    }).catch(() => {
+      if (!cancelled) setSaved("Could not load the current caps.");
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const setNumber = (key: keyof BillingControls, raw: string) => {
+    const n = Math.max(0, Math.floor(Number(raw) || 0));
+    setForm((current) => current ? { ...current, [key]: n } : current);
+  };
+
+  const save = async () => {
+    if (!form) return;
+    setSaving(true);
+    setSaved("");
+    try {
+      if (live) await saveBillingControls(form);
+      setSaved(live ? "Saved. The app picks this up on the next plan or voice check." : "Preview only — connect Firebase to save.");
+    } catch {
+      setSaved("Save failed. Your account needs the owner role, and Firestore rules must allow it.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!form) return <ChartCard title="Free plan" eyebrow="Loading"><p>Loading current caps…</p></ChartCard>;
+
+  const fields: Array<[keyof BillingControls, string, string]> = [
+    ["planGenerate", "Plan generations / month", "How many AI plans a Free account can create."],
+    ["planReevaluate", "Plan re-checks / month", "How many times a Free account can re-check an existing plan."],
+    ["canISpend", "Can I Spend / month", "Asks against the month before it stops."],
+    ["voiceCloud", "Cloud voice / month", "After this, voice stays on the phone."],
+  ];
+
+  return <div className="dashboard-grid dashboard-grid-main">
+    <ChartCard title="Monthly Free caps" eyebrow="app_config / billing" className="dashboard-chart-large">
+      <div className="dashboard-feedback-list">
+        {fields.map(([key, label, hint]) => <label key={key} className="dashboard-feedback-item" style={{ display: "grid", gap: 6 }}>
+          <strong>{label}</strong>
+          <span>{hint}</span>
+          <input type="number" min={0} value={String(form[key])} onChange={(event) => setNumber(key, event.target.value)} />
+        </label>)}
+        <button className="dashboard-primary-button" disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save caps"}</button>
+        {saved && <p>{saved}</p>}
+      </div>
+    </ChartCard>
+    <ChartCard title="Free trial of Pro" eyebrow="Everyone, until a date">
+      <div className="dashboard-feedback-list">
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="checkbox" checked={form.launchProEnabled} onChange={(event) => setForm({ ...form, launchProEnabled: event.target.checked })} />
+          Pro for everyone until the end date
+        </label>
+        <label style={{ display: "grid", gap: 6 }}>
+          <span>Ends on</span>
+          <input type="date" value={form.launchProEndsAt} onChange={(event) => setForm({ ...form, launchProEndsAt: event.target.value })} />
+        </label>
+        <p>While this is on, Free limits are skipped and the profile chip says Free trial. Turn it off, or let the date pass, and people go back to Free.</p>
+        <button className="dashboard-primary-button" disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save trial"}</button>
+      </div>
+    </ChartCard>
+  </div>;
+}
+
 const FlousyDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<DashboardData>(() => makeDemoData());
   const [days, setDays] = useState(30);
-  const [activeView, setActiveView] = useState<"overview" | "funnel" | "feedback" | "students" | "sms">("overview");
+  const [activeView, setActiveView] = useState<"overview" | "funnel" | "feedback" | "students" | "sms" | "plans" | "creators">("overview");
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -247,11 +328,14 @@ const FlousyDashboard = () => {
   const uniqueUsers = useMemo(() => new Set(data.events.map(e => e.uid).filter(Boolean)).size, [data.events]);
   const installs = data.events.filter(e => e.name === "install").length;
   const completed = data.events.filter(e => e.name === "sign_up_completed").length;
-  const plans = data.events.filter(e => e.name === "first_plan_generated").length;
+  const plans = useMemo(() => buildFunnel(data.events).find(s => s.name === "first_plan")?.count ?? 0, [data.events]);
   const portfolioVisits = data.events.filter(e => e.name === "portfolio_visit").length;
   const portfolioSessions = new Set(data.events.filter(e => e.name === "portfolio_visit").map(e => e.sessionId).filter(Boolean)).size;
   const trend = useMemo(() => Array.from({ length: 14 }, (_, index) => { const date = new Date(Date.now() - (13 - index) * 86400000); const key = dateKey(date); const dayEvents = data.events.filter(e => dateKey(e.createdAt) === key); return { date: date.toLocaleDateString("en", { weekday: "short" }), visits: dayEvents.filter(e => e.name === "store_visit").length, installs: dayEvents.filter(e => e.name === "install").length, active: new Set(dayEvents.map(e => e.uid).filter(Boolean)).size }; }), [data.events]);
-  const funnel = useMemo(() => FUNNEL_EVENTS.slice(0, 10).map((name, index) => ({ name, label: name.replaceAll("_", " "), count: data.events.filter(e => e.name === name).length, rate: index === 0 ? 100 : Math.round((data.events.filter(e => e.name === name).length / Math.max(1, data.events.filter(e => e.name === FUNNEL_EVENTS[0]).length)) * 100) })), [data.events]);
+  const funnel = useMemo(() => buildFunnel(data.events), [data.events]);
+  const star = useMemo(() => northStar(data.events), [data.events]);
+  const returns = useMemo(() => retention(data.events, days), [data.events, days]);
+  const pct = (value: number | null) => value == null ? "—" : `${Math.round(value * 100)}%`;
   const platforms = useMemo(() => ["android", "web", "ios"].map(name => ({ name, value: Math.round((data.events.filter(e => e.platform === name).length / Math.max(1, data.events.length)) * 100) })).filter(item => item.value), [data.events]);
   const platformData = useMemo(() => platforms.length ? platforms : data.live ? [] : [{ name: "android", value: 68 }, { name: "web", value: 25 }, { name: "ios", value: 7 }], [data.live, platforms]);
   const eventRows = useMemo(() => [...events].sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf()).slice(0, 12), [events]);
@@ -308,7 +392,7 @@ const FlousyDashboard = () => {
   return <div className="dashboard-shell"><AnimatedBackground />
     <aside className={`dashboard-sidebar ${mobileNav ? "open" : ""}`}><div className="dashboard-sidebar-brand"><div className="dashboard-logo"><Sparkles size={18} /></div><div><strong>FLOUSY</strong><span>owner console</span></div><button className="dashboard-mobile-close" onClick={() => setMobileNav(false)}><X size={17} /></button></div>
       <div className="dashboard-sidebar-section">Workspace</div>
-      {[["overview", BarChart3, "Overview"], ["funnel", Users, "Funnel & retention"], ["feedback", Inbox, "Feedback inbox"], ["sms", Flag, "False SMS detections"], ["students", GraduationCap, "Student verification"]].map(([view, Icon, label]) => <button key={view as string} className={`dashboard-nav-item ${activeView === view ? "active" : ""}`} onClick={() => { setActiveView(view as typeof activeView); setMobileNav(false); }}><Icon size={17} />{label as string}{view === "feedback" && feedback.filter(item => item.status === "new").length > 0 && <span className="dashboard-nav-count">{feedback.filter(item => item.status === "new").length}</span>}{view === "sms" && newSmsCount > 0 && <span className="dashboard-nav-count">{newSmsCount}</span>}{view === "students" && pendingStudents > 0 && <span className="dashboard-nav-count">{pendingStudents}</span>}</button>)}
+      {[["overview", BarChart3, "Overview"], ["funnel", Users, "Funnel & retention"], ["plans", SlidersHorizontal, "Plans & trials"], ["creators", Sparkles, "Creators & campaigns"], ["feedback", Inbox, "Feedback inbox"], ["sms", Flag, "False SMS detections"], ["students", GraduationCap, "Student verification"]].map(([view, Icon, label]) => <button key={view as string} className={`dashboard-nav-item ${activeView === view ? "active" : ""}`} onClick={() => { setActiveView(view as typeof activeView); setMobileNav(false); }}><Icon size={17} />{label as string}{view === "feedback" && feedback.filter(item => item.status === "new").length > 0 && <span className="dashboard-nav-count">{feedback.filter(item => item.status === "new").length}</span>}{view === "sms" && newSmsCount > 0 && <span className="dashboard-nav-count">{newSmsCount}</span>}{view === "students" && pendingStudents > 0 && <span className="dashboard-nav-count">{pendingStudents}</span>}</button>)}
       <div className="dashboard-sidebar-section">Signals</div><div className="dashboard-signal"><span className="dashboard-live-dot" />{data.live ? "Live connection" : "Preview dataset"}<small>{data.live ? "Firestore synced" : "No Firebase env yet"}</small></div>
       <div className="dashboard-sidebar-bottom"><div className="dashboard-sidebar-section">Owner</div><div className="dashboard-owner"><div className="dashboard-owner-avatar">M</div><div><strong>{user?.email?.split("@")[0] ?? "Mahmoud"}</strong><span>product owner</span></div></div>{user && <button className="dashboard-nav-item" onClick={() => flousyAuth && signOut(flousyAuth)}><LogOut size={16} />Sign out</button>}</div>
     </aside>
@@ -316,8 +400,10 @@ const FlousyDashboard = () => {
     <main className="dashboard-main"><header className="dashboard-topbar"><button className="dashboard-menu-button" onClick={() => setMobileNav(true)}><Menu size={19} /></button><div className="dashboard-breadcrumb"><span>Flousy</span><b>/</b><strong>{viewLabel(activeView)}</strong></div><div className="dashboard-top-actions"><ThemeToggle /><div className="dashboard-status"><span className="dashboard-live-dot" /> {data.live ? "Live" : "Preview"}</div><button className="dashboard-icon-button" onClick={() => void refresh()} disabled={loading} title="Refresh"><RefreshCw size={16} className={loading ? "animate-spin" : ""} /></button></div></header>
       <div className="dashboard-content"><div className="dashboard-heading"><div><div className="dashboard-kicker">Preproduction / testing period</div><h1>{viewTitle(activeView)}</h1><p>{viewSubtitle(activeView)}</p></div><div className="dashboard-heading-actions"><select value={days} onChange={e => setDays(Number(e.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="dashboard-secondary-button" onClick={() => exportCsv(data.events)}><Download size={15} />Export</button></div></div>
       {notice && <div className="dashboard-notice"><CircleAlert size={16} />{notice}<button onClick={() => setNotice("")}><X size={14} /></button></div>}
-      {activeView === "overview" && <><div className="dashboard-stat-grid"><StatCard label="People reached" value={formatCompact(uniqueUsers)} change="+18.4% vs prior period" icon={Users} /><StatCard label="Store visits" value={formatCompact(data.events.filter(e => e.name === "store_visit").length)} change="+12.1% vs prior period" icon={Eye} tone="violet" /><StatCard label="Install → signup" value={`${installs ? Math.round((completed / installs) * 100) : 0}%`} change="Activation checkpoint" icon={Smartphone} tone="orange" /><StatCard label="Plans generated" value={formatCompact(plans)} change="The value moment" icon={Sparkles} tone="cyan" /></div><div className="dashboard-grid dashboard-grid-main"><ChartCard title="Acquisition pulse" eyebrow="Daily movement" className="dashboard-chart-large"><ResponsiveContainer width="100%" height={250}><AreaChart data={trend}><defs><linearGradient id="visits" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={accent} stopOpacity={.3}/><stop offset="100%" stopColor={accent} stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8, color: "#f4f7f6" }}/><Area type="monotone" dataKey="visits" stroke={accent} fill="url(#visits)" strokeWidth={2}/><Area type="monotone" dataKey="installs" stroke={violet} fill="none" strokeWidth={2}/></AreaChart></ResponsiveContainer><div className="dashboard-chart-legend"><span><i style={{ background: accent }} />Store visits</span><span><i style={{ background: violet }} />Installs</span></div></ChartCard><ChartCard title="Where it runs" eyebrow="Platform mix" className="dashboard-chart-small"><div className="dashboard-donut-wrap"><ResponsiveContainer width="100%" height={190}><PieChart><Pie data={platformData} innerRadius={57} outerRadius={78} paddingAngle={4} dataKey="value"><Cell fill={accent}/><Cell fill={violet}/><Cell fill={orange}/></Pie><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/></PieChart></ResponsiveContainer><div className="dashboard-donut-center"><strong>{formatCompact(data.events.length)}</strong><span>events</span></div></div><div className="dashboard-platform-list">{platformData.map((item, index) => <div key={item.name}><span><i style={{ background: [accent, violet, orange][index] }} />{item.name}</span><b>{item.value}%</b></div>)}</div></ChartCard></div><div className="dashboard-grid dashboard-grid-bottom"><ChartCard title="Event stream" eyebrow="Latest product signals" className="dashboard-table-card"><EventTable events={eventRows} /></ChartCard><ChartCard title="At a glance" eyebrow="Quality of signal"><div className="dashboard-signal-stack"><div><span>Portfolio visits</span><strong>{formatCompact(portfolioVisits)}</strong></div><div><span>Portfolio sessions</span><strong>{formatCompact(portfolioSessions)}</strong></div><div><span>Feedback waiting</span><strong>{feedback.filter(item => item.status === "new").length}</strong></div><div><span>Returning on day 1</span><strong>{uniqueUsers ? Math.round((data.events.filter(e => e.name === "day_1_return").length / uniqueUsers) * 100) : 0}%</strong></div><div><span>Arabic audience</span><strong>{data.events.length ? Math.round((data.events.filter(e => e.locale === "ar").length / data.events.length) * 100) : 0}%</strong></div><div><span>Data freshness</span><strong>{data.live ? "Live" : "Preview"}</strong></div></div></ChartCard></div></>}
-      {activeView === "funnel" && <><div className="dashboard-grid dashboard-grid-funnel"><ChartCard title="Activation funnel" eyebrow="The first successful loop" className="dashboard-chart-large"><div className="dashboard-funnel">{funnel.map((step, index) => <div className="dashboard-funnel-row" key={step.name}><div className="dashboard-funnel-label"><span>{String(index + 1).padStart(2, "0")}</span><b>{step.label}</b><small>{step.rate}% of visits</small></div><div className="dashboard-funnel-track"><div style={{ width: `${Math.max(7, step.rate)}%` }} /></div><strong>{step.count}</strong></div>)}</div></ChartCard><ChartCard title="Return behavior" eyebrow="Retention moments"><ResponsiveContainer width="100%" height={300}><LineChart data={trend}><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/><Line type="monotone" dataKey="active" stroke={cyan} strokeWidth={2} dot={false}/></LineChart></ResponsiveContainer><div className="dashboard-retention-callout"><span className="dashboard-live-dot" /><div><strong>{uniqueUsers ? Math.round((data.events.filter(e => e.name === "day_7_return").length / uniqueUsers) * 100) : 0}% week-one return</strong><small>Keep watching this as onboarding changes ship.</small></div></div></ChartCard></div><ChartCard title="Event conversion map" eyebrow="Compare any event"><div className="dashboard-event-controls"><div className="dashboard-search"><Search size={15}/><select value={selectedEvent} onChange={e => setSelectedEvent(e.target.value)}><option value="all">All events</option><option value="portfolio_visit">portfolio_visit</option>{FUNNEL_EVENTS.map(name => <option key={name} value={name}>{name}</option>)}</select></div><span>{events.length} matching events</span></div><EventTable events={eventRows} /></ChartCard></>}
+      {activeView === "plans" && <BillingPanel live={data.live} />}
+      {activeView === "creators" && <FlousyCreatorsPanel live={data.live} />}
+      {activeView === "overview" && <><div className="dashboard-stat-grid"><StatCard label="People reached" value={formatCompact(uniqueUsers)} change="+18.4% vs prior period" icon={Users} /><StatCard label="Store visits" value={formatCompact(data.events.filter(e => e.name === "store_visit").length)} change="+12.1% vs prior period" icon={Eye} tone="violet" /><StatCard label="Install → signup" value={`${installs ? Math.round((completed / installs) * 100) : 0}%`} change="Activation checkpoint" icon={Smartphone} tone="orange" /><StatCard label="Plans generated" value={formatCompact(plans)} change="The value moment" icon={Sparkles} tone="cyan" /><StatCard label="Insight viewers (7 days)" value={pct(star.active ? star.rate : null)} change={`${star.viewers} of ${star.active} active · AI only ${pct(star.active ? star.aiRate : null)}`} icon={Eye} tone="violet" /></div><div className="dashboard-grid dashboard-grid-main"><ChartCard title="Acquisition pulse" eyebrow="Daily movement" className="dashboard-chart-large"><ResponsiveContainer width="100%" height={250}><AreaChart data={trend}><defs><linearGradient id="visits" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={accent} stopOpacity={.3}/><stop offset="100%" stopColor={accent} stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8, color: "#f4f7f6" }}/><Area type="monotone" dataKey="visits" stroke={accent} fill="url(#visits)" strokeWidth={2}/><Area type="monotone" dataKey="installs" stroke={violet} fill="none" strokeWidth={2}/></AreaChart></ResponsiveContainer><div className="dashboard-chart-legend"><span><i style={{ background: accent }} />Store visits</span><span><i style={{ background: violet }} />Installs</span></div></ChartCard><ChartCard title="Where it runs" eyebrow="Platform mix" className="dashboard-chart-small"><div className="dashboard-donut-wrap"><ResponsiveContainer width="100%" height={190}><PieChart><Pie data={platformData} innerRadius={57} outerRadius={78} paddingAngle={4} dataKey="value"><Cell fill={accent}/><Cell fill={violet}/><Cell fill={orange}/></Pie><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/></PieChart></ResponsiveContainer><div className="dashboard-donut-center"><strong>{formatCompact(data.events.length)}</strong><span>events</span></div></div><div className="dashboard-platform-list">{platformData.map((item, index) => <div key={item.name}><span><i style={{ background: [accent, violet, orange][index] }} />{item.name}</span><b>{item.value}%</b></div>)}</div></ChartCard></div><div className="dashboard-grid dashboard-grid-bottom"><ChartCard title="Event stream" eyebrow="Latest product signals" className="dashboard-table-card"><EventTable events={eventRows} /></ChartCard><ChartCard title="At a glance" eyebrow="Quality of signal"><div className="dashboard-signal-stack"><div><span>Portfolio visits</span><strong>{formatCompact(portfolioVisits)}</strong></div><div><span>Portfolio sessions</span><strong>{formatCompact(portfolioSessions)}</strong></div><div><span>Feedback waiting</span><strong>{feedback.filter(item => item.status === "new").length}</strong></div><div><span>Returning on day 1</span><strong>{pct(returns.d1.rate)}</strong></div><div><span>Arabic audience</span><strong>{data.events.length ? Math.round((data.events.filter(e => e.locale === "ar").length / data.events.length) * 100) : 0}%</strong></div><div><span>Data freshness</span><strong>{data.live ? "Live" : "Preview"}</strong></div></div></ChartCard></div></>}
+      {activeView === "funnel" && <><div className="dashboard-grid dashboard-grid-funnel"><ChartCard title="Activation funnel" eyebrow="The first successful loop" className="dashboard-chart-large"><div className="dashboard-funnel">{funnel.map((step, index) => <div className="dashboard-funnel-row" key={step.name}><div className="dashboard-funnel-label"><span>{String(index + 1).padStart(2, "0")}</span><b>{step.label}</b><small>{step.rate}% of visits</small></div><div className="dashboard-funnel-track"><div style={{ width: `${Math.max(7, step.rate)}%` }} /></div><strong>{step.count}</strong></div>)}</div></ChartCard><ChartCard title="Return behavior" eyebrow="Retention moments"><ResponsiveContainer width="100%" height={300}><LineChart data={trend}><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/><Line type="monotone" dataKey="active" stroke={cyan} strokeWidth={2} dot={false}/></LineChart></ResponsiveContainer><div className="dashboard-retention-callout"><span className="dashboard-live-dot" /><div><strong>{pct(returns.d7.rate)} week-one return</strong><small>Keep watching this as onboarding changes ship.</small></div></div></ChartCard></div><ChartCard title="Event conversion map" eyebrow="Compare any event"><div className="dashboard-event-controls"><div className="dashboard-search"><Search size={15}/><select value={selectedEvent} onChange={e => setSelectedEvent(e.target.value)}><option value="all">All events</option><option value="portfolio_visit">portfolio_visit</option>{FUNNEL_EVENTS.map(name => <option key={name} value={name}>{name}</option>)}</select></div><span>{events.length} matching events</span></div><EventTable events={eventRows} /></ChartCard></>}
       {activeView === "feedback" && <><div className="dashboard-feedback-summary"><StatCard label="All feedback" value={String(feedback.length)} change="Captured in-app" icon={Inbox} tone="violet" /><StatCard label="New to review" value={String(feedback.filter(item => item.status === "new").length)} change="Needs your attention" icon={CircleAlert} tone="orange" /><StatCard label="With media" value={String(feedback.filter(item => item.hasPhotos || item.hasAudio).length)} change="Screenshots or audio" icon={Eye} /></div><ChartCard title="Feedback inbox" eyebrow="From the app"><div className="dashboard-feedback-tools"><div className="dashboard-search"><Search size={15}/><input placeholder="Search feedback" value={search} onChange={e => setSearch(e.target.value)} /></div><span>{filteredFeedback.length} notes</span></div><div className="dashboard-feedback-list">{filteredFeedback.map(item => <article className="dashboard-feedback-item" key={item.id}><div className="dashboard-feedback-item-top"><span className={`dashboard-feedback-tag ${item.category === "Bug" ? "bug" : item.category === "Idea" ? "idea" : "ux"}`}>{item.category ?? "Other"}</span><time>{formatDate(item.createdAt)}</time></div><p>{item.message}</p><div className="dashboard-feedback-item-bottom"><span>{item.uid ?? "anonymous"}</span><div>{(item.hasPhotos || item.hasAudio) && <span className="dashboard-media-chip"><Eye size={13}/>media attached</span>}<select value={item.status ?? "new"} onChange={e => setFeedback(current => current.map(feedbackItem => feedbackItem.id === item.id ? { ...feedbackItem, status: e.target.value as FeedbackItem["status"] } : feedbackItem))}><option value="new">New</option><option value="reviewing">Reviewing</option><option value="resolved">Resolved</option></select></div></div></article>)}{!filteredFeedback.length && <div className="dashboard-empty"><Inbox size={24}/><strong>No feedback matches.</strong><span>New in-app feedback will appear here.</span></div>}</div></ChartCard></>}
       {activeView === "students" && <><div className="dashboard-feedback-summary"><StatCard label="All requests" value={String(students.length)} change="Email + document" icon={GraduationCap} tone="violet" /><StatCard label="Pending review" value={String(pendingStudents)} change="Needs your decision" icon={CircleAlert} tone="orange" /><StatCard label="Verified" value={String(students.filter(item => item.status === "verified").length)} change="Student pricing unlocked" icon={Check} tone="cyan" /></div><ChartCard title="Student verification" eyebrow="Inbox"><div className="dashboard-feedback-tools"><div className="dashboard-search"><Search size={15}/><input placeholder="Search students" value={search} onChange={e => setSearch(e.target.value)} /></div><span>{filteredStudents.length} requests</span></div><div className="dashboard-feedback-list">{filteredStudents.map(item => <article className="dashboard-feedback-item" key={item.id}><div className="dashboard-feedback-item-top"><span className={`dashboard-feedback-tag ${item.status === "pending" ? "bug" : item.status === "verified" ? "idea" : "ux"}`}>{item.status}</span><time>{formatDate(item.createdAt)}</time></div><p><strong>{item.uid}</strong>{item.email ? ` · ${item.email}` : ""}{item.universityHint ? ` · ${item.universityHint}` : ""}{item.method ? ` · via ${item.method}` : ""}</p>{item.documentDownloadUrl && <div style={{ margin: "10px 0" }}><a href={item.documentDownloadUrl} target="_blank" rel="noreferrer"><img src={item.documentDownloadUrl} alt="Student ID" style={{ maxWidth: "100%", maxHeight: 220, borderRadius: 10, objectFit: "cover" }} /></a></div>}{item.rejectionReason && <p style={{ opacity: .75 }}>Reason: {item.rejectionReason}</p>}<div className="dashboard-feedback-item-bottom"><span>{item.reviewedBy ? `Reviewed by ${item.reviewedBy}` : "Awaiting review"}</span><div style={{ display: "flex", gap: 8 }}><button className="dashboard-secondary-button" disabled={studentBusyId === item.id || item.status === "verified"} onClick={() => void reviewStudent(item, "verified")}><Check size={14}/>Approve</button><button className="dashboard-secondary-button" disabled={studentBusyId === item.id || item.status === "rejected"} onClick={() => void reviewStudent(item, "rejected")}><X size={14}/>Reject</button></div></div></article>)}{!filteredStudents.length && <div className="dashboard-empty"><GraduationCap size={24}/><strong>No student requests.</strong><span>Email and ID submissions will appear here.</span></div>}</div></ChartCard></>}
       {activeView === "sms" && <><div className="dashboard-feedback-summary"><StatCard label="All reports" value={String(smsReports.length)} change="Not an expense + Report" icon={Flag} tone="violet" /><StatCard label="New to review" value={String(newSmsCount)} change="Needs a look" icon={CircleAlert} tone="orange" /><StatCard label="With SMS text" value={String(smsReports.filter(item => item.smsBody.trim()).length)} change="Notification path" icon={Eye} tone="cyan" /></div><ChartCard title="False SMS detections" eyebrow="Parser training set"><div className="dashboard-feedback-tools"><div className="dashboard-search"><Search size={15}/><input placeholder="Search sender, merchant, SMS" value={search} onChange={e => setSearch(e.target.value)} /></div><span>{filteredSms.length} reports</span><div style={{ display: "flex", gap: 8, alignItems: "center" }}><label style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 13 }}><input type="checkbox" checked={smsExportUnresolvedOnly} onChange={e => setSmsExportUnresolvedOnly(e.target.checked)} />Unfinished only</label><button className="dashboard-secondary-button" onClick={() => exportSmsCsv(smsReports, smsExportUnresolvedOnly)}><Download size={15} />Export</button></div></div><div className="dashboard-feedback-list">{filteredSms.map(item => { const tag = smsReportTag(item.reportType); return <article className="dashboard-feedback-item" key={item.id}><div className="dashboard-feedback-item-top"><span className={`dashboard-feedback-tag ${tag.tone}`}>{tag.label}</span><time>{formatDate(item.createdAt)}</time></div><p><strong>{item.isExpense ? "Expense" : "Income"}</strong>{item.amount != null ? ` · ${item.amount}` : ""}{item.merchant ? ` · ${item.merchant}` : ""}{item.smsSender ? ` · from ${item.smsSender}` : ""}</p><p style={{ fontWeight: 600 }}>{item.reportType === "wrong_category" && item.correctedCategoryId ? <>Category: {item.categoryId || "uncategorized"} → {item.correctedCategoryId}</> : item.categoryId ? <>Category: {item.categoryId}</> : null}</p>{item.smsBody ? <pre className="dashboard-sms-body">{item.smsBody}</pre> : <p style={{ opacity: .7 }}>No SMS body stored — captured from an edited transaction.</p>}<div className="dashboard-feedback-item-bottom"><span>{item.uid ?? "anonymous"}{item.txnId ? ` · ${item.txnId}` : ""}</span><select value={item.status ?? "new"} onChange={e => void markSms(item, e.target.value as SmsFalseDetectionItem["status"])}><option value="new">New</option><option value="reviewing">Reviewing</option><option value="resolved">Resolved (done)</option></select></div></article>; })}{!filteredSms.length && <div className="dashboard-empty"><Flag size={24}/><strong>No false SMS reports.</strong><span>They appear when someone taps Not an expense or Report on an SMS transaction.</span></div>}</div></ChartCard></>}

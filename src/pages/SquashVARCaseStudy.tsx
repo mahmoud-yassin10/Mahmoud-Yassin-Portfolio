@@ -1,6 +1,7 @@
+import ManuscriptPreview from "@/components/ManuscriptPreview";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, ArrowUpRight, ScanLine, Route, Layers3, Activity, ShieldCheck, FileText, Github, ChevronDown, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowDown, ArrowUpRight, ScanLine, Route, Layers3, Activity, ShieldCheck, FileText, Github, ChevronDown, Info } from "lucide-react";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,12 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { caseStudiesAr } from "@/data/caseStudiesAr";
 import { getCaseStudy } from "@/data/caseStudies";
-import { SQUASHVAR_MANUSCRIPT_URL } from "@/data/projectLinks";
 import { squashCaseCopy, squashDetectorResults, squashImpactResults, squashSurfaceResults } from "@/data/squashvarCaseStudy";
 import "@/styles/squashvar.css";
 
 const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-const sectionIds = ["sq-overview", "sq-system", "sq-evaluation", "sq-limitations", "sq-resources"];
+const sectionIds = ["sq-overview", "sq-demo", "sq-system", "sq-evaluation", "sq-limitations", "sq-resources"];
 const stageIcons = [ScanLine, Route, Layers3, Activity, ShieldCheck];
 const sourceUrl = "https://github.com/mahmoud-yassin10/SquashVAR";
 const figuresUrl = `${sourceUrl}/tree/main/figs`;
@@ -58,7 +58,7 @@ export default function SquashVARCaseStudy() {
             <p className="sq-lead">{c.lead}</p>
             <p className="sq-publication-status"><FileText size={16} aria-hidden />{c.status}</p>
             <div className="sq-hero-actions">
-              <a href={SQUASHVAR_MANUSCRIPT_URL} target="_blank" rel="noreferrer" className="portfolio-button">{c.paper}<ArrowUpRight size={16} aria-hidden /></a>
+              <a href="#sq-resources" className="portfolio-button">{c.paper}<ArrowDown size={16} aria-hidden /></a>
               <a href={sourceUrl} target="_blank" rel="noreferrer" className="portfolio-text-link"><Github size={17} aria-hidden />{c.code}</a>
             </div>
           </div>
@@ -71,7 +71,10 @@ export default function SquashVARCaseStudy() {
           <div><dt>{c.roleLabel}</dt><dd>{c.role}</dd></div>
           <div><dt>{c.toolsLabel}</dt><dd><bdi>Python · YOLOv8 · BoT-SORT · OpenCV</bdi></dd></div>
         </dl>
-        <nav ref={navRef} className="sq-section-nav" aria-label={c.navLabel}>
+        <nav className="section-rail sq-section-rail" aria-label={c.navLabel}>
+          {sectionIds.map((id,index) => <a key={id} href={`#${id}`} aria-current={activeSection === id ? "location" : undefined} className={activeSection === id ? "is-active" : undefined}><span>{c.nav[index]}</span><i aria-hidden /></a>)}
+        </nav>
+        <nav ref={navRef} className="sq-section-nav sq-section-nav-compact" aria-label={c.navLabel}>
           {sectionIds.map((id,index) => <a key={id} href={`#${id}`} aria-current={activeSection === id ? "location" : undefined}>{c.nav[index]}</a>)}
         </nav>
 
@@ -87,6 +90,16 @@ export default function SquashVARCaseStudy() {
             <dl><div><dt>{c.training}</dt><dd>{c.trainingValue}</dd></div><div><dt>{c.benchmark}</dt><dd>{c.benchmarkValue}</dd></div></dl>
             <p>{c.context}</p>
           </aside>
+        </section>
+
+        <section id="sq-demo" className="squash-case-section sq-demo" aria-labelledby="sq-demo-title">
+          <header className="sq-section-heading"><h2 id="sq-demo-title">{lang === "ar" ? "شوفه شغال." : "See it running."}</h2><p>{lang === "ar" ? "ناتج مسجّل من النموذج على لقطات مباراة. عرض تفاعلي مباشر هييجي بعد ما أربط النموذج بالموقع." : "Recorded output from the prototype on match footage. A live, interactive demo will replace this once the model is deployed."}</p></header>
+          <figure className="sq-demo-figure glass-surface">
+            <video controls muted loop playsInline preload="metadata" poster={`${base}/research/squashvar-demo-poster.webp`} aria-label={lang === "ar" ? "ناتج SquashVAR على لقطات مباراة" : "SquashVAR output on match footage"}>
+              <source src={`${base}/research/squashvar-demo.mp4`} type="video/mp4" />
+            </video>
+            <figcaption>{lang === "ar" ? "مقطع مدته ١٠ ثواني. دقة قرارات الخطوط لسه متقاستش." : "A 10-second clip. Line-call accuracy has not been measured."}</figcaption>
+          </figure>
         </section>
 
         <section id="sq-system" className="squash-case-section" aria-labelledby="sq-system-title">
@@ -132,11 +145,11 @@ export default function SquashVARCaseStudy() {
 
         <section id="sq-resources" className="squash-case-section sq-resources" aria-labelledby="sq-resources-title">
           <header className="sq-section-heading"><h2 id="sq-resources-title">{c.resourcesTitle}</h2><p>{c.resourcesBody}</p></header>
+          <ManuscriptPreview />
           <div className="sq-resource-links">
-            <a href={SQUASHVAR_MANUSCRIPT_URL} target="_blank" rel="noreferrer"><FileText size={25} strokeWidth={1.5} aria-hidden /><span><strong>{c.paper}</strong><small>{c.paperMeta}</small></span><ArrowUpRight size={20} aria-hidden /></a>
             <a href={sourceUrl} target="_blank" rel="noreferrer"><Github size={25} strokeWidth={1.5} aria-hidden /><span><strong>{c.code}</strong><small>{c.codeMeta}</small></span><ArrowUpRight size={20} aria-hidden /></a>
+            <a href={figuresUrl} target="_blank" rel="noreferrer"><FileText size={25} strokeWidth={1.5} aria-hidden /><span><strong>{c.figures}</strong><small>{c.figuresMeta}</small></span><ArrowUpRight size={20} aria-hidden /></a>
           </div>
-          <a className="portfolio-text-link sq-figures-link" href={figuresUrl} target="_blank" rel="noreferrer">{c.figures}<ArrowUpRight size={17} aria-hidden /></a>
         </section>
       </div>
     </main>

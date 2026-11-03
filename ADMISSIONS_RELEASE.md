@@ -39,3 +39,8 @@ The user requested an AI-inspired redesign while preserving the original animate
 ## SquashVAR case-study cleanup
 
 The SquashVAR project route, legacy slug alias and Research now share a dedicated research case-study page. It replaces the repeated opening copy and generic stack/runtime/language/skills card sequence with a concise project header, actual prototype output, overview and attribution, keyboard-accessible pipeline tabs, separate detector/impact tables, visible limitations and a resource section. A sticky navigator follows the current section. Extra per-surface results use a disclosure. English/Arabic, manuscript status, public PDF/source links, the portrait homepage and the original particle background are preserved. Detector-table settings and the ±25-frame impact matching tolerance were checked against the supplied manuscript.
+
+
+## Manuscript preview and canonical Research entry
+
+Added an inline six-page preview of the supplied manuscript, with page navigation, zoom and full-PDF open/download options. Preview images were rendered from the exact existing PDF; a manifest records the source hash and page dimensions. Research and the hero research link now open the canonical SquashVAR project URL, and the old `/research` entry redirects with its query/hash preserved. The manuscript remains submitted and awaiting review.

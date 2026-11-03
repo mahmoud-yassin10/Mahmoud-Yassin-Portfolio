@@ -7,6 +7,8 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
+  Timestamp,
   updateDoc,
   where,
   writeBatch,
@@ -30,6 +32,14 @@ export const FUNNEL_EVENTS = [
   "referral_activated",
   "day_1_return",
   "day_7_return",
+  "app_open",
+  "onboarding_started",
+  "onboarding_completed",
+  "transaction_created",
+  "plan_generation_completed",
+  "insight_viewed",
+  "insight_shared",
+  "can_i_spend_used",
 ] as const;
 
 export type FunnelEvent = (typeof FUNNEL_EVENTS)[number];
@@ -129,7 +139,7 @@ function getPortfolioSessionId() {
   }
 }
 
-export async function trackPortfolioVisit(pathname: string) {
+export async function trackPortfolioVisit(_pathname: string) {
   if (!flousyFunctions) return;
   try {
     await httpsCallable(flousyFunctions, "trackAnalyticsEvent")({
@@ -138,7 +148,6 @@ export async function trackPortfolioVisit(pathname: string) {
       appVersion: "portfolio",
       locale: navigator.language.slice(0, 12),
       sessionId: getPortfolioSessionId(),
-      metadata: { path: pathname.slice(0, 120) },
     });
   } catch {
     // Portfolio telemetry is best-effort and must never block navigation.
@@ -157,7 +166,7 @@ const toDate = (value: unknown) => {
 const mapEvent = (id: string, data: DocumentData): AnalyticsEvent => ({
   id,
   name: String(data.name ?? "unknown"),
-  createdAt: toDate(data.createdAt),
+  createdAt: toDate(data.occurredAt ?? data.createdAt),
   uid: data.uid ? String(data.uid) : undefined,
   platform: data.platform ? String(data.platform) : undefined,
   appVersion: data.appVersion ? String(data.appVersion) : undefined,
@@ -225,7 +234,7 @@ export async function loadLiveDashboardData(days = 30): Promise<DashboardData> {
   if (!flousyDb) throw new Error("Firebase is not configured.");
   const since = new Date(Date.now() - days * 86400000);
   const eventCollection = collection(flousyDb, "analytics_events");
-  const eventQuery = query(eventCollection, where("createdAt", ">=", since), orderBy("createdAt", "desc"), limit(5000));
+  const eventQuery = query(eventCollection, where("occurredAt", ">=", since), orderBy("occurredAt", "desc"), limit(5000));
   const eventSnapshot = await getDocs(eventQuery);
   const feedbackSnapshot = await getDocs(query(collection(flousyDb, "feedback_inbox"), orderBy("createdAt", "desc"), limit(100)));
   const allFeedback = feedbackSnapshot.docs.map((docSnap) => mapFeedback(docSnap.id, docSnap.data()));
@@ -305,6 +314,130 @@ export async function reviewSmsFalseDetection(options: {
   } catch {
     // Feedback copy is optional; dedicated inbox is the source of truth.
   }
+}
+
+export type BillingControls = {
+  planGenerate: number;
+  planReevaluate: number;
+  canISpend: number;
+  voiceCloud: number;
+  launchProEnabled: boolean;
+  launchProEndsAt: string;
+};
+
+const defaultBillingControls: BillingControls = {
+  planGenerate: 2,
+  planReevaluate: 5,
+  canISpend: 5,
+  voiceCloud: 10,
+  launchProEnabled: false,
+  launchProEndsAt: "",
+};
+
+function quotaNumber(value: unknown, fallback: number) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+}
+
+export async function loadBillingControls(): Promise<BillingControls> {
+  if (!flousyDb) return { ...defaultBillingControls };
+  const snap = await getDoc(doc(flousyDb, "app_config", "billing"));
+  const data = snap.data() ?? {};
+  const quotas = (data.freeQuotas ?? {}) as Record<string, unknown>;
+  let ends = "";
+  const raw = data.launchProEndsAt;
+  if (raw && typeof raw === "object" && "toDate" in raw) {
+    ends = (raw as { toDate: () => Date }).toDate().toISOString().slice(0, 10);
+  } else if (typeof raw === "string") {
+    ends = raw.slice(0, 10);
+  }
+  return {
+    planGenerate: quotaNumber(quotas.planGenerate, defaultBillingControls.planGenerate),
+    planReevaluate: quotaNumber(quotas.planReevaluate, defaultBillingControls.planReevaluate),
+    canISpend: quotaNumber(quotas.canISpend, defaultBillingControls.canISpend),
+    voiceCloud: quotaNumber(quotas.voiceCloud, defaultBillingControls.voiceCloud),
+    launchProEnabled: data.launchProEnabled === true,
+    launchProEndsAt: ends,
+  };
+}
+
+export async function saveBillingControls(value: BillingControls) {
+  if (!flousyDb) throw new Error("Firebase is not configured.");
+  const ends = value.launchProEndsAt
+    ? Timestamp.fromDate(new Date(`${value.launchProEndsAt}T23:59:59.000Z`))
+    : null;
+  await setDoc(doc(flousyDb, "app_config", "billing"), {
+    freeQuotas: {
+      planGenerate: value.planGenerate,
+      planReevaluate: value.planReevaluate,
+      canISpend: value.canISpend,
+      voiceCloud: value.voiceCloud,
+    },
+    launchProEnabled: value.launchProEnabled && ends != null,
+    launchProEndsAt: ends,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export type CampaignCode = {
+  code: string;
+  label: string;
+  kind: "creator" | "campaign";
+  active: boolean;
+  attached: number;
+  activated: number;
+};
+
+/** Same shape the server and Firestore rules accept: 8 characters with a letter from G to Z. */
+export const isCampaignCodeShape = (code: string) => /^[A-Z0-9]{8}$/.test(code) && /[G-Z]/.test(code);
+
+export const campaignLink = (code: string) => `https://mahmoud-yassin.com/flousy/invite/${code}`;
+
+export async function loadCampaigns(): Promise<CampaignCode[]> {
+  if (!flousyDb) return [];
+  const [codes, attributions] = await Promise.all([
+    getDocs(collection(flousyDb, "campaign_codes")),
+    getDocs(collection(flousyDb, "campaign_attributions")),
+  ]);
+  const attached = new Map<string, number>();
+  const activated = new Map<string, number>();
+  for (const snap of attributions.docs) {
+    const data = snap.data();
+    const code = String(data.code ?? "");
+    attached.set(code, (attached.get(code) ?? 0) + 1);
+    if (data.status === "activated") activated.set(code, (activated.get(code) ?? 0) + 1);
+  }
+  return codes.docs
+    .map((snap) => ({
+      code: snap.id,
+      label: String(snap.data().label ?? ""),
+      kind: snap.data().kind === "creator" ? ("creator" as const) : ("campaign" as const),
+      active: snap.data().active === true,
+      attached: attached.get(snap.id) ?? 0,
+      activated: activated.get(snap.id) ?? 0,
+    }))
+    .sort((a, b) => b.attached - a.attached || a.code.localeCompare(b.code));
+}
+
+export async function saveCampaign(input: {
+  code: string;
+  label: string;
+  kind: "creator" | "campaign";
+  active: boolean;
+  isNew: boolean;
+}) {
+  if (!flousyDb) throw new Error("Firebase is not configured.");
+  await setDoc(
+    doc(flousyDb, "campaign_codes", input.code),
+    {
+      label: input.label.trim().slice(0, 60),
+      kind: input.kind,
+      active: input.active,
+      updatedAt: serverTimestamp(),
+      ...(input.isNew ? { createdAt: serverTimestamp() } : {}),
+    },
+    { merge: true },
+  );
 }
 
 export async function isFlousyAdmin(uid: string) {

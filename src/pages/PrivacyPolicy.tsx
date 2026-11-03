@@ -400,6 +400,28 @@ const PrivacyPolicy = () => {
                       device/app signals.
                     </p>
                     <p className="mt-2 text-muted-foreground">
+                      While you are signed in, the app also records a small set of product events on our
+                      own servers, such as opening the app, finishing setup, viewing or sharing an insight,
+                      using Can I Spend, and sharing your invite code. Each event holds the event name, the
+                      time, your app version, platform and language, and a few coarse labels (for example
+                      where an insight was shown, or the card format when sharing). These events are
+                      linked to your account ID so we can count how many people use a feature; they are
+                      not anonymous.
+                    </p>
+                    <p className="mt-2 text-muted-foreground">
+                      These events never include amounts, balances, SMS text or senders, merchants,
+                      category names, notes, or account or card details.
+                    </p>
+                    <p className="mt-2 text-muted-foreground">
+                      If you join through an invite or creator link, we also record the code used so we
+                      can count sign-ups.
+                    </p>
+                    <p className="mt-2 text-muted-foreground">
+                      You can turn this off at any time in the app under Data &amp; privacy, "Share usage
+                      stats". Turning it off stops these product events and Firebase Analytics on that
+                      device.
+                    </p>
+                    <p className="mt-2 text-muted-foreground">
                       You may be able to limit some tracking through device-level settings where available.
                     </p>
                   </li>

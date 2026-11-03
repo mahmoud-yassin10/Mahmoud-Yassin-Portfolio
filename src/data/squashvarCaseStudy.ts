@@ -25,7 +25,7 @@ export const squashCaseCopy = {
     paper: "Read manuscript", code: "View source", imageAlt: "SquashVAR prototype output showing court-plane calibration and a tracked ball trajectory",
     imageCaption: "Example output from the research prototype. Line-call accuracy has not been measured.",
     roleLabel: "My role", role: "Independent developer & researcher", toolsLabel: "Built with",
-    nav: ["Overview", "System", "Evaluation", "Limitations", "Resources"], navLabel: "Case study sections",
+    nav: ["Overview", "Demo", "System", "Evaluation", "Limitations", "Manuscript"], navLabel: "Case study sections",
     overviewTitle: "A second look at a fast-moving game.",
     overviewBody: "A tiny ball, fast rallies, occluded views and glass reflections make squash difficult to analyze. I explored whether one ordinary camera could provide court-referenced evidence for a referee to review.",
     contributionTitle: "What I contributed", contextTitle: "Research context", training: "Training set", benchmark: "Evaluation benchmark",
@@ -52,7 +52,7 @@ export const squashCaseCopy = {
     ],
     reviewNote: "Reviewers requested quantitative line-call accuracy, independent footage and stronger calibration evidence. The revised manuscript is submitted and awaiting review.",
     resourcesTitle: "Read the research. Inspect the work.", resourcesBody: "The manuscript is a submission, not an accepted journal publication. The source and research figures are available for closer inspection.",
-    figures: "Browse research figures", paperMeta: "Submitted manuscript · PDF · 9.5 MB", codeMeta: "Public repository · Implementation & evaluation"
+    figures: "Browse research figures", figuresMeta: "Figures and evaluation artifacts", paperMeta: "Submitted manuscript · PDF · 9.5 MB", codeMeta: "Public repository · Implementation & evaluation"
   },
   ar: {
     back: "ارجع للمشاريع", category: "بحث في الرؤية الحاسوبية", status: "مقدّم وفي انتظار المراجعة",
@@ -60,7 +60,7 @@ export const squashCaseCopy = {
     paper: "اقرأ البحث", code: "شوف الكود", imageAlt: "ناتج فعلي من نموذج SquashVAR بيعرض معايرة مستويات الملعب ومسار الكرة",
     imageCaption: "مثال من النموذج البحثي. دقة قرارات الخطوط لسه متقاستش.",
     roleLabel: "دوري", role: "مطوّر وباحث مستقل", toolsLabel: "الأدوات",
-    nav: ["الفكرة", "النظام", "التقييم", "الحدود", "المصادر"], navLabel: "أقسام دراسة المشروع",
+    nav: ["الفكرة", "العرض", "النظام", "التقييم", "الحدود", "الورقة"], navLabel: "أقسام دراسة المشروع",
     overviewTitle: "نظرة تانية على لعبة سريعة.",
     overviewBody: "كرة صغيرة، وتبادلات سريعة، ولاعبون بيحجبوا الرؤية، وانعكاسات الزجاج. جرّبت هل كاميرا عادية واحدة تقدر تقدّم للحكم دليل مرتبط بهندسة الملعب يقدر يراجعه.",
     contributionTitle: "مساهمتي", contextTitle: "سياق البحث", training: "بيانات التدريب", benchmark: "اختبار التقييم",
@@ -87,6 +87,6 @@ export const squashCaseCopy = {
     ],
     reviewNote: "المراجعون طلبوا قياس دقة قرارات الخطوط ولقطات مستقلة وأدلة معايرة أقوى. النسخة المنقحة مقدّمة وفي انتظار المراجعة.",
     resourcesTitle: "اقرأ البحث وراجع التنفيذ.", resourcesBody: "الورقة مقدّمة للمراجعة، ولسه مش منشورة في مجلة. الكود والأشكال البحثية متاحين للمراجعة بتفصيل أكبر.",
-    figures: "شوف الأشكال البحثية", paperMeta: "نسخة مقدّمة للمراجعة · PDF · ٩٫٥ ميجابايت", codeMeta: "مستودع عام · التنفيذ والتقييم"
+    figures: "شوف الأشكال البحثية", figuresMeta: "أشكال البحث وملفات التقييم", paperMeta: "نسخة مقدّمة للمراجعة · PDF · ٩٫٥ ميجابايت", codeMeta: "مستودع عام · التنفيذ والتقييم"
   }
 };

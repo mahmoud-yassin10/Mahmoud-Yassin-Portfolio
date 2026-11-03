@@ -1,3 +1,4 @@
+import { SQUASHVAR_CASE_STUDY_PATH } from "@/data/projectLinks";
 import { ArrowDown, ArrowUpRight, Github, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -16,7 +17,7 @@ export default function Hero() {
           <p className="hero-description">{arabic ? "أنا محمود ياسين. ببني أنظمة رؤية حاسوبية، وأدوات مالية، ومنصات تعليمية." : "I’m Mahmoud Yassin. I build computer-vision systems, financial tools, and learning platforms."}</p>
           <div className="hero-actions">
             <a className="portfolio-button" href="#stories">{arabic ? "استكشف الشغل" : "Explore my work"}<ArrowDown size={17} aria-hidden /></a>
-            <Link className="portfolio-text-link" to="/research">{arabic ? "شوف البحث" : "Explore the research"}<ArrowUpRight size={18} aria-hidden /></Link>
+            <Link className="portfolio-text-link" to={SQUASHVAR_CASE_STUDY_PATH}>{arabic ? "شوف البحث" : "Explore the research"}<ArrowUpRight size={18} aria-hidden /></Link>
           </div>
         </div>
         <div className="ai-hero-art">
