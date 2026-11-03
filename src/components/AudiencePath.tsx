@@ -1,48 +1,13 @@
-import { admissionsProofAr } from "@/data/admissionsAr";
-import { ArrowDownRight, ArrowRight, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useAudience } from "@/context/AudienceContext";
-import { useLanguage } from "@/i18n/LanguageContext";
 import { admissionsProof } from "@/data/admissions";
+import { admissionsProofAr } from "@/data/admissionsAr";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const AudiencePath = () => {
-  const { profile } = useAudience();
-  const { t, dict, lang } = useLanguage();
-  if (!profile) return null;
-
-  const copy = dict.audience[profile.id];
-
+export default function AudiencePath() {
+  const { lang } = useLanguage();
+  const proof = lang === "ar" ? admissionsProofAr : admissionsProof;
   return (
-    <section className="audience-path-section" aria-label={t("path.aria", { label: copy.shortLabel })}>
-      <div className="container mx-auto px-4">
-        <div className="audience-path">
-          <div className="audience-path-intro">
-            <p className="audience-hero-eyebrow">{copy.sectionLabel}</p>
-            <h2>{copy.routeDescription}</h2>
-            <div className="audience-path-route">
-              {copy.path.map((item, index) => (
-                <span key={item} className="audience-path-route-item">
-                  <CheckCircle2 size={15} aria-hidden /> {item}
-                  {index < copy.path.length - 1 ? <ArrowRight size={14} aria-hidden /> : null}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="audience-proof-grid">
-            {(profile.id === "admissions" ? (lang === "ar" ? admissionsProofAr : admissionsProof) : copy.proof).map((point) => (
-              <div className="audience-proof" key={point.label}>
-                <strong><bdi>{point.value}</bdi></strong>
-                <span>{point.label}</span>
-              </div>
-            ))}
-          </div>
-          <Link className="audience-path-cue" to={profile.id === "client" ? "/services" : profile.id === "admissions" ? "/portfolio" : "/work"}>
-            {t("path.follow")} <ArrowDownRight size={18} aria-hidden />
-          </Link>
-        </div>
-      </div>
+    <section className="proof-band portfolio-container" aria-label={lang === "ar" ? "أدلة من الشغل والتقديم" : "Evidence from the work and application"}>
+      <dl>{proof.map((item) => <div key={item.label}><dt><bdi>{item.value}</bdi></dt><dd>{item.label}</dd></div>)}</dl>
     </section>
   );
-};
-
-export default AudiencePath;
+}

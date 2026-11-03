@@ -65,6 +65,7 @@ const AnimatedBackground = () => {
     }
 
     let rafId = 0;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const animate = () => {
       const rect = canvas.getBoundingClientRect();
@@ -145,10 +146,12 @@ const AnimatedBackground = () => {
         });
       });
 
-      rafId = requestAnimationFrame(animate);
+      if (!reducedMotion.matches) rafId = requestAnimationFrame(animate);
     };
 
     animate();
+    const handleMotionChange = () => { cancelAnimationFrame(rafId); animate(); };
+    reducedMotion.addEventListener("change", handleMotionChange);
 
     let resizeTimeout: number;
     const handleResize = () => {
@@ -169,6 +172,7 @@ const AnimatedBackground = () => {
           p.x *= scaleX;
           p.y *= scaleY;
         });
+        if (reducedMotion.matches) animate();
       }, 100);
     };
 
@@ -197,6 +201,7 @@ const AnimatedBackground = () => {
 
 
     return () => {
+      reducedMotion.removeEventListener("change", handleMotionChange);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("orientationchange", handleResize);
       if (vv) {
@@ -212,6 +217,7 @@ const AnimatedBackground = () => {
 
   return (
     <canvas
+      aria-hidden
       ref={canvasRef}
       className="fixed pointer-events-none opacity-60"
       style={{ zIndex: 0 }}

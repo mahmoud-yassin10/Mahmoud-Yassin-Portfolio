@@ -9,9 +9,9 @@ const Education = () => {
   const education = dict.education.items;
 
   return (
-    <section id="education" className="py-20 relative">
+    <section id="education" className="portfolio-section education-section relative">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <h2 className="text-4xl md:text-5xl font-bold mb-12 text-foreground">
           {dict.education.title}
         </h2>
 
@@ -21,12 +21,12 @@ const Education = () => {
             return (
               <Card
                 key={index}
-                className="group hover:shadow-2xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border animate-fade-in"
+                className="group transition-colors duration-300 bg-card/50 backdrop-blur-sm border-border animate-fade-in"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <CardHeader>
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl group-hover:scale-110 transition-transform">
+                    <div className="p-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl  transition-transform">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1">

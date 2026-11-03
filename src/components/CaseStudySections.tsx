@@ -3,14 +3,14 @@ import { ExternalLink } from "lucide-react";
 import type { CaseStudy } from "@/data/caseStudies";
 
 const Label = ({ children }: { children: string }) => (
-  <p className="audience-hero-eyebrow mb-3">{children}</p>
+  <h2 className="case-study-heading mb-5">{children}</h2>
 );
 
 const CaseStudySections = ({ study }: { study: CaseStudy }) => {
   const { lang } = useLanguage();
   const arabic = lang === "ar";
   return (
-  <div className="space-y-16">
+  <div className="case-study space-y-16">
     <p className="text-xl md:text-2xl font-medium leading-snug max-w-3xl">{study.tagline}</p>
 
     <dl className="grid grid-cols-2 gap-4 md:grid-cols-4">

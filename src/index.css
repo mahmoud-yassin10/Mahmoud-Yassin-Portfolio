@@ -98,84 +98,6 @@ All colors MUST be HSL.
   }
 }
 
-/* ------------------------------------------------------------------
-   Editorial foundation (portfolio pages only).
-   App.tsx adds `html.editorial` on every route except /flousy and /hub,
-   so the Flousy and Student Hub products keep their own look.
-   Change the look of the whole portfolio by editing these tokens.
-------------------------------------------------------------------- */
-html.editorial {
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Source Serif 4", ui-serif, Georgia, serif;
-  --radius: 0.5rem;
-  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-  --shadow-elegant: 0 1px 2px hsl(225 25% 12% / 0.06), 0 8px 24px -12px hsl(225 25% 12% / 0.18);
-  --shadow-glow: none;
-  --shadow-deep: 0 1px 2px hsl(225 25% 12% / 0.08), 0 16px 40px -20px hsl(225 25% 12% / 0.3);
-}
-html.editorial:not(.dark) {
-  --background: 40 30% 97%;
-  --foreground: 225 25% 12%;
-  --card: 40 33% 99%;
-  --card-foreground: 225 25% 12%;
-  --popover: 40 33% 99%;
-  --popover-foreground: 225 25% 12%;
-  --primary: 224 64% 33%;
-  --primary-glow: 224 64% 42%;
-  --primary-deep: 224 64% 26%;
-  --accent: 220 55% 40%;
-  --accent-deep: 220 55% 32%;
-  --secondary: 40 20% 94%;
-  --muted: 40 20% 93%;
-  --muted-foreground: 225 10% 38%;
-  --border: 38 18% 86%;
-  --input: 38 18% 86%;
-  --ring: 224 64% 33%;
-}
-html.editorial.dark {
-  --primary-foreground: 225 25% 12%;
-  --accent-foreground: 225 25% 12%;
-  --background: 225 18% 8%;
-  --foreground: 40 20% 94%;
-  --card: 225 16% 11%;
-  --card-foreground: 40 20% 94%;
-  --popover: 225 16% 11%;
-  --popover-foreground: 40 20% 94%;
-  --primary: 219 85% 72%;
-  --primary-glow: 219 85% 78%;
-  --primary-deep: 219 85% 62%;
-  --accent: 219 70% 66%;
-  --accent-deep: 219 70% 56%;
-  --secondary: 225 14% 15%;
-  --muted: 225 14% 15%;
-  --muted-foreground: 225 10% 68%;
-  --border: 225 12% 20%;
-  --input: 225 12% 20%;
-  --ring: 219 85% 72%;
-}
-html.editorial body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
-html.editorial h1, html.editorial h2, html.editorial h3 {
-  font-family: var(--font-display);
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-html.editorial p { text-wrap: pretty; }
-/* Arabic keeps Cairo for everything. */
-html.editorial[dir="rtl"] body,
-html.editorial[dir="rtl"] h1,
-html.editorial[dir="rtl"] h2,
-html.editorial[dir="rtl"] h3 { font-family: "Cairo", ui-sans-serif, system-ui, sans-serif; letter-spacing: 0; }
-html.editorial :focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 3px; }
-html.editorial .audience-hero-eyebrow { letter-spacing: 0.14em; }
-@media (prefers-reduced-motion: reduce) {
-  html.editorial *, html.editorial *::before, html.editorial *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 /* Audience-first opening: the gate is a calm decision point, not a blocking splash screen. */
 .audience-gate {
   position: fixed;
@@ -892,24 +814,3 @@ html:not(.dark) .dashboard-login .dashboard-login-foot { color: #71809e; }
   color: #d4dfdb;
   margin: 10px 0 0;
 }
-
-/* Editorial portfolio: solid ink, quiet surfaces, readable narrow screens. */
-html.editorial .bg-clip-text.text-transparent {
-  background-image: none;
-  color: hsl(var(--primary));
-  -webkit-text-fill-color: currentColor;
-}
-html.editorial .bg-gradient-to-r.from-primary.to-accent {
-  background-image: none;
-  background-color: hsl(var(--primary));
-}
-html.editorial .bg-clip-text.text-transparent.bg-gradient-to-r {
-  background-color: transparent;
-}
-html.editorial main > section:first-child:not(#hero) { padding-top: 8rem; }
-html.editorial section[id] { scroll-margin-top: 6rem; }
-html.editorial .audience-proof strong { overflow-wrap: anywhere; }
-html.editorial .audience-hero-eyebrow { text-transform: none; letter-spacing: normal; }
-html.editorial .backdrop-blur-sm { backdrop-filter: none; }
-html.editorial .shadow-\[var\(--shadow-deep\)\] { box-shadow: none; }
-html.editorial[dir="rtl"] .audience-path-route-item svg { transform: scaleX(-1); }

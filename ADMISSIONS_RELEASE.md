@@ -29,3 +29,8 @@ Working repository: `C:/Mahmoud/Coding/Portfolio`. The workspace path from the c
 The SquashVAR manuscript PDF was supplied by the user and linked on Research and its case study. The existing Flousy Google Play URL is shared with both language versions of its case study. The Fly.io demo is not ready, as confirmed by the user; its API contract, recorded fallback and Solar Share screenshots remain unavailable. Demo warm-up behavior and upload limits need the actual service contract; no speculative upload UI was shipped. The SquashVAR presentation PDF has not been reviewed in this continuation.
 
 Optional removal of the dead Index page, public/joudy bundles and stale docs copy was not performed. The admissions rebuild was pushed to main as f04f678; this follow-up adds the supplied manuscript and existing Play Store link. Existing unrelated user changes were preserved.
+
+
+## Visual redesign requested after the admissions release
+
+The user requested an AI-inspired redesign while preserving the original animated background, a visible dated timeline, matching header/footer, clearer organization, section tracking, a custom scrollbar, additional interaction and a desktop cursor effect. The new design uses self-hosted Manrope/Cairo, the original particle field, a generated neural sculpture, actual SquashVAR court output, a shared navigation/brand/theme system, native disclosure controls, and responsive timeline/navigation. The duplicate project grid on Home was removed; all five projects remain reachable from Selected Work and Work. Editorial serif/paper styling was retired. Research status, supplied PDF, Google Play links, activity claims and contact details remain intact.

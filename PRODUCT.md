@@ -14,7 +14,7 @@ Make the submitted application’s evidence easy to review during the admissions
 
 ## Brand Personality
 
-Thoughtful, concrete, candid. Retain the existing editorial identity and project imagery.
+Thoughtful, technical, curious. Use a cohesive AI-inspired visual identity with the original blue animated particle field, strong sans-serif typography, real project imagery and a consistent header and footer.
 
 ## Anti-references
 
@@ -26,6 +26,8 @@ Avoid exaggerated impact, unsupported metrics, decorative animation that obscure
 - Describe individual responsibility separately from platform totals.
 - Publish no essay text, private family details or money figures.
 - Make project evidence reachable without an audience gate.
+- Organize content into distinct chapters, a dated timeline and a section navigator.
+- Keep interactions useful, accessible and respectful of reduced-motion preferences.
 
 ## Accessibility & Inclusion
 

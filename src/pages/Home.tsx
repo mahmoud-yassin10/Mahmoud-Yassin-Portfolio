@@ -24,11 +24,11 @@ const Home = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
-    if (location.hash !== "#services") return;
-    const node = document.getElementById("services");
+    if (!location.hash) return;
+    const node = document.getElementById(location.hash.slice(1));
     if (!node) return;
     requestAnimationFrame(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
+      node.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
     });
   }, [location.pathname, location.hash]);
 
@@ -49,11 +49,10 @@ const Home = () => {
         {audience === "admissions" ? (
           <>
             <AdmissionsStories />
+            <AdmissionsJourney />
             <AdmissionsActivities />
             <AdmissionsHonors />
-            <AdmissionsJourney />
             <Education />
-            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.exploreProjects")} />
           </>
         ) : null}
         {audience === "client" ? (

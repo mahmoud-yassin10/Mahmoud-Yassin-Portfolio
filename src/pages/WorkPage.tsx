@@ -1,3 +1,4 @@
+import AdmissionsStories from "@/components/AdmissionsStories";
 import { useAudience } from "@/context/AudienceContext";
 import { useState } from "react";
 import AnimatedBackground from "@/components/AnimatedBackground";
@@ -19,6 +20,10 @@ const WorkPage = () => {
   const { t, lang } = useLanguage();
   const isClientTab = !isAdmissions && activeTab === "client";
   const items = (isAdmissions ? admissionsProjects : isClientTab ? clientProjects : technicalProjects).map((project) => localizeProject(project, lang));
+
+  if (isAdmissions) return <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <AnimatedBackground /><Navbar /><main id="main-content" className="relative z-10"><AdmissionsStories standalone /></main><Footer />
+  </div>;
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">

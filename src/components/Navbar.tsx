@@ -1,177 +1,46 @@
+import PortfolioThemeToggle from "@/components/PortfolioThemeToggle";
 import { useState, useEffect } from "react";
-import { Moon, Sun, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ADMISSIONS_ONLY, useAudience } from "@/context/AudienceContext";
+import { Menu, X } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useAudience } from "@/context/AudienceContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import PortfolioBrand from "@/components/PortfolioBrand";
+import { getPortfolioNavigation } from "@/data/portfolioNavigation";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const Navbar = () => {
-  const [isDark, setIsDark] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { profile, clearAudience } = useAudience();
+  const { audience } = useAudience();
   const { t, lang } = useLanguage();
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const shouldBeDark = savedTheme === "dark" || (!savedTheme && prefersDark);
-
-    setIsDark(shouldBeDark);
-    document.documentElement.classList.toggle("dark", shouldBeDark);
-
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { pathname } = useLocation();
+  const navLinks = getPortfolioNavigation(t, lang, audience);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
-    const prev = document.body.style.overflow;
+    const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setIsMobileMenuOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => { document.body.style.overflow = previous; window.removeEventListener("keydown", closeOnEscape); };
   }, [isMobileMenuOpen]);
 
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme);
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-  };
-
-  const navLinks = profile?.id === "client"
-    ? [
-        { name: t("nav.services"), to: "/services" },
-        { name: t("nav.work"), to: "/work" },
-        { name: t("nav.contact"), to: "/contact" }
-      ]
-    : profile?.id === "admissions"
-      ? [
-          { name: t("nav.about"), to: "/portfolio" },
-          { name: lang === "ar" ? "البحث" : "Research", to: "/research" },
-          { name: t("nav.work"), to: "/work" },
-          { name: t("nav.contact"), to: "/contact" }
-        ]
-      : [
-          { name: t("nav.work"), to: "/work" },
-          { name: t("nav.services"), to: "/services" },
-          { name: t("nav.contact"), to: "/contact" }
-        ];
-
-  const navSurfaceActive = isScrolled || isMobileMenuOpen;
-  const audienceLabel = profile ? t(`audience.${profile.id}.shortLabel`) : t("nav.chooseView");
-
-  return (
-    <>
-      {isMobileMenuOpen ? (
-        <div
-          role="presentation"
-          className="fixed inset-0 z-40 bg-background/70 backdrop-blur-[2px] transition-opacity duration-300 md:hidden motion-reduce:transition-none"
-          aria-hidden
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      ) : null}
-
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          navSurfaceActive
-            ? "bg-background/90 backdrop-blur-lg shadow-lg border-b border-border"
-            : "bg-transparent"
-        }`}
-        aria-label="Primary"
-      >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              to="/"
-              className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:opacity-80 transition-opacity"
-            >
-              MY
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
-                  to={link.to}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                  aria-label={t("nav.goTo", { name: link.name })}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <LanguageToggle />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className="rounded-full"
-                aria-label={t("nav.theme")}
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
-              {!ADMISSIONS_ONLY && <button type="button" className="audience-switcher" onClick={clearAudience}>
-                <span className="audience-switcher-dot" />
-                {audienceLabel}
-              </button>}
-            </div>
-
-            <div className="flex md:hidden items-center gap-2">
-              <LanguageToggle />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className="rounded-full"
-                aria-label={t("nav.theme")}
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
-              {!ADMISSIONS_ONLY && <button type="button" className="audience-switcher" onClick={clearAudience}>
-                <span className="audience-switcher-dot" />
-                {audienceLabel}
-              </button>}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="rounded-full"
-                aria-expanded={isMobileMenuOpen}
-                aria-label={isMobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
-              >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-          </div>
-
-          {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 animate-fade-in">
-              <div className="flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={typeof link.to === "string" ? link.to : `${link.to.pathname}${link.to.hash ?? ""}`}
-                    to={link.to}
-                    className="text-start text-foreground hover:text-primary transition-colors font-medium py-2"
-                    aria-label={t("nav.goTo", { name: link.name })}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+  return <>
+    {isMobileMenuOpen && <div className="portfolio-menu-backdrop" onClick={() => setIsMobileMenuOpen(false)} aria-hidden />}
+    <header className="portfolio-topbar">
+      <div className="portfolio-nav-shell">
+        <PortfolioBrand />
+        <nav className="portfolio-desktop-links" aria-label={lang === "ar" ? "القائمة الرئيسية" : "Primary"}>
+          {navLinks.map((link) => <NavLink key={link.to} to={link.to} className={({ isActive }) => `portfolio-nav-link${isActive ? " is-active" : ""}`}>{link.name}</NavLink>)}
+        </nav>
+        <div className="portfolio-nav-tools">
+          <LanguageToggle />
+          <PortfolioThemeToggle />
+          <button type="button" className="portfolio-icon-button portfolio-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-controls="portfolio-mobile-navigation" aria-expanded={isMobileMenuOpen} aria-label={isMobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}>{isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}</button>
         </div>
-      </nav>
-    </>
-  );
-};
-
-export default Navbar;
+      </div>
+      {isMobileMenuOpen && <nav id="portfolio-mobile-navigation" className="portfolio-mobile-links" aria-label={lang === "ar" ? "قائمة الموبايل" : "Mobile navigation"}>
+        {navLinks.map((link) => <NavLink key={link.to} to={link.to} aria-current={pathname === link.to ? "page" : undefined} onClick={() => setIsMobileMenuOpen(false)} className="portfolio-nav-link">{link.name}</NavLink>)}
+      </nav>}
+    </header>
+  </>;
+}

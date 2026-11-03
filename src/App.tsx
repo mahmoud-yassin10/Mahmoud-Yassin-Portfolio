@@ -1,3 +1,4 @@
+import PortfolioInteractions from "./components/PortfolioInteractions";
 import ResearchPage from "./pages/ResearchPage";
 import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -65,6 +66,7 @@ const App = () => (
           {!ADMISSIONS_ONLY && <AudienceGate />}
           {!ADMISSIONS_ONLY && <AudienceTransition />}
         <ThemeScope />
+        <PortfolioInteractions />
         <PortfolioRouteAnalytics />
         <ScrollToTop />
         <Routes>

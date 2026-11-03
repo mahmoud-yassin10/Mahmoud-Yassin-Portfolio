@@ -185,9 +185,9 @@ const Contact = ({ standalone = false }: { standalone?: boolean }) => {
   };
 
   return (
-    <section id="contact" className="py-20 relative">
+    <section id="contact" className="portfolio-section contact-section relative">
       <div className="container mx-auto px-4">
-        <Heading className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <Heading className="text-4xl md:text-5xl font-bold mb-12 text-foreground">
           {audience === "client" ? t("contact.titleClient") : audience === "admissions" ? t("contact.titleAdmissions") : t("contact.titleRecruiter")}
         </Heading>
 
