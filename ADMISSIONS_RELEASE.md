@@ -9,7 +9,7 @@ Working repository: `C:/Mahmoud/Coding/Portfolio`. The workspace path from the c
 - Neutral ONTV interview wording in English and Arabic. Student Body President retained following direct user confirmation, without adding term dates.
 - Removed money figures from admissions stories, activities, project summaries and case studies. Kept reported usage qualifiers and dated TrueTutor snapshot labels.
 - Egyptian Arabic stories, activities, honors, proof strip and five case studies. Arabic project summaries derive from the translated case-study evidence.
-- Bilingual research overview at `/research`, with manuscript status, evaluation, limitations and existing public source links. No unpublished manuscript file was copied into public assets.
+- Bilingual research overview at `/research`, with manuscript status, evaluation, limitations and existing public source links. The user-supplied submitted manuscript is available as a PDF, clearly labelled as awaiting review.
 - Bilingual journey timeline. Correct standalone page headings, RTL hero alignment, eager portrait loading, quieter project hover behavior and dark-theme button contrast.
 - Admissions hero links to Projects in place of the unreviewed CV download. Contact email and phone values were preserved.
 
@@ -26,6 +26,6 @@ Working repository: `C:/Mahmoud/Coding/Portfolio`. The workspace path from the c
 
 ## Remaining assets and integration
 
-The approved SquashVAR paper URL/PDF, Fly.io demo URL and API contract, recorded fallback, Flousy Google Play URL and Solar Share screenshots are still unavailable. Demo warm-up behavior and upload limits need the actual service contract; no speculative upload UI was shipped. The SquashVAR presentation PDF has not been reviewed in this continuation.
+The SquashVAR manuscript PDF was supplied by the user and linked on Research and its case study. The existing Flousy Google Play URL is shared with both language versions of its case study. The Fly.io demo is not ready, as confirmed by the user; its API contract, recorded fallback and Solar Share screenshots remain unavailable. Demo warm-up behavior and upload limits need the actual service contract; no speculative upload UI was shipped. The SquashVAR presentation PDF has not been reviewed in this continuation.
 
-Optional removal of the dead Index page, public/joudy bundles and stale docs copy was not performed. No commit or deployment was made. Existing unrelated user changes were preserved.
+Optional removal of the dead Index page, public/joudy bundles and stale docs copy was not performed. The admissions rebuild was pushed to main as f04f678; this follow-up adds the supplied manuscript and existing Play Store link. Existing unrelated user changes were preserved.

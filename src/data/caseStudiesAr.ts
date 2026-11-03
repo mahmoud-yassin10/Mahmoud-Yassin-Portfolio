@@ -1,3 +1,4 @@
+import { FLOUSY_PLAY_STORE_URL, SQUASHVAR_MANUSCRIPT_URL } from "./projectLinks";
 import type { CaseStudy } from "./caseStudies";
 
 export const caseStudiesAr: CaseStudy[] = [
@@ -33,6 +34,7 @@ export const caseStudiesAr: CaseStudy[] = [
     ],
     status: "بإشراف Rijul Gupta من خلال Lumiere. فيه محادثات استكشافية أولية مع الاتحاد المصري للاسكواش، من غير تبنّي للنظام.",
     links: [
+      { label: "نسخة البحث المقدّمة (PDF)", href: SQUASHVAR_MANUSCRIPT_URL },
       { label: "الكود المصدري", href: "https://github.com/mahmoud-yassin10/SquashVAR" },
       { label: "الأشكال والنتائج", href: "https://github.com/mahmoud-yassin10/SquashVAR/tree/main/figs" }
     ]
@@ -57,7 +59,10 @@ export const caseStudiesAr: CaseStudy[] = [
     turningPoint: { title: "خطأ في إعادة توزيع الميزانية", body: "وثّقت في ٩ أغسطس ٢٠٢٦ مشكلة: لما المخطط يحط صفر لفئة، الفئة ممكن تختفي بشكل دائم من غير اختيار المستخدم. التوثيق بيوضح إن استبعاد الفئة لازم يعتمد على اختيار صريح، مش استنتاج من الصفر." },
     results: ["٣٠٦ معاملات مسجلة من سبتمبر لأكتوبر ٢٠٢٦ حسب تقاريري", "حوالي ١٠٠ مستخدم حسب تقاريري", "نجاح ٤٠ من ٤٠ اختبار للخدمات و١٣٧ من ١٣٧ اختبار Flutter في نسخة مرجعية من يوليو ٢٠٢٦"],
     limits: ["لسه مفيش أرقام متحققة للتثبيت أو الاحتفاظ بالمستخدمين أو الإيرادات.", "أعداد المستخدمين والمعاملات من تقاريري عن بيانات التطبيق، مش مراجعة مستقلة.", "استيراد الرسائل متاح على أندرويد بس."],
-    links: [{ label: "زيارة فلوسي", href: "https://flousy.mahmoud-yassin.com" }]
+    links: [
+      { label: "فلوسي على Google Play", href: FLOUSY_PLAY_STORE_URL },
+      { label: "زيارة فلوسي", href: "https://flousy.mahmoud-yassin.com" }
+    ]
   },
   {
     slug: "true-tutor-learning-platform",

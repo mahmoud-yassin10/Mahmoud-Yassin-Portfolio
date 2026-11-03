@@ -1,3 +1,4 @@
+import { FLOUSY_PLAY_STORE_URL, SQUASHVAR_MANUSCRIPT_URL } from "./projectLinks";
 import type { ProofPoint } from "@/data/admissions";
 
 /**
@@ -74,6 +75,7 @@ export const caseStudies: CaseStudy[] = [
     ],
     status: "Mentored by Rijul Gupta through the Lumiere research program. Early, exploratory conversations with the Egyptian Squash Federation, with no adoption.",
     links: [
+      { label: "Submitted manuscript (PDF)", href: SQUASHVAR_MANUSCRIPT_URL },
       { label: "Source code", href: "https://github.com/mahmoud-yassin10/SquashVAR" },
       { label: "Figures", href: "https://github.com/mahmoud-yassin10/SquashVAR/tree/main/figs" }
     ]
@@ -123,7 +125,10 @@ export const caseStudies: CaseStudy[] = [
       "User and transaction counts come from my own reports of the app's data, not an independent audit.",
       "SMS import works on Android only."
     ],
-    links: [{ label: "Visit Flousy", href: "https://flousy.mahmoud-yassin.com" }]
+    links: [
+      { label: "Get Flousy on Google Play", href: FLOUSY_PLAY_STORE_URL },
+      { label: "Visit Flousy", href: "https://flousy.mahmoud-yassin.com" }
+    ]
   },
   {
     slug: "true-tutor-learning-platform",

@@ -1,3 +1,4 @@
+import { FLOUSY_PLAY_STORE_URL } from "@/data/projectLinks";
 import {
   ArrowRight,
   BadgeCheck,
@@ -96,8 +97,7 @@ const audiencePoints = [
 ];
 
 const FlousyLanding = () => {
-  const playStoreHref =
-    "https://play.google.com/store/apps/details?id=com.mahmoud.flousy";
+  const playStoreHref = FLOUSY_PLAY_STORE_URL;
 
   useEffect(() => {
     void trackPublicFlousyEvent("store_visit");

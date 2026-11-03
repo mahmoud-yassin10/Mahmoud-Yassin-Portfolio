@@ -1,3 +1,4 @@
+import { SQUASHVAR_MANUSCRIPT_URL } from "@/data/projectLinks";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -29,6 +30,14 @@ export default function ResearchPage() {
               <p className="mt-6 border-y border-border py-4 text-sm font-medium">
                 {arabic ? "حالة البحث: النسخة المنقحة مقدّمة وفي انتظار المراجعة. البحث لم يُنشر بعد." : "Manuscript status: revised and submitted, awaiting review. The paper is not published."}
               </p>
+              <a
+                href={SQUASHVAR_MANUSCRIPT_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex min-h-11 items-center rounded-lg border border-primary px-4 py-2 font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                {arabic ? "اقرأ نسخة البحث المقدّمة (PDF، ٩٫٥ ميجابايت)" : "Read the submitted manuscript (PDF, 9.5 MB)"}
+              </a>
             </header>
             <CaseStudySections study={study} />
             <Link to="/work" className="inline-block mt-12 text-primary font-semibold underline underline-offset-4">
