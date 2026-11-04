@@ -60,8 +60,8 @@ export const timeline: TimelineEntry[] = [
   },
   {
     id: "blb",
-    rail: "Apr 2025", railAr: "أبريل ٢٠٢٥",
-    period: "April to September 2025", periodAr: "أبريل لسبتمبر ٢٠٢٥",
+    rail: "Spring 2025", railAr: "ربيع ٢٠٢٥",
+    period: "Spring to September 2025", periodAr: "من ربيع ٢٠٢٥ لسبتمبر ٢٠٢٥",
     title: "BLB School Development Team", titleAr: "فريق التطوير في BLB",
     role: "Software development intern, NIS Parents App", roleAr: "متدرب تطوير برمجيات، تطبيق NIS Parents",
     summary: "An internship on the school's Flutter app for parents.", summaryAr: "تدريب على تطبيق Flutter الخاص بالمدرسة لأولياء الأمور.",
@@ -106,8 +106,8 @@ export const timeline: TimelineEntry[] = [
     title: "TrueTutor", titleAr: "TrueTutor",
     role: "Full-stack developer, sole active developer since May 2026", roleAr: "مطوّر Full-stack، والمطوّر النشط الوحيد من مايو ٢٠٢٦",
     summary: "Joined a live test-prep platform and now maintain it.", summaryAr: "انضميت لمنصة تحضير امتحانات شغالة وبصونها دلوقتي.",
-    bullets: ["Built Reading Radar, Lecture Radar and AI vocabulary tools", "Quiz publishing, drafts, EST templates and WhatsApp registration", "Kept exams working across devices and group changes"],
-    bulletsAr: ["بنيت Reading Radar وLecture Radar وأدوات المفردات بالذكاء الاصطناعي", "نشر الكويزات والمسودات وقوالب EST وتسجيل واتساب", "خلّيت الامتحانات تشتغل عبر الأجهزة وتغيير المجموعات"],
+    bullets: ["Built and improved the quiz and mock-exam engine: timed attempts, autosave and attempt recovery", "Server-side access control across groups, enrollment, grants and attempt limits", "Reading Radar, Lecture Radar, AI vocabulary tools and WhatsApp registration", "Integrations with WhatsApp, Telegram, Zoom, Cloudflare R2 and scheduled jobs"],
+    bulletsAr: ["بنيت وحسّنت محرك الكويزات والامتحانات التجريبية: محاولات بوقت وحفظ تلقائي واسترجاع المحاولة", "صلاحيات على السيرفر عبر المجموعات والتسجيل والمنح وحدود المحاولات", "Reading Radar وLecture Radar وأدوات المفردات بالذكاء الاصطناعي وتسجيل واتساب", "تكامل مع واتساب وتيليجرام وZoom وCloudflare R2 ومهام مجدولة"],
     tags: ["Next.js", "PostgreSQL", "Vercel"],
     numbers: [
       { value: "5,732", label: "platform accounts", labelAr: "حساب على المنصة" },
@@ -117,16 +117,28 @@ export const timeline: TimelineEntry[] = [
     href: "/projects/true-tutor-learning-platform"
   },
   {
+    id: "modx",
+    rail: "Apr 2026", railAr: "أبريل ٢٠٢٦",
+    period: "April to June 2026", periodAr: "أبريل ليونيو ٢٠٢٦",
+    title: "MODX", titleAr: "MODX",
+    role: "Freelance full-stack developer, sole developer", roleAr: "مطوّر Full-stack مستقل، المطوّر الوحيد",
+    summary: "An offline-first retail POS and storefront for a client.", summaryAr: "نظام نقاط بيع ومتجر بيشتغل بدون إنترنت لعميل.",
+    bullets: ["Windows desktop POS in C#, .NET, WPF and SQLite: sales, inventory, refunds and cashier shifts", "Cloud sync to an ASP.NET Core and PostgreSQL backend with inbox and outbox queues", "Next.js storefront and admin portal for catalogs, orders and sync monitoring"],
+    bulletsAr: ["تطبيق نقاط بيع ويندوز بـC#/.NET وWPF وSQLite: مبيعات ومخزون ومرتجعات ورديات كاشير", "مزامنة سحابية مع باك إند ASP.NET Core وPostgreSQL بطوابير inbox وoutbox", "متجر وبوابة إدارة بـNext.js للمنتجات والطلبات ومراقبة المزامنة"],
+    tags: ["C# / .NET", "SQLite", "PostgreSQL", "Next.js"],
+    numbers: []
+  },
+  {
     id: "decodelabs",
     rail: "May 2026", railAr: "مايو ٢٠٢٦",
     period: "May to June 2026", periodAr: "مايو ليونيو ٢٠٢٦",
     title: "DecodeLabs", titleAr: "DecodeLabs",
     role: "Artificial intelligence intern", roleAr: "متدرب ذكاء اصطناعي",
     summary: "An AI internship with applied machine-learning projects.", summaryAr: "تدريب ذكاء اصطناعي بمشاريع تعلّم آلة تطبيقية.",
-    bullets: ["Supervised classification and recommender systems", "OCR and rule-based automation", "Python and scikit-learn, comparing approaches with experiments"],
-    bulletsAr: ["تصنيف بإشراف وأنظمة توصية", "OCR وأتمتة بقواعد", "Python وscikit-learn ومقارنة الطرق بتجارب"],
+    bullets: ["Four Python projects: rule-based systems, supervised learning, recommendation and OCR", "Compared four classifiers with 5-fold cross-validation on the Iris dataset", "A TF-IDF and cosine-similarity course recommender", "An OCR pipeline with OpenCV and Tesseract that tested 20 preprocessing setups"],
+    bulletsAr: ["أربع مشاريع Python: أنظمة بقواعد وتعلّم بإشراف وتوصية وOCR", "قارنت أربع نماذج تصنيف بتحقق متقاطع ٥ مرات على بيانات Iris", "نظام توصية كورسات بـTF-IDF وcosine similarity", "مسار OCR بـOpenCV وTesseract اختبر ٢٠ إعداد معالجة"],
     tags: ["Python", "scikit-learn", "OCR"],
-    numbers: []
+    numbers: [{ value: "95.96%", label: "average OCR word confidence", labelAr: "متوسط ثقة الكلمات في OCR" }, { value: "20", label: "OCR setups compared", labelAr: "إعداد OCR اتقارنوا" }]
   },
   {
     id: "flyrank",

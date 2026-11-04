@@ -100,6 +100,11 @@ export const activityGroups: ActivityGroup[] = [
         detail: "Bug fixes, testing, improvements and release support on the production school-family app."
       },
       {
+        name: "MODX",
+        role: "Freelance full-stack developer, sole developer",
+        detail: "Offline-first retail POS and storefront: a Windows desktop app (C#/.NET, WPF, SQLite) that syncs with an ASP.NET Core and PostgreSQL backend, plus a Next.js storefront. April to June 2026."
+      },
+      {
         name: "Solar Share",
         role: "Founder, developer & project lead",
         detail: "Flutter and Firebase solar-sharing prototype; Best Idea Award at the Ignited Hackathon."
@@ -136,7 +141,7 @@ export const activityGroups: ActivityGroup[] = [
       {
         name: "NIS Peer Tutoring Program",
         role: "Co-founder & tutor trainer",
-        detail: "Co-founded and expanded peer tutoring across seven campuses; recruited and trained student tutors."
+        detail: "Co-founded and expanded peer tutoring across seven campuses; recruited and trained student tutors. One report counted 12 tutors supporting about 45 students."
       },
       {
         name: "Schoolhouse.world",
@@ -147,6 +152,11 @@ export const activityGroups: ActivityGroup[] = [
         name: "SAT tutor assistant",
         role: "Instructional assistant",
         detail: "Created practice sets and mock exams, reviewed mistakes and supported study plans."
+      },
+      {
+        name: "Techno Square",
+        role: "Coding and robotics instructor",
+        detail: "Taught younger students coding and robotics with Scratch, Python and basic Arduino, June to September 2025."
       },
       {
         name: "CS & AI workshops",
@@ -167,8 +177,8 @@ export const activityGroups: ActivityGroup[] = [
   },
   {
     id: "compete",
-    title: "Squash",
-    blurb: "The sport behind most of the questions I ask.",
+    title: "Sport",
+    blurb: "Squash is behind most of the questions I ask.",
     items: [
       {
         name: "Competitive squash",
@@ -179,6 +189,11 @@ export const activityGroups: ActivityGroup[] = [
         name: "Youth coaching",
         role: "Coach",
         detail: "Coached young players, including a player ranked Egypt U11 No. 4."
+      },
+      {
+        name: "Karate",
+        role: "First-dan black belt, national competitor",
+        detail: "Trained and competed from 2012 to 2019 and earned a first-dan black belt."
       }
     ]
   }

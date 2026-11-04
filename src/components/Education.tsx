@@ -1,11 +1,11 @@
-import { Award, BookOpenCheck, GraduationCap, Languages, Landmark } from "lucide-react";
+import { Award, BookOpenCheck, GraduationCap, Languages, Landmark, Globe2 } from "lucide-react";
 import CountUp from "@/components/CountUp";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const scores = [
   { icon: Award, value: "4.0", label: "GPA, rank 2 of 30", labelAr: "GPA، الترتيب ٢ من ٣٠" },
   { icon: BookOpenCheck, value: "1500", label: "SAT: 780 Math, 720 Reading & Writing", labelAr: "SAT: ٧٨٠ رياضيات، ٧٢٠ قراءة وكتابة" },
-  { icon: Languages, value: "8.5", label: "IELTS Academic", labelAr: "IELTS Academic" }
+  { icon: Languages, value: "8.5", label: "IELTS Academic: Listening 9, Reading 9, Writing 7, Speaking 9", labelAr: "IELTS Academic: استماع ٩، قراءة ٩، كتابة ٧، تحدث ٩" }
 ];
 
 const Education = () => {
@@ -22,6 +22,7 @@ const Education = () => {
             <p className="education-meta">{school.period}</p>
             <h3>{school.title}</h3>
             <p className="education-institution">{school.institution}<span> · {school.location}</span></p>
+            <p className="education-track">{arabic ? "المسار الهندسي: تفاضل وتكامل متقدم وفيزياء وميكانيكا." : "Engineering Track: Advanced Calculus, Physics and Mechanics."}</p>
             <div className="education-chips">{school.achievements.filter((line) => /president|رئيس|valedictorian|salutatorian|التاني/i.test(line)).map((line) => <span key={line}>{line}</span>)}</div>
           </article>
           {scores.map((score) => {
@@ -39,6 +40,10 @@ const Education = () => {
           <article className="education-extra glass-surface">
             <span className="education-icon"><BookOpenCheck size={22} strokeWidth={1.5} aria-hidden /></span>
             <div><h3>{courses.title}</h3><p>{courses.achievements.slice(0, 4).join(" · ")}</p></div>
+          </article>
+          <article className="education-extra glass-surface">
+            <span className="education-icon"><Globe2 size={22} strokeWidth={1.5} aria-hidden /></span>
+            <div><h3>{arabic ? "اللغات" : "Languages"}</h3><p>{arabic ? "العربية (لغتي الأم) · الإنجليزية (IELTS 8.5، مستوى C2) · الألمانية A2 · الإسبانية A1 · الفرنسية A1" : "Arabic (native) · English (IELTS 8.5, C2) · German A2 · Spanish A1 · French A1"}</p></div>
           </article>
         </div>
       </div>

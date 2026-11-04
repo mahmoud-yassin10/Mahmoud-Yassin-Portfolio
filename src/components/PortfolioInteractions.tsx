@@ -10,6 +10,7 @@ const sections = [
   { id: "activities", en: "Activities", ar: "الأنشطة" },
   { id: "honors", en: "Honors", ar: "الجوائز" },
   { id: "education", en: "Education", ar: "التعليم" },
+  { id: "skills", en: "Toolkit", ar: "الأدوات" },
   { id: "contact", en: "Contact", ar: "تواصل" }
 ];
 

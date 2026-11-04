@@ -15,6 +15,7 @@ import AudiencePath from "@/components/AudiencePath";
 import AdmissionsStories from "@/components/AdmissionsStories";
 import AdmissionsActivities from "@/components/AdmissionsActivities";
 import AdmissionsHonors from "@/components/AdmissionsHonors";
+import AdmissionsSkills from "@/components/AdmissionsSkills";
 import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -53,6 +54,7 @@ const Home = () => {
             <AdmissionsActivities />
             <AdmissionsHonors />
             <Education />
+            <AdmissionsSkills />
           </>
         ) : null}
         {audience === "client" ? (
