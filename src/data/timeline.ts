@@ -59,6 +59,18 @@ export const timeline: TimelineEntry[] = [
     href: "/projects/flousy-ai-financial-planner"
   },
   {
+    id: "blb",
+    rail: "Apr 2025", railAr: "أبريل ٢٠٢٥",
+    period: "April to September 2025", periodAr: "أبريل لسبتمبر ٢٠٢٥",
+    title: "BLB School Development Team", titleAr: "فريق التطوير في BLB",
+    role: "Software development intern, NIS Parents App", roleAr: "متدرب تطوير برمجيات، تطبيق NIS Parents",
+    summary: "An internship on the school's Flutter app for parents.", summaryAr: "تدريب على تطبيق Flutter الخاص بالمدرسة لأولياء الأمور.",
+    bullets: ["Adjusted features on the existing Flutter app", "Reproduced and fixed bugs, and ran regression tests", "Wrote issue reports and helped keep releases stable"],
+    bulletsAr: ["عدّلت مميزات في تطبيق Flutter الموجود", "كررت الأخطاء وصلّحتها وعملت اختبارات انحدار", "كتبت تقارير مشاكل وساعدت في استقرار الإصدارات"],
+    tags: ["Flutter", "Testing", "Bug fixing"],
+    numbers: []
+  },
+  {
     id: "squashvar",
     rail: "Sep 2025", railAr: "سبتمبر ٢٠٢٥",
     period: "Sep 2025 to present", periodAr: "من سبتمبر ٢٠٢٥ لحد دلوقتي",
