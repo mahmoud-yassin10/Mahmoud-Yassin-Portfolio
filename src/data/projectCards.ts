@@ -64,7 +64,8 @@ export const projectCards: ProjectCard[] = [
     category: "NASA Space Apps", categoryAr: "NASA Space Apps",
     blurb: "A flood-risk map. Port Said 1st place and Global Nominee.",
     blurbAr: "خريطة لمخاطر الفيضان. الأول في بورسعيد وGlobal Nominee.",
-    imageAlt: "Flood Lens risk map", imageAltAr: "خريطة مخاطر الفيضان",
+    image: "flood-lens.webp",
+    imageAlt: "The Flood Lens interface: a satellite map of Egypt and the Nile Delta with a city risk panel", imageAltAr: "واجهة Flood Lens: خريطة قمر صناعي لمصر ودلتا النيل مع لوحة مخاطر المدينة",
     imageKind: "wide",
     numbers: [{ value: "1st", label: "Port Said", labelAr: "بورسعيد" }]
   },
