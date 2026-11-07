@@ -5,6 +5,7 @@ import type { Project } from "@/data/projects";
 import { clientProjects } from "@/data/projects";
 import { isLiveSiteUrl } from "@/components/ProjectLivePreview";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { cn } from "@/lib/utils";
 
 function previewImageUrl(siteUrl: string) {
   return `https://s0.wp.com/mshots/v1/${encodeURIComponent(siteUrl)}?w=480`;

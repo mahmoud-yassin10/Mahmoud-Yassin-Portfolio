@@ -7,6 +7,12 @@ export function getPortfolioNavigation(t: (key: string) => string, lang: "en" | 
     { name: t("nav.work"), to: "/work" },
     { name: t("nav.contact"), to: "/contact" }
   ];
+  if (audience === "recruiter") return [
+    { name: t("nav.work"), to: "/work" },
+    { name: lang === "ar" ? "المهارات" : "Skills", to: "/skills" },
+    { name: lang === "ar" ? "البحث" : "Research", to: SQUASHVAR_CASE_STUDY_PATH },
+    { name: t("nav.contact"), to: "/contact" }
+  ];
   return [
     { name: t("nav.about"), to: "/portfolio" },
     { name: lang === "ar" ? "البحث" : "Research", to: SQUASHVAR_CASE_STUDY_PATH },

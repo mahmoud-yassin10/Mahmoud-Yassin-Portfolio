@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
-// Temporary admissions-only release. Other profiles remain available in source.
-export const ADMISSIONS_ONLY = true;
+// All three views are live. Admissions stays the default until a visitor picks another.
+export const ADMISSIONS_ONLY = false;
 
 export type Audience = "recruiter" | "admissions" | "client";
 
@@ -88,13 +88,18 @@ type AudienceContextValue = {
   transitionTarget: AudienceProfile | null;
   setAudience: (audience: Audience) => void;
   clearAudience: () => void;
+  chooserOpen: boolean;
+  openChooser: () => void;
+  closeChooser: () => void;
 };
 
 const AudienceContext = createContext<AudienceContextValue | undefined>(undefined);
 const STORAGE_KEY = "mahmoud-portfolio-audience";
+const SEEN_KEY = "mahmoud-portfolio-view-chosen";
 
 export const AudienceProvider = ({ children }: { children: ReactNode }) => {
   const [audience, setAudienceState] = useState<Audience | null>("admissions");
+  const [chooserOpen, setChooserOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionTarget, setTransitionTarget] = useState<AudienceProfile | null>(null);
   const previousAudienceRef = useRef<Audience | null>(null);
@@ -104,6 +109,11 @@ export const AudienceProvider = ({ children }: { children: ReactNode }) => {
     if (ADMISSIONS_ONLY) return;
     const stored = window.localStorage.getItem(STORAGE_KEY) as Audience | null;
     if (stored && audienceProfiles.some((profile) => profile.id === stored)) setAudienceState(stored);
+    let seen = false;
+    try { seen = window.localStorage.getItem(SEEN_KEY) === "1"; } catch { /* storage can be blocked */ }
+    if (seen) return;
+    const timer = window.setTimeout(() => setChooserOpen(true), 1200);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const value = useMemo<AudienceContextValue>(() => {
@@ -138,9 +148,15 @@ export const AudienceProvider = ({ children }: { children: ReactNode }) => {
       isTransitioning,
       transitionTarget,
       setAudience,
-      clearAudience
+      clearAudience,
+      chooserOpen,
+      openChooser: () => setChooserOpen(true),
+      closeChooser: () => {
+        setChooserOpen(false);
+        try { window.localStorage.setItem(SEEN_KEY, "1"); } catch { /* storage can be blocked */ }
+      }
     };
-  }, [audience, isTransitioning, transitionTarget]);
+  }, [audience, isTransitioning, transitionTarget, chooserOpen]);
 
   useEffect(() => () => {
     if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);

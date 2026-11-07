@@ -26,7 +26,7 @@ import { trackPortfolioVisit } from "@/lib/flousyAnalytics";
 import { isProductRoute } from "@/lib/themeScope";
 import { ADMISSIONS_ONLY, AudienceProvider } from "@/context/AudienceContext";
 import { LanguageProvider } from "@/i18n/LanguageContext";
-import AudienceGate from "@/components/AudienceGate";
+import ViewChooser from "@/components/ViewChooser";
 import AudienceTransition from "@/components/AudienceTransition";
 import HubPage from "./pages/HubPage";
 import WorkDetailPage from "./pages/WorkDetailPage";
@@ -66,7 +66,7 @@ const App = () => (
       <Sonner />
       <Analytics />
         <BrowserRouter basename={import.meta.env.BASE_URL}>
-          {!ADMISSIONS_ONLY && <AudienceGate />}
+          <ViewChooser />
           {!ADMISSIONS_ONLY && <AudienceTransition />}
         <ThemeScope />
         <PortfolioInteractions />

@@ -10,7 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { audience } = useAudience();
+  const { audience, openChooser } = useAudience();
   const { t, lang } = useLanguage();
   const { pathname } = useLocation();
   const navLinks = getPortfolioNavigation(t, lang, audience);
@@ -33,6 +33,7 @@ export default function Navbar() {
           {navLinks.map((link) => <NavLink key={link.to} to={link.to} className={({ isActive }) => `portfolio-nav-link${isActive ? " is-active" : ""}`}>{link.name}</NavLink>)}
         </nav>
         <div className="portfolio-nav-tools">
+          <button type="button" className="portfolio-view-switch" onClick={openChooser} aria-label={lang === "ar" ? "غيّر الواجهة" : "Change view"}><span aria-hidden className="portfolio-view-dot" />{audience ? t(`audience.${audience}.shortLabel`) : ""}</button>
           <LanguageToggle />
           <PortfolioThemeToggle />
           <button type="button" className="portfolio-icon-button portfolio-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-controls="portfolio-mobile-navigation" aria-expanded={isMobileMenuOpen} aria-label={isMobileMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}>{isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}</button>
