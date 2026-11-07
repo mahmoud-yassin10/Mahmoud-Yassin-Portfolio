@@ -1,334 +1,191 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, BellRing, CalendarClock, Check, ChevronDown, Languages, LineChart, Mic, Moon, Sun, Target, Wallet } from "lucide-react";
 import { FLOUSY_PLAY_STORE_URL } from "@/data/projectLinks";
-import {
-  ArrowRight,
-  BadgeCheck,
-  BellRing,
-  BrainCircuit,
-  CalendarClock,
-  CheckCircle2,
-  Globe2,
-  LineChart,
-  Lock,
-  Sparkles,
-  Target,
-  Wallet
-} from "lucide-react";
-import AnimatedBackground from "@/components/AnimatedBackground";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { landingCopy } from "@/data/flousyLanding";
 import { trackPublicFlousyEvent } from "@/lib/flousyAnalytics";
-import { useEffect } from "react";
+import { useLanguage } from "@/i18n/LanguageContext";
+import "@/styles/flousy-landing.css";
 
-type FeatureItem = {
-  title: string;
-  description: string;
-  icon: typeof Wallet;
-};
+const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+const img = (name: string) => `${base}/images/flousy/${name}`;
+const WEB_APP_URL = "https://flousy.mahmoud-yassin.com";
 
-const featureItems: FeatureItem[] = [
-  {
-    title: "Expense Tracking That Stays Simple",
-    description:
-      "Log transactions quickly and see exactly where your money goes across all categories.",
-    icon: Wallet
-  },
-  {
-    title: "AI-Powered Planning",
-    description:
-      "Generate practical budget plans based on your income, bills, goals, and current spending.",
-    icon: BrainCircuit
-  },
-  {
-    title: "Bills and Recurring Payments",
-    description:
-      "Keep monthly obligations visible so you can plan ahead and avoid late surprises.",
-    icon: BellRing
-  },
-  {
-    title: "Goal-Based Saving",
-    description:
-      "Set clear savings targets and track progress with milestones that keep you moving.",
-    icon: Target
-  },
-  {
-    title: "Actionable Insights",
-    description:
-      "Use trends and summaries to improve monthly decisions, not just record history.",
-    icon: LineChart
-  },
-  {
-    title: "Bilingual Experience",
-    description:
-      "Built with Arabic and English support so every flow feels natural and accessible.",
-    icon: Globe2
-  }
-];
+const icons = { target: Target, calendar: CalendarClock, wallet: Wallet, bell: BellRing, mic: Mic, languages: Languages, moon: Moon, chart: LineChart } as const;
 
-const steps = [
-  {
-    title: "Add your financial basics",
-    description: "Enter income, regular bills, goals, and your spending categories."
-  },
-  {
-    title: "Track and organize daily spending",
-    description: "Capture transactions as you go and keep your monthly view up to date."
-  },
-  {
-    title: "Use AI to generate a realistic plan",
-    description: "Get a personalized plan, adjust it, and follow progress with confidence."
-  }
-];
+/** Public landing page for the Flousy app. Uses Flousy's own "Calm Ledger" look, not the portfolio's. */
+export default function FlousyLanding() {
+  const { lang, toggleLang } = useLanguage();
+  const c = landingCopy[lang];
+  const [dark, setDark] = useState(() => typeof document !== "undefined" && document.documentElement.classList.contains("dark"));
 
-const trustPoints = [
-  "Authentication and secure account access via Firebase",
-  "Cloud sync for your budgets, goals, and transaction history",
-  "Integrity and abuse protection using app security checks",
-  "In-app controls for account and data deletion"
-];
-
-const audiencePoints = [
-  "Students managing tight monthly budgets",
-  "Families balancing bills, groceries, and long-term goals",
-  "Early-career professionals who want stronger financial habits",
-  "Anyone who wants a clear plan instead of scattered notes"
-];
-
-const FlousyLanding = () => {
-  const playStoreHref = FLOUSY_PLAY_STORE_URL;
+  useEffect(() => { void trackPublicFlousyEvent("store_visit"); }, []);
 
   useEffect(() => {
-    void trackPublicFlousyEvent("store_visit");
+    if (document.getElementById("flousy-poppins")) return;
+    const link = document.createElement("link");
+    link.id = "flousy-poppins";
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap";
+    document.head.appendChild(link);
   }, []);
 
+  useEffect(() => {
+    const previous = document.title;
+    // The language provider sets the portfolio title in its own effect, which runs after this one.
+    const timer = window.setTimeout(() => {
+      document.title = lang === "ar" ? "فلوسي — اعرف تصرف كام بأمان" : "Flousy — Know what you can safely spend";
+    }, 0);
+    return () => { window.clearTimeout(timer); document.title = previous; };
+  }, [lang]);
+
+  const setTheme = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    try { localStorage.setItem("theme", next ? "dark" : "light"); } catch { /* storage can be blocked */ }
+  };
+
+  const install = () => { void trackPublicFlousyEvent("install"); };
+  const playButton = (extra = "") => (
+    <a className={`fl-btn fl-btn-primary ${extra}`} href={FLOUSY_PLAY_STORE_URL} target="_blank" rel="noreferrer" onClick={install}>{c.play}<ArrowRight size={17} aria-hidden /></a>
+  );
+
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-      <AnimatedBackground />
-      <Navbar />
-      <main id="main-content" className="relative z-10">
-        <section className="pt-28 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-background" />
-          <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-float" />
-          <div
-            className="absolute -bottom-20 -right-16 h-80 w-80 rounded-full bg-accent/20 blur-3xl animate-float"
-            style={{ animationDelay: "1.2s" }}
-          />
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-5xl mx-auto text-center space-y-6 animate-fade-in-up">
-              <Badge className="bg-primary/10 text-primary border border-primary/30 px-3 py-1">
-                AI Financial Planner
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
-                Flousy helps you take control of your money, one smart plan at a time.
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-                Track spending, organize budgets, and generate AI-powered plans designed for real
-                life. Flousy brings your financial picture into one clear, focused app.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                <Button
-                  size="lg"
-                  className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
-                  asChild
-                >
-                  <a href="https://flousy.mahmoud-yassin.com" target="_blank" rel="noreferrer">
-                    Open Flousy
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </a>
-                </Button>
-                <Button
-                  size="lg"
-                  className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
-                  asChild
-                >
-                  <a href={playStoreHref} target="_blank" rel="noreferrer" onClick={() => void trackPublicFlousyEvent("install")}>
-                    Get it on Google Play
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </a>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary/40 hover:bg-primary hover:text-primary-foreground"
-                  asChild
-                >
-                  <a href="/flousy/privacy-policy">Privacy Policy</a>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary/40 hover:bg-primary hover:text-primary-foreground"
-                  asChild
-                >
-                  <a href="/flousy/terms-and-conditions">Terms and Conditions</a>
-                </Button>
+    <div className="fl-landing" dir={lang === "ar" ? "rtl" : "ltr"}>
+      <a className="fl-skip" href="#main">{lang === "ar" ? "تخطى للمحتوى" : "Skip to content"}</a>
+      <header className="fl-header">
+        <div className="fl-container fl-header-row">
+          <a className="fl-brand" href="#top" aria-label={c.brand}><img src={img("logo.png")} alt="" width="34" height="34" /><span>{c.brand}</span></a>
+          <nav className="fl-nav" aria-label={lang === "ar" ? "القائمة" : "Primary"}>
+            <a href="#features">{c.nav.features}</a><a href="#how">{c.nav.how}</a><a href="#privacy">{c.nav.privacy}</a><a href="#faq">{c.nav.faq}</a>
+          </nav>
+          <div className="fl-header-tools">
+            <button type="button" className="fl-chip" onClick={toggleLang} aria-label={lang === "ar" ? "Switch to English" : "التبديل للعربية"}>{c.language}</button>
+            <button type="button" className="fl-icon-btn" onClick={setTheme} aria-label={c.theme}>{dark ? <Sun size={18} /> : <Moon size={18} />}</button>
+            <a className="fl-btn fl-btn-primary fl-btn-small" href={FLOUSY_PLAY_STORE_URL} target="_blank" rel="noreferrer" onClick={install}>{c.playShort}</a>
+          </div>
+        </div>
+      </header>
+
+      <main id="main">
+        <section id="top" className="fl-hero">
+          <div className="fl-container fl-hero-grid">
+            <div className="fl-hero-copy">
+              <p className="fl-eyebrow">{c.eyebrow}</p>
+              <h1>{c.headline} <span>{c.headlineAccent}</span></h1>
+              <p className="fl-sub">{c.sub}</p>
+              <div className="fl-actions">
+                {playButton()}
+                <a className="fl-btn fl-btn-ghost" href="#how">{c.secondary}</a>
               </div>
+              <ul className="fl-notes">{c.heroNotes.map((note) => <li key={note}><Check size={15} aria-hidden />{note}</li>)}</ul>
+            </div>
+            <div className="fl-hero-visual" aria-hidden={false}>
+              <div className="fl-phone fl-phone-back"><img src={img("assistant.webp")} alt={c.showcase[3].alt} width="420" height="880" loading="eager" /></div>
+              <div className="fl-phone fl-phone-front"><img src={img("activity.webp")} alt={c.showcase[0].alt} width="420" height="880" loading="eager" /></div>
             </div>
           </div>
         </section>
 
-        <section className="py-16 relative">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {featureItems.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <Card
-                    key={item.title}
-                    className="bg-card/50 backdrop-blur-sm border-border hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 animate-fade-in"
-                    style={{ animationDelay: `${index * 0.08}s` }}
-                  >
-                    <CardHeader className="space-y-3">
-                      <div className="inline-flex items-center justify-center h-11 w-11 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20">
-                        <Icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <CardTitle className="text-xl">{item.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{item.description}</p>
-                    </CardContent>
-                  </Card>
-                );
+        <section className="fl-asks">
+          <div className="fl-container">
+            <h2>{c.askTitle}</h2>
+            <div className="fl-ask-grid">
+              {c.asks.map((ask) => <article key={ask.q}><h3>{ask.q}</h3><p>{ask.a}</p></article>)}
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="fl-showcase">
+          {c.showcase.map((item, index) => (
+            <article key={item.id} className={`fl-feature${index % 2 ? " is-flip" : ""}`}>
+              <div className="fl-container fl-feature-grid">
+                <div className="fl-feature-copy">
+                  <p className="fl-eyebrow">{item.tag}</p>
+                  <h2>{item.title}</h2>
+                  <p>{item.body}</p>
+                  <ul>{item.points.map((point) => <li key={point}><Check size={16} aria-hidden />{point}</li>)}</ul>
+                </div>
+                <div className={`fl-feature-visual fl-visual-${item.kind}`}>
+                  <img src={img(item.image)} alt={item.alt} loading="lazy" decoding="async" />
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="fl-grid-section">
+          <div className="fl-container">
+            <header className="fl-section-head"><h2>{c.gridTitle}</h2><p>{c.gridIntro}</p></header>
+            <div className="fl-feature-cards">
+              {c.grid.map((item) => {
+                const Icon = icons[item.icon as keyof typeof icons];
+                return <article key={item.title}><span className="fl-icon"><Icon size={22} strokeWidth={1.6} aria-hidden /></span><h3>{item.title}</h3><p>{item.body}</p></article>;
               })}
             </div>
           </div>
         </section>
 
-        <section className="py-20 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center space-y-4 mb-10">
-                <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  How Flousy works
-                </h2>
-                <p className="text-lg text-muted-foreground">
-                  Fast setup, clear tracking, and plan guidance you can act on.
-                </p>
+        <section id="how" className="fl-how">
+          <div className="fl-container">
+            <header className="fl-section-head"><h2>{c.howTitle}</h2><p>{c.howIntro}</p></header>
+            <ol className="fl-steps">
+              {c.steps.map((step, index) => <li key={step.title}><span className="fl-step-number">{index + 1}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}
+            </ol>
+          </div>
+        </section>
+
+        <section id="privacy" className="fl-privacy">
+          <div className="fl-container fl-privacy-grid">
+            <header className="fl-section-head"><h2>{c.privacyTitle}</h2><p>{c.privacyIntro}</p>
+              <div className="fl-link-list">
+                <Link to="/flousy/privacy-policy">{c.privacyLinks.policy}</Link>
+                <Link to="/flousy/terms-and-conditions">{c.privacyLinks.terms}</Link>
+                <Link to="/flousy/delete-account">{c.privacyLinks.deleteAccount}</Link>
+                <Link to="/flousy/delete-data">{c.privacyLinks.deleteData}</Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {steps.map((step, index) => (
-                  <Card
-                    key={step.title}
-                    className="bg-card/50 backdrop-blur-sm border-border animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary text-sm font-semibold">
-                          {index + 1}
-                        </span>
-                        <CardTitle className="text-lg">{step.title}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{step.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+            </header>
+            <div className="fl-privacy-cards">
+              {c.privacy.map((item) => <article key={item.title}><h3>{item.title}</h3><p>{item.body}</p></article>)}
             </div>
           </div>
         </section>
 
-        <section className="py-16 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-card/60 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle className="text-2xl flex items-center gap-2">
-                    <Lock className="h-5 w-5 text-primary" />
-                    Privacy and control
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-muted-foreground">
-                    {trustPoints.map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 mt-1 text-accent shrink-0" />
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/60 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle className="text-2xl flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Built for real people
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-muted-foreground">
-                    {audiencePoints.map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <BadgeCheck className="h-4 w-4 mt-1 text-accent shrink-0" />
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
+        <section id="faq" className="fl-faq">
+          <div className="fl-container fl-faq-wrap">
+            <h2>{c.faqTitle}</h2>
+            {c.faq.map((item) => (
+              <details key={item.q}><summary>{item.q}<ChevronDown size={18} aria-hidden /></summary><p>{item.a}</p></details>
+            ))}
           </div>
         </section>
 
-        <section className="py-20 relative">
-          <div className="container mx-auto px-4">
-            <Card className="max-w-5xl mx-auto bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-primary/20 backdrop-blur-sm">
-              <CardContent className="py-12 px-6 md:px-10 text-center space-y-5">
-                <div className="inline-flex items-center gap-2 text-sm text-primary font-medium">
-                  <CalendarClock className="h-4 w-4" />
-                  Start building better money habits today
-                </div>
-                <h2 className="text-3xl md:text-5xl font-bold">
-                  Make your next month more predictable with Flousy.
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                  Keep your account active, track your data with clarity, and use AI planning when
-                  you need a practical next step.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-3 pt-2">
-                  <Button
-                    size="lg"
-                    className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 hover:scale-105"
-                    asChild
-                  >
-                    <a href="https://flousy.mahmoud-yassin.com" target="_blank" rel="noreferrer">
-                      Open Flousy
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </Button>
-                  <Button
-                    size="lg"
-                    className="group bg-gradient-to-r from-accent to-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
-                    asChild
-                  >
-                    <a href={playStoreHref} target="_blank" rel="noreferrer" onClick={() => void trackPublicFlousyEvent("install")}>
-                      Get it on Google Play
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-primary/40 hover:bg-primary hover:text-primary-foreground"
-                    asChild
-                  >
-                    <a href="/flousy/delete-account">Delete account options</a>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+        <section className="fl-cta">
+          <div className="fl-container fl-cta-box">
+            <img src={img("logo.png")} alt="" width="56" height="56" />
+            <h2>{c.ctaTitle}</h2>
+            <p>{c.ctaBody}</p>
+            <div className="fl-actions fl-actions-center">
+              {playButton("fl-btn-on-dark")}
+              <a className="fl-btn fl-btn-outline-light" href={WEB_APP_URL} target="_blank" rel="noreferrer">{c.openWeb}</a>
+            </div>
           </div>
         </section>
       </main>
-      <Footer />
+
+      <footer className="fl-footer">
+        <div className="fl-container fl-footer-row">
+          <span className="fl-brand"><img src={img("logo.png")} alt="" width="26" height="26" /><span>{c.brand}</span></span>
+          <p>{c.footer.made} © {new Date().getFullYear()} {c.footer.rights}</p>
+          <nav aria-label="Legal">
+            <Link to="/flousy/privacy-policy">{c.privacyLinks.policy}</Link>
+            <Link to="/flousy/terms-and-conditions">{c.privacyLinks.terms}</Link>
+            <Link to="/flousy/delete-account">{c.privacyLinks.deleteAccount}</Link>
+            <Link to="/contact">{c.footer.contact}</Link>
+          </nav>
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default FlousyLanding;
+}
