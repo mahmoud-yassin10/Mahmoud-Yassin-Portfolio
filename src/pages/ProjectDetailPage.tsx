@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CaseStudySections from "@/components/CaseStudySections";
 import ProjectCaseHero from "@/components/ProjectCaseHero";
+import SkillsUsed from "@/components/SkillsUsed";
 import { useAudience } from "@/context/AudienceContext";
 import { getCaseStudy } from "@/data/caseStudies";
 import { localizeProject } from "@/i18n/projectsAr";
@@ -95,6 +96,7 @@ const ProjectDetailPage = () => {
               )}
 
               {caseStudy ? <CaseStudySections study={caseStudy} showTagline={false} /> : null}
+              {caseStudy ? <SkillsUsed caseStudy={project.slug} /> : null}
 
               {!caseStudy ? <ProjectLivePreview
                 liveUrl={liveUrl || undefined}

@@ -1,89 +1,12 @@
-import AdmissionsStories from "@/components/AdmissionsStories";
-import { useAudience } from "@/context/AudienceContext";
-import { useState } from "react";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { ClientWorkTile } from "@/components/ClientWorkTile";
-import { ProjectTile } from "@/components/Projects";
-import { admissionsProjects, clientProjects, technicalProjects } from "@/data/projects";
-import { useLanguage } from "@/i18n/LanguageContext";
-import { localizeProject } from "@/i18n/projectsAr";
+import { WorkExplorer } from "@/components/WorkSections";
 
-type WorkTab = "client" | "projects";
-
-const WorkPage = () => {
-  const { audience } = useAudience();
-  const isAdmissions = audience === "admissions";
-  const [activeTab, setActiveTab] = useState<WorkTab>("client");
-  const { t, lang } = useLanguage();
-  const isClientTab = !isAdmissions && activeTab === "client";
-  const items = (isAdmissions ? admissionsProjects : isClientTab ? clientProjects : technicalProjects).map((project) => localizeProject(project, lang));
-
-  if (isAdmissions) return <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-    <AnimatedBackground /><Navbar /><main id="main-content" className="relative z-10"><AdmissionsStories standalone /></main><Footer />
-  </div>;
-
-  return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-      <AnimatedBackground />
-      <Navbar />
-      <main id="main-content" className="relative z-10">
-        <section className="py-20 relative">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {isAdmissions ? (lang === "ar" ? "المشاريع" : "Projects") : t("work.title")}
-            </h1>
-
-            {!isAdmissions && <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-              <Button
-                type="button"
-                variant={isClientTab ? "default" : "outline"}
-                onClick={() => setActiveTab("client")}
-                className="rounded-full"
-              >
-                {t("work.clientTab")}
-              </Button>
-              <Button
-                type="button"
-                variant={isClientTab ? "outline" : "default"}
-                onClick={() => setActiveTab("projects")}
-                className="rounded-full"
-              >
-                {t("work.projectsTab")}
-              </Button>
-            </div>
-
-            }
-
-            {isClientTab ? (
-              <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                {t("work.clientHint")}
-              </p>
-            ) : null}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {items.map((project, index) =>
-                isClientTab ? (
-                  <ClientWorkTile key={project.slug} project={project} index={index} />
-                ) : (
-                  <ProjectTile
-                    key={`${activeTab}-${project.slug}`}
-                    project={project}
-                    index={index}
-                    alignButton
-                    linkTarget="_self"
-                  />
-                )
-              )}
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+const WorkPage = () => (
+  <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <AnimatedBackground /><Navbar /><main id="main-content" className="relative z-10 pt-28"><WorkExplorer standalone /></main><Footer />
+  </div>
+);
 
 export default WorkPage;

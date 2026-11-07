@@ -29,6 +29,9 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import AudienceGate from "@/components/AudienceGate";
 import AudienceTransition from "@/components/AudienceTransition";
 import HubPage from "./pages/HubPage";
+import WorkDetailPage from "./pages/WorkDetailPage";
+import SkillPage from "./pages/SkillPage";
+import SkillsPage from "./pages/SkillsPage";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +77,9 @@ const App = () => (
           <Route path="/services" element={ADMISSIONS_ONLY ? <Navigate to="/work" replace /> : <ServicesPage />} />
           <Route path="/research" element={<ResearchPage />} />
           <Route path="/work" element={<WorkPage />} />
+          <Route path="/work/:slug" element={<WorkDetailPage />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/skills/:slug" element={<SkillPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />

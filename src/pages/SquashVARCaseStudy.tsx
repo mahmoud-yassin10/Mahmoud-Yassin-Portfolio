@@ -1,4 +1,5 @@
 import ManuscriptPreview from "@/components/ManuscriptPreview";
+import SkillsUsed from "@/components/SkillsUsed";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, ArrowDown, ArrowUpRight, ScanLine, Route, Layers3, Activity, ShieldCheck, FileText, Github, ChevronDown, Info } from "lucide-react";
@@ -151,6 +152,7 @@ export default function SquashVARCaseStudy() {
             <a href={figuresUrl} target="_blank" rel="noreferrer"><FileText size={25} strokeWidth={1.5} aria-hidden /><span><strong>{c.figures}</strong><small>{c.figuresMeta}</small></span><ArrowUpRight size={20} aria-hidden /></a>
           </div>
         </section>
+        <SkillsUsed itemSlug="squashvar" />
       </div>
     </main>
     <Footer />

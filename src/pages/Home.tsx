@@ -7,15 +7,13 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import HomeServicesSection from "@/components/HomeServicesSection";
 import Navbar from "@/components/Navbar";
-import Projects from "@/components/Projects";
-import Experience from "@/components/Experience";
 import Education from "@/components/Education";
-import Skills from "@/components/Skills";
 import AudiencePath from "@/components/AudiencePath";
 import AdmissionsStories from "@/components/AdmissionsStories";
 import AdmissionsActivities from "@/components/AdmissionsActivities";
 import AdmissionsHonors from "@/components/AdmissionsHonors";
 import AdmissionsSkills from "@/components/AdmissionsSkills";
+import { ClientWork, HiringWork } from "@/components/WorkSections";
 import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -42,9 +40,9 @@ const Home = () => {
         <AudiencePath />
         {audience === "recruiter" ? (
           <>
-            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.viewAllWork")} />
-            <Experience />
-            <Skills />
+            <HiringWork />
+            <AdmissionsJourney />
+            <AdmissionsSkills />
           </>
         ) : null}
         {audience === "admissions" ? (
@@ -60,7 +58,7 @@ const Home = () => {
         {audience === "client" ? (
           <>
             <HomeServicesSection />
-            <Projects limit={4} ctaHref="/work" ctaLabel={t("home.viewSelectedWork")} />
+            <ClientWork />
           </>
         ) : null}
         <Contact />

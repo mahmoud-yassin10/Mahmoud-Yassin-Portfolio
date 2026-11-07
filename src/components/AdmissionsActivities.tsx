@@ -1,10 +1,25 @@
 import { useState } from "react";
-import { Code2, FlaskConical, HeartHandshake, CircleDot } from "lucide-react";
+import { ArrowRight, Code2, FlaskConical, HeartHandshake, CircleDot } from "lucide-react";
+import { Link } from "react-router-dom";
+import { getWorkItem, itemHref } from "@/data/workItems";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { activityGroups } from "@/data/admissions";
 import { activityGroupsAr } from "@/data/admissionsAr";
 
 const icons = [Code2, FlaskConical, HeartHandshake, CircleDot];
+
+/** Work-item page for every activity row, in the same order as the activity groups. */
+const activitySlugs = [
+  ["truetutor", "flousy", "freelance", "nis-parents-app", "modx", "solar-share"],
+  ["squashvar", "flood-lens"],
+  ["nis-student-body", "peer-tutoring", "schoolhouse", "sat-tutor-assistant", "techno-square", "eg-scholars-workshops", "jplp", "el-nasr-hospital"],
+  ["competitive-squash", "squash-coaching", "karate"]
+];
+const hrefFor = (groupIndex: number, itemIndex: number) => {
+  const slug = activitySlugs[groupIndex]?.[itemIndex];
+  const item = slug ? getWorkItem(slug) : undefined;
+  return item ? itemHref(item) : undefined;
+};
 
 export default function AdmissionsActivities() {
   const { lang } = useLanguage();
@@ -27,7 +42,11 @@ export default function AdmissionsActivities() {
       <div id="activity-panel" role="tabpanel" aria-labelledby={`activity-tab-${group.id}`} key={group.id} className="activity-panel glass-surface">
         <h3>{group.title}</h3>
         <p className="activity-panel-blurb">{group.blurb}</p>
-        <ul>{group.items.map((item) => <li key={item.name}><div><h4>{item.name}</h4><span>{item.role}</span></div><p>{item.detail}</p></li>)}</ul>
+        <ul>{group.items.map((item, itemIndex) => {
+          const href = hrefFor(selected, itemIndex);
+          const body = <><div><h4>{item.name}</h4><span>{item.role}</span></div><p>{item.detail}</p>{href && <span className="activity-arrow" aria-hidden><ArrowRight size={18} /></span>}</>;
+          return <li key={item.name}>{href ? <Link to={href} className="activity-row">{body}</Link> : <div className="activity-row">{body}</div>}</li>;
+        })}</ul>
       </div>
     </div>
   </section>;

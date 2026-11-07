@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, ArrowDown, ArrowUpRight, FileText, Globe2, Info,
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SkillsUsed from "@/components/SkillsUsed";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { FLOUSY_PLAY_STORE_URL } from "@/data/projectLinks";
@@ -145,6 +146,7 @@ export default function FlousyCaseStudy() {
             <a href={FLOUSY_SITE_URL} target="_blank" rel="noreferrer"><Globe2 size={25} strokeWidth={1.5} aria-hidden /><span><strong>{c.site}</strong><small>{c.siteMeta}</small></span><ArrowUpRight size={20} aria-hidden /></a>
           </div>
         </section>
+        <SkillsUsed itemSlug="flousy" />
       </div>
     </main>
     <Footer />
