@@ -1,19 +1,4 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  serverTimestamp,
-  setDoc,
-  Timestamp,
-  updateDoc,
-  where,
-  writeBatch,
-  type DocumentData,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch, type DocumentData, deleteField } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { flousyDb, flousyFunctions } from "./flousyFirebase";
 
@@ -84,6 +69,8 @@ export type SmsFalseDetectionItem = {
   createdAt: Date;
   uid?: string;
   status?: "new" | "reviewing" | "resolved";
+  resolutionNote?: string;
+  resolvedAt?: Date;
 };
 
 export type StudentVerificationItem = {
@@ -213,6 +200,8 @@ const mapSmsFalseDetection = (id: string, data: DocumentData): SmsFalseDetection
   createdAt: toDate(data.createdAt),
   uid: data.uid ? String(data.uid) : undefined,
   status: data.status ?? "new",
+  resolutionNote: data.resolutionNote ? String(data.resolutionNote) : undefined,
+  resolvedAt: data.resolvedAt ? toDate(data.resolvedAt) : undefined,
 });
 
 const mapStudentVerification = (id: string, data: DocumentData): StudentVerificationItem => ({
@@ -302,17 +291,59 @@ export async function reviewStudentVerification(options: {
   await batch.commit();
 }
 
+/**
+ * What a review writes. Resolving stamps the time and keeps the optional note
+ * the user will read in the app; undoing clears both. A server function copies
+ * this onto the reporter's own report, which is what the app shows.
+ */
+function smsReviewPatch(status: "new" | "reviewing" | "resolved", note?: string) {
+  if (status === "resolved") {
+    const trimmed = (note ?? "").trim().slice(0, 500);
+    return {
+      status,
+      resolvedAt: serverTimestamp(),
+      resolutionNote: trimmed ? trimmed : deleteField(),
+    };
+  }
+  return { status, resolvedAt: deleteField(), resolutionNote: deleteField() };
+}
+
 export async function reviewSmsFalseDetection(options: {
   inboxId: string;
   status: "new" | "reviewing" | "resolved";
+  note?: string;
 }) {
   if (!flousyDb) throw new Error("Firebase is not configured.");
-  const patch = { status: options.status };
+  const patch = smsReviewPatch(options.status, options.note);
   await updateDoc(doc(flousyDb, "sms_false_detection_inbox", options.inboxId), patch);
   try {
     await updateDoc(doc(flousyDb, "feedback_inbox", options.inboxId), patch);
   } catch {
     // Feedback copy is optional; dedicated inbox is the source of truth.
+  }
+}
+
+/** Marks every given report resolved in as few writes as possible. */
+export async function resolveSmsFalseDetections(inboxIds: string[], note?: string) {
+  if (!flousyDb) throw new Error("Firebase is not configured.");
+  for (let i = 0; i < inboxIds.length; i += 200) {
+    const batch = writeBatch(flousyDb);
+    for (const id of inboxIds.slice(i, i + 200)) {
+      batch.update(doc(flousyDb, "sms_false_detection_inbox", id), smsReviewPatch("resolved", note));
+    }
+    await batch.commit();
+  }
+  // The feedback-inbox copy is optional, so a failure there is not fatal.
+  for (let i = 0; i < inboxIds.length; i += 200) {
+    try {
+      const batch = writeBatch(flousyDb);
+      for (const id of inboxIds.slice(i, i + 200)) {
+        batch.update(doc(flousyDb, "feedback_inbox", id), smsReviewPatch("resolved", note));
+      }
+      await batch.commit();
+    } catch {
+      // ignore
+    }
   }
 }
 

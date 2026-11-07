@@ -814,3 +814,27 @@ html:not(.dark) .dashboard-login .dashboard-login-foot { color: #71809e; }
   color: #d4dfdb;
   margin: 10px 0 0;
 }
+
+/* SMS report review: status filter and resolve / undo buttons */
+.dashboard-segmented { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(19, 31, 64, .66); border: 1px solid var(--dash-line); }
+.dashboard-segmented button { border: 0; background: transparent; color: #9fb1d6; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 9px; cursor: pointer; transition: background .2s ease, color .2s ease; }
+.dashboard-segmented button:hover { color: #e5eeff; }
+.dashboard-segmented button.active { background: rgba(114, 227, 255, .16); color: #e9fbff; box-shadow: inset 0 0 0 1px rgba(114, 227, 255, .32); }
+.dashboard-resolve-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.dashboard-note-input { min-width: 200px; flex: 1 1 200px; color: #d3def5; background: rgba(19, 31, 64, .8); border: 1px solid var(--dash-line); border-radius: 10px; font-size: 12px; padding: 9px 11px; outline: 0; }
+.dashboard-note-input:focus { border-color: rgba(114, 227, 255, .5); }
+.dashboard-resolve-button, .dashboard-undo-button { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: transform .2s ease, background .2s ease; }
+.dashboard-resolve-button { color: #052018; background: linear-gradient(135deg, #7be6b0, #4fcf9a); border: 0; }
+.dashboard-resolve-button:hover:not(:disabled) { transform: translateY(-1px); }
+.dashboard-undo-button { color: #d3def5; background: transparent; border: 1px solid var(--dash-line); }
+.dashboard-undo-button:hover:not(:disabled) { background: rgba(255, 255, 255, .06); }
+.dashboard-resolve-button:disabled, .dashboard-undo-button:disabled { opacity: .55; cursor: default; }
+.dashboard-resolved-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #7be6b0; background: rgba(79, 207, 154, .12); border-radius: 999px; padding: 6px 10px; }
+.dashboard-resolution-note { margin: 10px 0 0 !important; font-size: 12px; opacity: .8; }
+html:not(.dark) .dashboard-shell .dashboard-segmented { background: rgba(255, 255, 255, .7); }
+html:not(.dark) .dashboard-shell .dashboard-segmented button { color: #51638a; }
+html:not(.dark) .dashboard-shell .dashboard-segmented button.active { background: rgba(46, 120, 200, .12); color: #17356b; box-shadow: inset 0 0 0 1px rgba(46, 120, 200, .3); }
+html:not(.dark) .dashboard-shell .dashboard-note-input { color: #304467; background: rgba(255, 255, 255, .85); }
+html:not(.dark) .dashboard-shell .dashboard-undo-button { color: #304467; }
+html:not(.dark) .dashboard-shell .dashboard-resolved-chip { color: #11704a; background: rgba(32, 160, 110, .12); }
+@media (max-width: 620px) { .dashboard-resolve-actions { justify-content: stretch; width: 100%; } .dashboard-note-input { min-width: 0; } .dashboard-feedback-item-bottom { flex-wrap: wrap; } }
