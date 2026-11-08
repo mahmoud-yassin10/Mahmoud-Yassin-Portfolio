@@ -1,9 +1,12 @@
 import { getSkill, skillCatalog, type Skill } from "@/data/skillCatalog";
+import type { WorkCategory } from "@/data/serviceCatalog";
 
 export type WorkKind = "engineering" | "client" | "activity";
 
 export type WorkItem = {
   slug: string;
+  /** Used by the Work page filters and by the services pages. Activities have none. */
+  categories: WorkCategory[];
   kind: WorkKind;
   /** Also shown in the Client view (a platform or site I built for someone). */
   forClients?: boolean;
@@ -26,7 +29,7 @@ export type WorkItem = {
 
 const L = (label: string, href: string) => ({ label, href });
 
-export const workItems: WorkItem[] = [
+const rawItems: Array<Omit<WorkItem, "categories">> = [
   // ---------- Engineering: case-study projects (full pages already exist) ----------
   {
     slug: "squashvar", kind: "engineering", caseStudy: "squashvar", name: "SquashVAR", category: "Computer vision research", period: "Sep 2025 to present",
@@ -407,6 +410,15 @@ export const workItems: WorkItem[] = [
   }
 ];
 
+const categoryBySlug: Record<string, WorkCategory[]> = {
+  squashvar: ["ai", "research"], flousy: ["mobile", "ai"], truetutor: ["platform"], "flood-lens": ["research", "ai"], "solar-share": ["mobile"],
+  "dr-zeyad-lms": ["platform"], modx: ["desktop", "ecommerce"], surplussync: ["ai", "platform"], "mr-ghonem-math": ["platform"], imkan: ["ai", "platform"],
+  split: ["ai"], decodelabs: ["ai"], "niney-yassin": ["portfolio"], fresheria: ["ecommerce"], revwear: ["ecommerce"], femplus: ["business-site"],
+  "nine-store": ["ecommerce"], "literary-lounge": ["ecommerce"], "vibe-trend": ["ecommerce"], "bank-elafkar": ["business-site"], ell3ba: ["platform", "desktop"], striker: ["platform", "desktop"]
+};
+
+export const workItems: WorkItem[] = rawItems.map((item) => ({ ...item, categories: categoryBySlug[item.slug] ?? [] }));
+
 // ---------- Lookups ----------
 const itemBySlug = new Map(workItems.map((item) => [item.slug, item]));
 export const getWorkItem = (slug: string) => itemBySlug.get(slug);
@@ -416,13 +428,16 @@ export const engineeringItems = workItems.filter((item) => item.kind === "engine
 export const clientItems = workItems.filter((item) => item.kind === "client" || (item.kind === "engineering" && item.forClients));
 export const activityItems = workItems.filter((item) => item.kind === "activity");
 
-export const itemsForSkill = (skillSlug: string) => workItems.filter((item) => item.skills.includes(skillSlug));
+/** Activities are only shown to admissions readers; hiring teams and clients see work only. */
+export const itemsForSkill = (skillSlug: string, includeActivities = true) =>
+  workItems.filter((item) => item.skills.includes(skillSlug) && (includeActivities || item.kind !== "activity"));
+export const itemsForCategory = (category: WorkCategory) => workItems.filter((item) => item.categories.includes(category));
 export const skillsForItem = (item: WorkItem): Skill[] => item.skills.map((slug) => getSkill(slug)).filter((skill): skill is Skill => Boolean(skill));
 
 /** Skills that appear together with this one, most shared first. */
-export const relatedSkills = (skillSlug: string, limit = 8): Array<{ skill: Skill; shared: number }> => {
+export const relatedSkills = (skillSlug: string, limit = 8, includeActivities = true): Array<{ skill: Skill; shared: number }> => {
   const counts = new Map<string, number>();
-  for (const item of itemsForSkill(skillSlug)) for (const other of item.skills) if (other !== skillSlug) counts.set(other, (counts.get(other) ?? 0) + 1);
+  for (const item of itemsForSkill(skillSlug, includeActivities)) for (const other of item.skills) if (other !== skillSlug) counts.set(other, (counts.get(other) ?? 0) + 1);
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit)
     .map(([slug, shared]) => ({ skill: getSkill(slug)!, shared })).filter((entry) => entry.skill);
 };
@@ -434,3 +449,4 @@ export const similarItems = (item: WorkItem, limit = 3): WorkItem[] =>
     .filter((entry) => entry.score > 0).sort((a, b) => b.score - a.score).slice(0, limit).map((entry) => entry.other);
 
 export const usedSkills = skillCatalog.filter((skill) => itemsForSkill(skill.slug).length > 0);
+export const usedSkillsFor = (includeActivities: boolean) => skillCatalog.filter((skill) => itemsForSkill(skill.slug, includeActivities).length > 0);

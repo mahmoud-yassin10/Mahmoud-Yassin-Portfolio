@@ -1,0 +1,57 @@
+/* Work toolbar, services page and inquiry wizard */
+.work-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1.25rem; }
+.work-search { display: flex; align-items: center; gap: 0.5rem; flex: 1 1 240px; min-width: 0; padding: 0.55rem 0.9rem; border-radius: 999px; border: 1px solid var(--glass-border, rgba(128,128,128,.25)); background: var(--glass-fill, rgba(128,128,128,.08)); }
+.work-search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: inherit; font: inherit; }
+.work-empty { padding: 2rem 0; opacity: 0.7; }
+
+.service-jump { margin-top: 1.25rem; }
+.service-block { scroll-margin-top: 6rem; }
+.service-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.service-card { padding: 1.25rem; border-radius: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+.service-card h3, .service-related h3, .inquiry-section h3, .inquiry-body > h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+.service-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.service-list li { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.95rem; }
+.service-list svg { margin-top: 0.2rem; flex: none; }
+.service-related { margin-top: 1.5rem; display: grid; gap: 0.9rem; }
+.service-related-links { display: flex; flex-wrap: wrap; gap: 1rem; }
+.service-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.9rem; margin: 1.25rem 0 1.5rem; }
+.service-overview-card { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.25rem; border-radius: 1.25rem; color: inherit; text-decoration: none; }
+.service-overview-card small { display: block; opacity: 0.7; margin-top: 0.25rem; font-size: 0.85rem; }
+
+.inquiry { padding: clamp(1.25rem, 3vw, 2.25rem); border-radius: 1.75rem; scroll-margin-top: 6rem; position: relative; }
+.inquiry-kicker { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.65; margin: 0 0 0.25rem; }
+.inquiry-head h2 { margin: 0 0 1rem; }
+.inquiry-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0; margin: 0 0 1.5rem; font-size: 0.85rem; }
+.inquiry-steps li { display: flex; align-items: center; gap: 0.4rem; opacity: 0.5; }
+.inquiry-steps li.is-current, .inquiry-steps li.is-done { opacity: 1; }
+.inquiry-steps li span { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 1px solid currentColor; font-size: 0.75rem; }
+.inquiry-steps li.is-current span { background: currentColor; }
+.inquiry-steps li.is-current span { color: inherit; }
+.inquiry-body { display: grid; gap: 1.25rem; }
+.inquiry-section { display: grid; gap: 1.1rem; padding-top: 0.5rem; }
+.service-picks { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
+.service-pick, .q-option { display: flex; gap: 0.7rem; align-items: center; text-align: start; padding: 0.8rem 1rem; border-radius: 1rem; border: 1px solid var(--glass-border, rgba(128,128,128,.3)); background: transparent; color: inherit; cursor: pointer; font: inherit; transition: border-color .15s, background .15s; }
+.service-pick small { display: block; opacity: 0.65; font-size: 0.8rem; margin-top: 0.15rem; }
+.service-pick:hover, .q-option:hover { border-color: currentColor; }
+.service-pick.is-picked, .q-option.is-picked { border-color: currentColor; background: var(--glass-fill, rgba(128,128,128,.12)); }
+.q-mark { flex: none; display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border: 1px solid currentColor; border-radius: 0.35rem; }
+.q-option input { position: absolute; opacity: 0; pointer-events: none; }
+.q-option { position: relative; padding: 0.55rem 0.9rem; font-size: 0.92rem; }
+.q-field { border: 0; margin: 0; padding: 0; display: grid; gap: 0.5rem; min-width: 0; }
+.q-field legend, .q-legend { font-weight: 600; font-size: 0.95rem; padding: 0; }
+.q-required { color: #e5484d; }
+.q-help { font-size: 0.85rem; opacity: 0.7; margin: 0; }
+.q-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.q-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.q-input { width: 100%; padding: 0.7rem 0.9rem; border-radius: 0.85rem; border: 1px solid var(--glass-border, rgba(128,128,128,.3)); background: var(--glass-fill, rgba(128,128,128,.08)); color: inherit; font: inherit; }
+.q-input:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.q-textarea { resize: vertical; }
+.q-bot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.inquiry-review { white-space: pre-wrap; font: inherit; font-size: 0.9rem; padding: 1rem; border-radius: 1rem; border: 1px solid var(--glass-border, rgba(128,128,128,.3)); max-height: 28rem; overflow: auto; margin: 0; }
+.inquiry-errors { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 1rem; border: 1px solid #e5484d; font-size: 0.9rem; }
+.inquiry-errors ul { margin: 0.4rem 0 0; padding-inline-start: 1.1rem; }
+.inquiry-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; gap: 1rem; }
+.inquiry-back { display: inline-flex; gap: 0.4rem; align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; font: inherit; }
+.inquiry-done { text-align: center; display: grid; gap: 0.9rem; justify-items: center; padding: 2rem 0; }
+.inquiry-done-icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; border: 1px solid currentColor; }
+.section-anchor { position: absolute; top: -6rem; }

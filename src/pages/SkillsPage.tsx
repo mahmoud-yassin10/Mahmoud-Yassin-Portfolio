@@ -5,7 +5,8 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import type { SkillGroup } from "@/data/skillCatalog";
-import { itemsForSkill, usedSkills } from "@/data/workItems";
+import { useAudience } from "@/context/AudienceContext";
+import { itemsForSkill, usedSkillsFor } from "@/data/workItems";
 import { useLanguage } from "@/i18n/LanguageContext";
 import "@/styles/squashvar.css";
 
@@ -14,10 +15,12 @@ const groups: SkillGroup[] = ["Languages", "Frameworks", "Data and cloud", "AI a
 /** Every skill, grouped, with how many pieces of work use it. */
 export default function SkillsPage() {
   const { lang } = useLanguage();
+  const { audience } = useAudience();
+  const includeActivities = audience === "admissions";
   const arabic = lang === "ar";
   const [query, setQuery] = useState("");
   useEffect(() => { window.scrollTo(0, 0); }, []);
-  const filtered = useMemo(() => usedSkills.filter((skill) => skill.name.toLowerCase().includes(query.trim().toLowerCase())), [query]);
+  const filtered = useMemo(() => usedSkillsFor(includeActivities).filter((skill) => skill.name.toLowerCase().includes(query.trim().toLowerCase())), [query, includeActivities]);
 
   return <div className="squash-case-page relative min-h-screen bg-background text-foreground">
     <AnimatedBackground />
@@ -37,7 +40,7 @@ export default function SkillsPage() {
             <header className="sq-section-heading"><h2>{group}</h2></header>
             <ul className="skill-chip-grid">
               {list.map((skill) => {
-                const count = itemsForSkill(skill.slug).length;
+                const count = itemsForSkill(skill.slug, includeActivities).length;
                 return <li key={skill.slug}><Link to={`/skills/${skill.slug}`} className="skill-chip"><span><strong>{skill.name}</strong><small>{skill.blurb}</small></span><em>{count}</em><ArrowRight size={16} aria-hidden /></Link></li>;
               })}
             </ul>

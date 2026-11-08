@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { getWorkItem, itemsForSkill, skillsForItem, workItems } from "@/data/workItems";
+import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 /** Skills list for any work page. Each skill opens a page of everything that uses it. */
 export default function SkillsUsed({ itemSlug, caseStudy }: { itemSlug?: string; caseStudy?: string }) {
   const { lang } = useLanguage();
+  const { audience } = useAudience();
+  const includeActivities = audience === "admissions";
   const arabic = lang === "ar";
   const item = itemSlug ? getWorkItem(itemSlug) : workItems.find((entry) => entry.caseStudy === caseStudy);
   if (!item) return null;
@@ -19,7 +22,7 @@ export default function SkillsUsed({ itemSlug, caseStudy }: { itemSlug?: string;
       </header>
       <ul className="skill-chip-grid">
         {skills.map((skill) => {
-          const count = itemsForSkill(skill.slug).length;
+          const count = itemsForSkill(skill.slug, includeActivities).length;
           return (
             <li key={skill.slug}>
               <Link to={`/skills/${skill.slug}`} className="skill-chip">

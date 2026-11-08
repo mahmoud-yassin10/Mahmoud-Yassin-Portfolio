@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { isProductRoute } from "@/lib/themeScope";
 
 const sections = [
   { id: "hero", en: "Introduction", ar: "البداية" },
   { id: "stories", en: "Selected work", ar: "المشاريع" },
+  { id: "work", en: "Work", ar: "الشغل" },
+  { id: "services", en: "Services", ar: "الخدمات" },
   { id: "journey", en: "Timeline", ar: "الرحلة" },
   { id: "activities", en: "Activities", ar: "الأنشطة" },
   { id: "honors", en: "Honors", ar: "الجوائز" },
@@ -17,18 +20,21 @@ const sections = [
 export default function PortfolioInteractions() {
   const { pathname } = useLocation();
   const { lang } = useLanguage();
+  const { audience } = useAudience();
   const [active, setActive] = useState("hero");
+  const [present, setPresent] = useState(sections);
   const cursorRef = useRef<HTMLDivElement>(null);
   const product = isProductRoute(pathname);
 
   useEffect(() => {
     if (pathname !== "/") return;
+    const timer = window.setTimeout(() => setPresent(sections.filter(({ id }) => document.getElementById(id))), 80);
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) if (entry.isIntersecting) setActive(entry.target.id);
     }, { rootMargin: "-15% 0px -65% 0px", threshold: 0 });
     sections.forEach(({ id }) => { const node = document.getElementById(id); if (node) observer.observe(node); });
-    return () => observer.disconnect();
-  }, [pathname]);
+    return () => { window.clearTimeout(timer); observer.disconnect(); };
+  }, [pathname, audience]);
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -80,9 +86,9 @@ export default function PortfolioInteractions() {
     <div className="portfolio-cursor" ref={cursorRef} aria-hidden><span className="cursor-ring" /><span className="cursor-core" /></div>
     {pathname === "/" && <>
       <nav className="section-rail" aria-label={lang === "ar" ? "أقسام الصفحة" : "Page sections"}>
-        {sections.map((section) => <a href={`#${section.id}`} key={section.id} aria-current={active === section.id ? "location" : undefined} className={active === section.id ? "is-active" : undefined}><span>{lang === "ar" ? section.ar : section.en}</span><i aria-hidden /></a>)}
+        {present.map((section) => <a href={`#${section.id}`} key={section.id} aria-current={active === section.id ? "location" : undefined} className={active === section.id ? "is-active" : undefined}><span>{lang === "ar" ? section.ar : section.en}</span><i aria-hidden /></a>)}
       </nav>
-      <div className="mobile-section-navigator"><label htmlFor="section-jump">{lang === "ar" ? "بتقرأ دلوقتي" : "Now reading"}</label><select id="section-jump" aria-label={lang === "ar" ? "انتقل لقسم" : "Jump to section"} value={active} onChange={(event) => jump(event.target.value)}>{sections.map((section) => <option key={section.id} value={section.id}>{lang === "ar" ? section.ar : section.en}</option>)}</select></div>
+      <div className="mobile-section-navigator"><label htmlFor="section-jump">{lang === "ar" ? "بتقرأ دلوقتي" : "Now reading"}</label><select id="section-jump" aria-label={lang === "ar" ? "انتقل لقسم" : "Jump to section"} value={active} onChange={(event) => jump(event.target.value)}>{present.map((section) => <option key={section.id} value={section.id}>{lang === "ar" ? section.ar : section.en}</option>)}</select></div>
     </>}
   </>;
 }

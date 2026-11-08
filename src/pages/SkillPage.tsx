@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import WorkCard from "@/components/WorkCard";
 import { getSkill, skillCatalog } from "@/data/skillCatalog";
 import { itemsForSkill, relatedSkills } from "@/data/workItems";
+import { useAudience } from "@/context/AudienceContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import "@/styles/squashvar.css";
 
@@ -15,17 +16,19 @@ import "@/styles/squashvar.css";
 export default function SkillPage() {
   const { slug } = useParams();
   const { lang } = useLanguage();
+  const { audience } = useAudience();
+  const includeActivities = audience === "admissions";
   const arabic = lang === "ar";
   const skill = slug ? getSkill(slug) : undefined;
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
   if (!skill) return <Navigate to="/skills" replace />;
 
-  const items = itemsForSkill(skill.slug);
+  const items = itemsForSkill(skill.slug, includeActivities);
   const projects = items.filter((item) => item.kind === "engineering");
   const clients = items.filter((item) => item.kind === "client");
   const activities = items.filter((item) => item.kind === "activity");
-  const related = relatedSkills(skill.slug, 8);
-  const sameGroup = skillCatalog.filter((entry) => entry.group === skill.group && entry.slug !== skill.slug && itemsForSkill(entry.slug).length > 0);
+  const related = relatedSkills(skill.slug, 8, includeActivities);
+  const sameGroup = skillCatalog.filter((entry) => entry.group === skill.group && entry.slug !== skill.slug && itemsForSkill(entry.slug, includeActivities).length > 0);
   const label = (en: string, ar: string) => (arabic ? ar : en);
   const section = (title: string, list: typeof items) => list.length > 0 && (
     <section className="squash-case-section" aria-label={title}>
@@ -53,7 +56,7 @@ export default function SkillPage() {
 
         {section(label("Projects", "المشاريع"), projects)}
         {section(label("Client sites", "مواقع العملاء"), clients)}
-        {section(label("Activities", "الأنشطة"), activities)}
+        {includeActivities && section(label("Activities", "الأنشطة"), activities)}
 
         {related.length > 0 && (
           <section className="squash-case-section" aria-label={label("Often used with", "بتتستخدم مع")}>
@@ -69,7 +72,7 @@ export default function SkillPage() {
         {sameGroup.length > 0 && (
           <section className="squash-case-section sq-resources" aria-label={label("More in this group", "المزيد في نفس المجموعة")}>
             <header className="sq-section-heading"><h2>{label("More", "المزيد من")} {skill.group.toLowerCase()}.</h2></header>
-            <ul className="skill-pills">{sameGroup.map((entry) => <li key={entry.slug}><Link to={`/skills/${entry.slug}`}>{entry.name}<small>{itemsForSkill(entry.slug).length}</small></Link></li>)}</ul>
+            <ul className="skill-pills">{sameGroup.map((entry) => <li key={entry.slug}><Link to={`/skills/${entry.slug}`}>{entry.name}<small>{itemsForSkill(entry.slug, includeActivities).length}</small></Link></li>)}</ul>
             <Link to="/skills" className="portfolio-text-link skills-all-link">{label("Explore all skills", "كل المهارات")}<ArrowRight size={16} aria-hidden /></Link>
           </section>
         )}

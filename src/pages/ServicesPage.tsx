@@ -1,108 +1,82 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { ArrowRight, Check } from "lucide-react";
 import AnimatedBackground from "@/components/AnimatedBackground";
-import BusinessInquiryForm from "@/components/BusinessInquiryForm";
-import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { ProjectTile } from "@/components/Projects";
-import { Badge } from "@/components/ui/badge";
-import { type ProjectTileData } from "@/data/projects";
-import { getServicesInquiryHref, servicesPageOfferings } from "@/data/servicesOfferings";
-import { cn } from "@/lib/utils";
+import ServiceInquiryWizard from "@/components/ServiceInquiryWizard";
+import WorkCard from "@/components/WorkCard";
+import { services, workCategoryLabels } from "@/data/serviceCatalog";
+import { getSkill } from "@/data/skillCatalog";
+import { itemsForCategory } from "@/data/workItems";
 import { useLanguage } from "@/i18n/LanguageContext";
+import "@/styles/squashvar.css";
 
-const ServicesPage = () => {
+/** Every service in detail, with related past work and a guided request form. */
+export default function ServicesPage() {
+  const { lang } = useLanguage();
+  const arabic = lang === "ar";
   const location = useLocation();
-  const { t, dict } = useLanguage();
-  const servicesInquiryHref = getServicesInquiryHref();
 
   useEffect(() => {
-    if (location.hash !== "#business-inquiry") return;
-    const node = document.getElementById("business-inquiry");
-    if (!node) return;
-    requestAnimationFrame(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }, [location.pathname, location.hash]);
+    const id = location.hash.replace("#", "");
+    if (!id) { window.scrollTo(0, 0); return; }
+    const timer = window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
+    return () => window.clearTimeout(timer);
+  }, [location.hash]);
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="squash-case-page relative min-h-screen bg-background text-foreground">
       <AnimatedBackground />
       <Navbar />
-      <main id="main-content" className="relative z-10">
-        <section className="py-20 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {t("services.title")}
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {t("services.introLead")}
-                <strong className="text-foreground font-medium">{t("services.introWebsite")}</strong>
-                {t("services.introMid")}
-                <strong className="text-foreground font-medium">{t("services.introKashier")}</strong>
-                {t("services.introKashierNote")}
-                <strong className="text-foreground font-medium">{t("services.introBoth")}</strong>
-                {t("services.introEnd")}
-              </p>
-            </div>
+      <main id="main-content" className="squash-case-main relative z-10">
+        <div className="portfolio-container">
+          <header className="skill-hero">
+            <p className="sq-category">{arabic ? "الخدمات" : "Services"}</p>
+            <h1>{arabic ? "إيه اللي أقدر أبنيه ليك." : "What I can build for you."}</h1>
+            <p className="sq-lead">{arabic ? "كل خدمة تحت بالتفصيل، مع شغل سابق شبهها. لما تكون جاهز، ابدأ الطلب." : "Every service in detail, with past work like it. When you are ready, start a request and answer a few questions."}</p>
+            <ul className="skill-pills service-jump">
+              {services.map((service) => <li key={service.slug}><a href={`#${service.slug}`}>{service.title}</a></li>)}
+            </ul>
+          </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-20">
-              {servicesPageOfferings.map((service, index) => {
-                const copy = dict.offerings[service.id as keyof typeof dict.offerings];
-                const project: ProjectTileData = {
-                  title: copy.title,
-                  description: copy.description,
-                  tech: copy.bullets,
-                  period: t("services.available"),
-                  link: servicesInquiryHref,
-                  type: t("services.serviceType")
-                };
-
-                const isWebsiteFirst = index === 0;
-
-                return (
-                  <div
-                    key={service.id}
-                    className={cn(
-                      "relative flex flex-col min-h-0",
-                      isWebsiteFirst &&
-                        "rounded-2xl p-[2px] bg-gradient-to-br from-primary/50 via-primary/25 to-accent/30 shadow-lg shadow-primary/10"
-                    )}
-                  >
-                    {isWebsiteFirst ? (
-                      <Badge
-                        variant="secondary"
-                        className="absolute -top-2.5 left-4 z-10 border border-primary/40 bg-background/95 shadow-sm"
-                      >
-                        {t("services.coreOffering")}
-                      </Badge>
-                    ) : null}
-                    <div className={cn("flex flex-col flex-1 min-h-0", isWebsiteFirst && "rounded-[14px] bg-background")}>
-                      <ProjectTile
-                        project={project}
-                        index={index}
-                        buttonLabel={t("services.requestThis")}
-                        linkRel={undefined}
-                        linkTarget="_self"
-                        alignButton
-                      />
+          {services.map((service) => {
+            const related = Array.from(new Map(service.categories.flatMap((category) => itemsForCategory(category)).filter((item) => item.kind !== "activity").map((item) => [item.slug, item])).values()).slice(0, 3);
+            return (
+              <section key={service.slug} id={service.slug} className="squash-case-section service-block" aria-label={service.title}>
+                <header className="sq-section-heading"><h2>{service.title}</h2><p>{service.who}</p></header>
+                <p className="wk-prose">{service.summary}</p>
+                <div className="service-columns">
+                  <div className="glass-surface service-card">
+                    <h3>{arabic ? "اللي هتاخده" : "What you get"}</h3>
+                    <ul className="service-list">{service.includes.map((entry) => <li key={entry}><Check size={15} aria-hidden />{entry}</li>)}</ul>
+                  </div>
+                  <div className="glass-surface service-card">
+                    <h3>{arabic ? "الأدوات" : "Built with"}</h3>
+                    <ul className="skill-pills">
+                      {service.skills.map((slug) => { const skill = getSkill(slug); return skill ? <li key={slug}><Link to={`/skills/${slug}`}>{skill.name}</Link></li> : null; })}
+                    </ul>
+                    <p className="q-help">{service.stack.join(" · ")}</p>
+                    <Link to={`/services?service=${service.slug}#inquiry`} className="portfolio-button">{arabic ? "ابدأ الطلب" : "Start this request"}<ArrowRight size={16} aria-hidden /></Link>
+                  </div>
+                </div>
+                {related.length > 0 && (
+                  <div className="service-related">
+                    <h3>{arabic ? "شغل شبه ده" : "Work like this"}</h3>
+                    <div className="work-grid">{related.map((item) => <WorkCard key={item.slug} item={item} />)}</div>
+                    <div className="service-related-links">
+                      {service.categories.map((category) => <Link key={category} to={`/work?category=${category}`} className="portfolio-text-link">{arabic ? workCategoryLabels[category].ar : workCategoryLabels[category].en}<ArrowRight size={15} aria-hidden /></Link>)}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                )}
+              </section>
+            );
+          })}
 
-            <BusinessInquiryForm />
-          </div>
-        </section>
-
-        <Contact />
+          <section className="squash-case-section"><ServiceInquiryWizard /></section>
+        </div>
       </main>
       <Footer />
     </div>
   );
-};
-
-export default ServicesPage;
+}
