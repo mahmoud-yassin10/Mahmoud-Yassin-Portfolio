@@ -379,6 +379,12 @@ html.editorial[dir="rtl"] a.activity-row:hover { transform: translateX(-3px); }
 /* ---------- First-visit view chooser ---------- */
 .view-chooser-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: rgba(3, 7, 18, .62); animation: chooser-fade .3s ease both; }
 .view-chooser { position: relative; width: min(560px, 100%); padding: 32px; border-radius: 30px; animation: chooser-pop .4s cubic-bezier(.2,.8,.2,1) both; }
+/* The page behind the popup is blurred and dimmed, and the card itself is mostly opaque so the text stays readable. */
+html.editorial .view-chooser-backdrop { background: rgba(3, 7, 18, .5); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
+html.editorial .view-chooser.glass-surface {
+  background: linear-gradient(135deg, hsl(var(--card) / .93), hsl(var(--card) / .8));
+  -webkit-backdrop-filter: blur(34px) saturate(1.5); backdrop-filter: blur(34px) saturate(1.5);
+}
 .view-chooser-close { position: absolute; inset-inline-end: 16px; top: 16px; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: inherit; background: hsl(var(--foreground) / .08); }
 .view-chooser-kicker { font-size: 13px; font-weight: 650; color: hsl(var(--primary)); margin: 0 0 8px; }
 .view-chooser h2 { font-size: 28px; font-weight: 700; margin: 0; }
