@@ -280,19 +280,19 @@ export const workItems: WorkItem[] = [
     numbers: [], skills: ["typescript", "react", "i18n", "postgresql", "responsive", "vercel"], links: [L("Visit the site", "https://bank-elafkar.vercel.app")]
   },
   {
-    slug: "ell3ba", kind: "client", name: "Ell3ba Gaming Lounge", category: "Gaming lounge website", period: "Apr to Jul 2026",
+    slug: "ell3ba", kind: "client", image: "/images/work/ell3ba.webp", name: "Ell3ba Gaming Lounge", category: "Gaming lounge management system", period: "Apr to Jul 2026",
     status: "Live · private repository", role: "Freelance developer",
-    summary: "A website and sign-in flow for a gaming lounge, in Arabic and English.",
-    overview: ["Ell3ba is a gaming lounge. The site gives its customers an account and a way into the venue's offers."],
-    built: ["A TypeScript front end with sign-in", "Arabic and English through i18next, validation with zod and Firebase for data", "44 of the repository's commits are mine"],
+    summary: "A management dashboard for a gaming lounge: stations, timed sessions, pricing, shifts and product sales.",
+    overview: ["Ell3ba is a gaming lounge. Running one means tracking which devices are free, who is playing, for how long and what they owe. The admin dashboard puts all of that on one screen."],
+    built: ["A dashboard showing available and occupied devices at a glance, with search and filters", "Per-station sessions with single and multi-player modes, live timers and running cost in EGP", "Shifts (open and close), product sales and a private room", "Sign-in, Arabic and English through i18next, validation with zod and Firebase for data"],
     numbers: [{ value: "44", label: "of my commits" }], skills: ["typescript", "react", "firebase", "i18n", "authentication", "vercel"], links: [L("Visit the site", "https://ell3ba.vercel.app")]
   },
   {
-    slug: "striker", kind: "client", name: "Striker Gaming Lounge", category: "Gaming lounge website", period: "May to Jul 2026",
+    slug: "striker", kind: "client", image: "/images/work/striker.webp", name: "Striker Gaming Lounge", category: "Gaming lounge management system", period: "May to Jul 2026",
     status: "Live · private repository", role: "Freelance developer",
-    summary: "A second gaming lounge website, with sign-in and Arabic and English support.",
-    overview: ["Striker is a gaming lounge. The site follows the same approach as Ell3ba, tuned to its own venue."],
-    built: ["A TypeScript front end with sign-in", "Arabic and English through i18next, validation with zod and Firebase for data", "63 of the repository's commits are mine"],
+    summary: "A second gaming-lounge management dashboard, with timed station sessions, shifts and product sales.",
+    overview: ["Striker is a gaming lounge. The system follows the same approach as Ell3ba, tuned to its own venue: devices, sessions, pricing and the till in one dashboard."],
+    built: ["An admin dashboard with available, occupied and total gaming devices", "Station sessions with live timers, adjustable start and end times and running cost", "Shifts, product sales and a private room with its own timer", "Sign-in, Arabic and English through i18next, validation with zod and Firebase for data"],
     numbers: [{ value: "63", label: "of my commits" }], skills: ["typescript", "react", "firebase", "i18n", "authentication", "vercel"], links: [L("Visit the site", "https://striker-alpha.vercel.app")]
   },
 
