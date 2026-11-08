@@ -381,7 +381,7 @@ html.editorial[dir="rtl"] a.activity-row:hover { transform: translateX(-3px); }
 .view-chooser { position: relative; width: min(560px, 100%); padding: 32px; border-radius: 30px; animation: chooser-pop .4s cubic-bezier(.2,.8,.2,1) both; }
 /* The page behind the popup is blurred and dimmed, and the card itself is mostly opaque so the text stays readable. */
 html.editorial .view-chooser-backdrop { background: rgba(3, 7, 18, .5); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
-html.editorial .view-chooser.glass-surface {
+html.editorial .view-chooser.view-chooser.glass-surface {
   background: linear-gradient(135deg, hsl(var(--card) / .93), hsl(var(--card) / .8));
   -webkit-backdrop-filter: blur(34px) saturate(1.5); backdrop-filter: blur(34px) saturate(1.5);
 }
