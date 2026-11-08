@@ -311,6 +311,15 @@ const FlousyDashboard = () => {
   const [smsNotes, setSmsNotes] = useState<Record<string, string>>({});
   const [smsBusyId, setSmsBusyId] = useState("");
 
+  useEffect(() => {
+    const links = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
+    const icon = document.createElement("link");
+    icon.rel = "icon"; icon.type = "image/png"; icon.href = "/images/flousy/logo.png";
+    links.forEach((link) => link.remove());
+    document.head.appendChild(icon);
+    return () => { icon.remove(); links.forEach((link) => document.head.appendChild(link)); };
+  }, []);
+
   useEffect(() => { if (flousyAuth) return onAuthStateChanged(flousyAuth, setUser); return undefined; }, []);
   useEffect(() => { setFeedback(data.feedback); }, [data.feedback]);
   useEffect(() => { setStudents(data.studentVerifications); }, [data.studentVerifications]);
