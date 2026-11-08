@@ -73,7 +73,7 @@ export const landingCopy: { en: LandingCopy; ar: LandingCopy } = {
     ],
     ctaTitle: "Make your next month more predictable.", ctaBody: "Download Flousy, connect your first bank message and see what you can safely spend.",
     footer: { made: "Built by Mahmoud Yassin in Egypt.", contact: "Contact", rights: "All rights reserved." },
-    theme: "Toggle theme", language: "العربية"
+    theme: "Toggle theme", language: "AR"
   },
   ar: {
     brand: "فلوسي",
@@ -131,6 +131,6 @@ export const landingCopy: { en: LandingCopy; ar: LandingCopy } = {
     ],
     ctaTitle: "خلّي شهرك الجاي أكتر قابلية للتوقع.", ctaBody: "نزّل فلوسي، وخلّي أول رسالة من البنك تيجي، وشوف تصرف كام بأمان.",
     footer: { made: "من تطوير محمود ياسين في مصر.", contact: "تواصل", rights: "جميع الحقوق محفوظة." },
-    theme: "تبديل الوضع", language: "English"
+    theme: "تبديل الوضع", language: "EN"
   }
 };

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BellRing, CalendarClock, Check, ChevronDown, Languages, LineChart, Mic, Moon, Sun, Target, Wallet } from "lucide-react";
 import { FLOUSY_PLAY_STORE_URL } from "@/data/projectLinks";
 import { landingCopy } from "@/data/flousyLanding";
+import FlousyBackground from "@/components/FlousyBackground";
+import FlousyIntro from "@/components/FlousyIntro";
 import { trackPublicFlousyEvent } from "@/lib/flousyAnalytics";
 import { useLanguage } from "@/i18n/LanguageContext";
 import "@/styles/flousy-landing.css";
@@ -53,6 +55,8 @@ export default function FlousyLanding() {
 
   return (
     <div className="fl-landing" dir={lang === "ar" ? "rtl" : "ltr"}>
+      <FlousyBackground />
+      <FlousyIntro arabic={lang === "ar"} />
       <a className="fl-skip" href="#main">{lang === "ar" ? "تخطى للمحتوى" : "Skip to content"}</a>
       <header className="fl-header">
         <div className="fl-container fl-header-row">
