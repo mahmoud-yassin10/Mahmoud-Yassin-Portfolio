@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch, type DocumentData, deleteField } from "firebase/firestore";
+import { collection, doc, documentId, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch, type DocumentData, deleteField } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { flousyDb, flousyFunctions } from "./flousyFirebase";
 
@@ -522,6 +522,157 @@ export async function loadAiGatewayStatus(): Promise<AiGatewayStatus> {
       };
     }),
   };
+}
+
+// ---- Daily totals and money totals (written by Cloud Functions) -------------
+
+export type FlowStepTotals = {
+  viewed: number;
+  completed: number;
+  abandoned: number;
+  skipped: number;
+  error: number;
+  totalMs: number;
+  timed: number;
+  indexSum: number;
+  indexN: number;
+};
+
+export type DailyTotals = {
+  day: string;
+  activeUsers: number;
+  events: Record<string, number>;
+  platforms: Record<string, number>;
+  locales: Record<string, number>;
+  screens: Record<string, { views: number; totalMs: number; timed: number }>;
+  flows: Record<string, Record<string, FlowStepTotals>>;
+  features: Record<string, number>;
+  errors: Record<string, Record<string, number>>;
+};
+
+const asNumber = (value: unknown) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+};
+
+function numberMap(raw: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (raw && typeof raw === "object") {
+    for (const [key, value] of Object.entries(raw as Record<string, unknown>)) out[key] = asNumber(value);
+  }
+  return out;
+}
+
+function mapDaily(day: string, data: DocumentData): DailyTotals {
+  const screens: DailyTotals["screens"] = {};
+  for (const [name, value] of Object.entries((data.screens ?? {}) as Record<string, Record<string, unknown>>)) {
+    screens[name] = { views: asNumber(value?.views), totalMs: asNumber(value?.totalMs), timed: asNumber(value?.timed) };
+  }
+  const flows: DailyTotals["flows"] = {};
+  for (const [flow, steps] of Object.entries((data.flows ?? {}) as Record<string, Record<string, Record<string, unknown>>>)) {
+    flows[flow] = {};
+    for (const [step, v] of Object.entries(steps ?? {})) {
+      flows[flow][step] = {
+        viewed: asNumber(v?.viewed),
+        completed: asNumber(v?.completed),
+        abandoned: asNumber(v?.abandoned),
+        skipped: asNumber(v?.skipped),
+        error: asNumber(v?.error),
+        totalMs: asNumber(v?.totalMs),
+        timed: asNumber(v?.timed),
+        indexSum: asNumber(v?.indexSum),
+        indexN: asNumber(v?.indexN),
+      };
+    }
+  }
+  const errors: DailyTotals["errors"] = {};
+  for (const [screen, codes] of Object.entries((data.errors ?? {}) as Record<string, unknown>)) {
+    errors[screen] = numberMap(codes);
+  }
+  return {
+    day,
+    activeUsers: asNumber(data.activeUsers),
+    events: numberMap(data.events),
+    platforms: numberMap(data.platforms),
+    locales: numberMap(data.locales),
+    screens,
+    flows,
+    features: numberMap(data.features),
+    errors,
+  };
+}
+
+/** The last [days] days of running totals, oldest first. One small read per day. */
+export async function loadDailyTotals(days: number): Promise<DailyTotals[]> {
+  if (!flousyDb) return [];
+  const since = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo" }).format(new Date(Date.now() - days * 86400000));
+  const snap = await getDocs(
+    query(collection(flousyDb, "analytics_daily"), where(documentId(), ">=", since), orderBy(documentId()), limit(days + 2)),
+  );
+  return snap.docs.map((d) => mapDaily(d.id, d.data()));
+}
+
+export type CurrencyTotals = { count: number; expense: number; income: number; transferLegs: number };
+
+export type PlatformStats = {
+  transactionCount: number;
+  transferLegCount: number;
+  moneyTrackedUsdEst: number;
+  expenseTrackedUsdEst: number;
+  incomeTrackedUsdEst: number;
+  unconvertedTxnCount: number;
+  byCurrency: Record<string, CurrencyTotals>;
+  planCount: number;
+  goalCount: number;
+  subscriptionCount: number;
+  installmentCount: number;
+  debtInstrumentCount: number;
+  usersScanned: number;
+  backfilledAt: Date | null;
+  updatedAt: Date | null;
+};
+
+const asDate = (value: unknown): Date | null =>
+  value && typeof value === "object" && "toDate" in value ? (value as { toDate: () => Date }).toDate() : null;
+
+/** Running totals of what people track, kept by Cloud Functions. */
+export async function loadPlatformStats(): Promise<PlatformStats | null> {
+  if (!flousyDb) return null;
+  const snap = await getDoc(doc(flousyDb, "platform_stats", "totals"));
+  if (!snap.exists()) return null;
+  const d = snap.data();
+  const byCurrency: Record<string, CurrencyTotals> = {};
+  for (const [code, v] of Object.entries((d.byCurrency ?? {}) as Record<string, Record<string, unknown>>)) {
+    byCurrency[code] = {
+      count: asNumber(v?.count),
+      expense: asNumber(v?.expense),
+      income: asNumber(v?.income),
+      transferLegs: asNumber(v?.transferLegs),
+    };
+  }
+  return {
+    transactionCount: asNumber(d.transactionCount),
+    transferLegCount: asNumber(d.transferLegCount),
+    moneyTrackedUsdEst: asNumber(d.moneyTrackedUsdEst),
+    expenseTrackedUsdEst: asNumber(d.expenseTrackedUsdEst),
+    incomeTrackedUsdEst: asNumber(d.incomeTrackedUsdEst),
+    unconvertedTxnCount: asNumber(d.unconvertedTxnCount),
+    byCurrency,
+    planCount: asNumber(d.planCount),
+    goalCount: asNumber(d.goalCount),
+    subscriptionCount: asNumber(d.subscriptionCount),
+    installmentCount: asNumber(d.installmentCount),
+    debtInstrumentCount: asNumber(d.debtInstrumentCount),
+    usersScanned: asNumber(d.usersScanned),
+    backfilledAt: asDate(d.backfilledAt),
+    updatedAt: asDate(d.updatedAt),
+  };
+}
+
+/** Owner-only: recounts every total from the real data (takes a while). */
+export async function recountPlatformStats(): Promise<void> {
+  if (!flousyFunctions) throw new Error("Firebase is not configured.");
+  await httpsCallable(flousyFunctions, "backfillPlatformStats")({});
 }
 
 export type CampaignCode = {
