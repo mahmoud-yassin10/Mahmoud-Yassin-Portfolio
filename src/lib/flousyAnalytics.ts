@@ -410,6 +410,120 @@ export async function saveBillingControls(value: BillingControls) {
   }, { merge: true });
 }
 
+export type ChatTierControls = {
+  cooldownSec: number;
+  perMinute: number;
+  dailyCap: number;
+  maxOutputTokens: number;
+};
+
+/** Everything that decides how Gemini is used. Mirrors the Cloud Functions defaults. */
+export type AiGatewayControls = {
+  paidEnabled: boolean;
+  paidMonthlyCeilingUsd: number;
+  freeKeyRpm: number;
+  freeKeyRpd: number;
+  keyCooldownSec: number;
+  maxWaitInteractiveMs: number;
+  maxWaitBackgroundMs: number;
+  chatFree: ChatTierControls;
+  chatPro: ChatTierControls;
+  proFairUse: { planGenerate: number; planReevaluate: number; canISpend: number; voiceCloud: number };
+};
+
+export const defaultAiGatewayControls: AiGatewayControls = {
+  paidEnabled: true,
+  paidMonthlyCeilingUsd: 5,
+  freeKeyRpm: 10,
+  freeKeyRpd: 800,
+  keyCooldownSec: 60,
+  maxWaitInteractiveMs: 6000,
+  maxWaitBackgroundMs: 15000,
+  chatFree: { cooldownSec: 12, perMinute: 0, dailyCap: 15, maxOutputTokens: 900 },
+  chatPro: { cooldownSec: 2, perMinute: 8, dailyCap: 150, maxOutputTokens: 2048 },
+  proFairUse: { planGenerate: 60, planReevaluate: 120, canISpend: 600, voiceCloud: 300 },
+};
+
+function gwNumber(value: unknown, fallback: number) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+}
+
+function gwTier(raw: unknown, d: ChatTierControls): ChatTierControls {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  return {
+    cooldownSec: gwNumber(r.cooldownSec, d.cooldownSec),
+    perMinute: gwNumber(r.perMinute, d.perMinute),
+    dailyCap: gwNumber(r.dailyCap, d.dailyCap),
+    maxOutputTokens: gwNumber(r.maxOutputTokens, d.maxOutputTokens),
+  };
+}
+
+export async function loadAiGatewayControls(): Promise<AiGatewayControls> {
+  const d = defaultAiGatewayControls;
+  if (!flousyDb) return { ...d };
+  const snap = await getDoc(doc(flousyDb, "ai_gateway_config", "main"));
+  const r = (snap.data() ?? {}) as Record<string, unknown>;
+  const fair = (r.proFairUse ?? {}) as Record<string, unknown>;
+  return {
+    paidEnabled: typeof r.paidEnabled === "boolean" ? r.paidEnabled : d.paidEnabled,
+    paidMonthlyCeilingUsd: gwNumber(r.paidMonthlyCeilingUsd, d.paidMonthlyCeilingUsd),
+    freeKeyRpm: gwNumber(r.freeKeyRpm, d.freeKeyRpm),
+    freeKeyRpd: gwNumber(r.freeKeyRpd, d.freeKeyRpd),
+    keyCooldownSec: gwNumber(r.keyCooldownSec, d.keyCooldownSec),
+    maxWaitInteractiveMs: gwNumber(r.maxWaitInteractiveMs, d.maxWaitInteractiveMs),
+    maxWaitBackgroundMs: gwNumber(r.maxWaitBackgroundMs, d.maxWaitBackgroundMs),
+    chatFree: gwTier(r.chatFree, d.chatFree),
+    chatPro: gwTier(r.chatPro, d.chatPro),
+    proFairUse: {
+      planGenerate: gwNumber(fair.planGenerate, d.proFairUse.planGenerate),
+      planReevaluate: gwNumber(fair.planReevaluate, d.proFairUse.planReevaluate),
+      canISpend: gwNumber(fair.canISpend, d.proFairUse.canISpend),
+      voiceCloud: gwNumber(fair.voiceCloud, d.proFairUse.voiceCloud),
+    },
+  };
+}
+
+export async function saveAiGatewayControls(value: AiGatewayControls) {
+  if (!flousyDb) throw new Error("Firebase is not configured.");
+  await setDoc(doc(flousyDb, "ai_gateway_config", "main"), { ...value, updatedAt: serverTimestamp() }, { merge: true });
+}
+
+export type AiGatewayStatus = {
+  month: string;
+  paidSpentUsd: number;
+  paidCalls: number;
+  keys: Array<{ id: string; restingUntil: Date | null; minuteCount: number; dayCount: number }>;
+};
+
+/** This month's paid-key spend (an estimate) and how each key is doing right now. */
+export async function loadAiGatewayStatus(): Promise<AiGatewayStatus> {
+  const now = new Date();
+  const month = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  if (!flousyDb) return { month, paidSpentUsd: 0, paidCalls: 0, keys: [] };
+  const [paid, keys] = await Promise.all([
+    getDoc(doc(flousyDb, "ai_gateway_state", `paid_${month}`)),
+    getDoc(doc(flousyDb, "ai_gateway_state", "keys")),
+  ]);
+  const paidData = (paid.data() ?? {}) as Record<string, unknown>;
+  const keyMap = ((keys.data() ?? {}).keys ?? {}) as Record<string, Record<string, unknown>>;
+  const nowMs = Date.now();
+  return {
+    month,
+    paidSpentUsd: Number(paidData.estUsd) || 0,
+    paidCalls: Number(paidData.calls) || 0,
+    keys: Object.entries(keyMap).map(([id, k]) => {
+      const until = Number(k.cooldownUntil) || 0;
+      return {
+        id,
+        restingUntil: until > nowMs ? new Date(until) : null,
+        minuteCount: Number(k.minuteCount) || 0,
+        dayCount: Number(k.dayCount) || 0,
+      };
+    }),
+  };
+}
+
 export type CampaignCode = {
   code: string;
   label: string;

@@ -39,7 +39,7 @@ import {
 } from "recharts";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { flousyAuth, isFlousyFirebaseConfigured } from "@/lib/flousyFirebase";
-import { FUNNEL_EVENTS, isFlousyAdmin, loadBillingControls, loadLiveDashboardData, resolveSmsFalseDetections, reviewSmsFalseDetection, reviewStudentVerification, saveBillingControls, type AnalyticsEvent, type BillingControls, type DashboardData, type FeedbackItem, type SmsFalseDetectionItem, type StudentVerificationItem } from "@/lib/flousyAnalytics";
+import { FUNNEL_EVENTS, isFlousyAdmin, loadAiGatewayControls, loadAiGatewayStatus, loadBillingControls, loadLiveDashboardData, resolveSmsFalseDetections, reviewSmsFalseDetection, reviewStudentVerification, saveAiGatewayControls, saveBillingControls, type AiGatewayControls, type AiGatewayStatus, type AnalyticsEvent, type BillingControls, type ChatTierControls, type DashboardData, type FeedbackItem, type SmsFalseDetectionItem, type StudentVerificationItem } from "@/lib/flousyAnalytics";
 import { buildFunnel, northStar, retention } from "@/lib/flousyMetrics";
 import FlousyCreatorsPanel from "@/components/FlousyCreatorsPanel";
 import AnimatedBackground from "@/components/AnimatedBackground";
@@ -288,6 +288,105 @@ function BillingPanel({ live }: { live: boolean }) {
   </div>;
 }
 
+function AiGatewayPanel({ live }: { live: boolean }) {
+  const [form, setForm] = useState<AiGatewayControls | null>(null);
+  const [status, setStatus] = useState<AiGatewayStatus | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadAiGatewayControls().then((value) => { if (!cancelled) setForm(value); }).catch(() => { if (!cancelled) setSaved("Could not load the AI limits."); });
+    void loadAiGatewayStatus().then((value) => { if (!cancelled) setStatus(value); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
+
+  const num = (raw: string) => Math.max(0, Number(raw) || 0);
+  const setTop = (key: keyof AiGatewayControls, raw: string) => setForm((c) => c ? { ...c, [key]: num(raw) } : c);
+  const setTier = (tier: "chatFree" | "chatPro", key: keyof ChatTierControls, raw: string) =>
+    setForm((c) => c ? { ...c, [tier]: { ...c[tier], [key]: num(raw) } } : c);
+  const setFair = (key: keyof AiGatewayControls["proFairUse"], raw: string) =>
+    setForm((c) => c ? { ...c, proFairUse: { ...c.proFairUse, [key]: Math.floor(num(raw)) } } : c);
+
+  const save = async () => {
+    if (!form) return;
+    setSaving(true);
+    setSaved("");
+    try {
+      if (live) await saveAiGatewayControls(form);
+      setSaved(live ? "Saved. The AI picks this up within a minute." : "Preview only. Connect Firebase to save.");
+    } catch {
+      setSaved("Save failed. Your account needs the owner role, and Firestore rules must allow it.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!form) return <ChartCard title="AI limits" eyebrow="Loading"><p>Loading the current AI limits…</p></ChartCard>;
+
+  const spent = status?.paidSpentUsd ?? 0;
+  const ceiling = form.paidMonthlyCeilingUsd;
+  const pct = ceiling > 0 ? Math.min(100, Math.round((spent / ceiling) * 100)) : 100;
+  const field = (label: string, hint: string, value: number, onChange: (raw: string) => void, step = 1) => (
+    <label key={label} className="dashboard-feedback-item" style={{ display: "grid", gap: 6 }}>
+      <strong>{label}</strong>
+      <span>{hint}</span>
+      <input type="number" min={0} step={step} value={String(value)} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+
+  return <div className="dashboard-grid dashboard-grid-main" style={{ marginTop: 18 }}>
+    <ChartCard title="Paid key spending" eyebrow="Gemini, this month" className="dashboard-chart-large">
+      <div className="dashboard-feedback-list">
+        <div className="dashboard-feedback-item" style={{ display: "grid", gap: 8 }}>
+          <strong>${spent.toFixed(2)} of ${ceiling.toFixed(2)} estimated</strong>
+          <div className="dashboard-funnel-track"><div style={{ width: `${pct}%` }} /></div>
+          <span>{status ? `${status.paidCalls} paid calls in ${status.month}. This is an estimate; Google Cloud billing is the source of truth.` : "No paid calls recorded yet."}</span>
+        </div>
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="checkbox" checked={form.paidEnabled} onChange={(event) => setForm({ ...form, paidEnabled: event.target.checked })} />
+          Allow the paid key (Pro requests only, when both free keys are busy)
+        </label>
+        {field("Monthly ceiling (USD)", "Once the estimate reaches this, the paid key stops for the month and requests wait or fail politely.", form.paidMonthlyCeilingUsd, (raw) => setTop("paidMonthlyCeilingUsd", raw), 0.5)}
+        {status && status.keys.length > 0 && <div className="dashboard-feedback-item">
+          <strong>Keys right now</strong>
+          {status.keys.map((k) => <p key={k.id} style={{ margin: "6px 0 0" }}>{k.id}: {k.restingUntil ? `resting until ${k.restingUntil.toLocaleTimeString()}` : "ready"} · {k.minuteCount} this minute · {k.dayCount} today</p>)}
+        </div>}
+      </div>
+    </ChartCard>
+    <ChartCard title="Free keys and the waiting line" eyebrow="Keep under Google's limits">
+      <div className="dashboard-feedback-list">
+        {field("Requests per minute, per free key", "Google's free allowance is the ceiling. Stay below it.", form.freeKeyRpm, (raw) => setTop("freeKeyRpm", raw))}
+        {field("Requests per day, per free key", "Resets at midnight Pacific time.", form.freeKeyRpd, (raw) => setTop("freeKeyRpd", raw))}
+        {field("Rest after a rate-limit error (seconds)", "How long a key is skipped after Google refuses it.", form.keyCooldownSec, (raw) => setTop("keyCooldownSec", raw))}
+        {field("Chat waits up to (ms)", "When every free key is busy, chat waits this long before saying it is busy.", form.maxWaitInteractiveMs, (raw) => setTop("maxWaitInteractiveMs", raw))}
+        {field("Plans and voice wait up to (ms)", "The same, for plan generation and voice.", form.maxWaitBackgroundMs, (raw) => setTop("maxWaitBackgroundMs", raw))}
+      </div>
+    </ChartCard>
+    <ChartCard title="Free chat" eyebrow="Cooldown and daily cap">
+      <div className="dashboard-feedback-list">
+        {field("Seconds between messages", "A free user must wait this long between two messages.", form.chatFree.cooldownSec, (raw) => setTier("chatFree", "cooldownSec", raw))}
+        {field("Messages per day", "Counted per Cairo day.", form.chatFree.dailyCap, (raw) => setTier("chatFree", "dailyCap", raw))}
+        {field("Longest reply (tokens)", "Caps how long a free reply can be.", form.chatFree.maxOutputTokens, (raw) => setTier("chatFree", "maxOutputTokens", raw))}
+      </div>
+    </ChartCard>
+    <ChartCard title="Pro fair use" eyebrow="What unlimited means">
+      <div className="dashboard-feedback-list">
+        {field("Chat: seconds between messages", "A short gap, so a stuck button cannot flood the AI.", form.chatPro.cooldownSec, (raw) => setTier("chatPro", "cooldownSec", raw))}
+        {field("Chat: messages per minute", "0 turns this limit off.", form.chatPro.perMinute, (raw) => setTier("chatPro", "perMinute", raw))}
+        {field("Chat: messages per day", "Far above normal use.", form.chatPro.dailyCap, (raw) => setTier("chatPro", "dailyCap", raw))}
+        {field("Chat: longest reply (tokens)", "Caps how long a Pro reply can be.", form.chatPro.maxOutputTokens, (raw) => setTier("chatPro", "maxOutputTokens", raw))}
+        {field("Plan generations / month", "Pro fair-use ceiling.", form.proFairUse.planGenerate, (raw) => setFair("planGenerate", raw))}
+        {field("Plan re-checks / month", "Pro fair-use ceiling.", form.proFairUse.planReevaluate, (raw) => setFair("planReevaluate", raw))}
+        {field("Can I Spend / month", "Pro fair-use ceiling.", form.proFairUse.canISpend, (raw) => setFair("canISpend", raw))}
+        {field("Cloud voice / month", "After this, voice stays on the phone.", form.proFairUse.voiceCloud, (raw) => setFair("voiceCloud", raw))}
+        <button className="dashboard-primary-button" disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save AI limits"}</button>
+        {saved && <p>{saved}</p>}
+      </div>
+    </ChartCard>
+  </div>;
+}
+
 const FlousyDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<DashboardData>(() => makeDemoData());
@@ -433,7 +532,7 @@ const FlousyDashboard = () => {
     <main className="dashboard-main"><header className="dashboard-topbar"><button className="dashboard-menu-button" onClick={() => setMobileNav(true)}><Menu size={19} /></button><div className="dashboard-breadcrumb"><span>Flousy</span><b>/</b><strong>{viewLabel(activeView)}</strong></div><div className="dashboard-top-actions"><ThemeToggle /><div className="dashboard-status"><span className="dashboard-live-dot" /> {data.live ? "Live" : "Preview"}</div><button className="dashboard-icon-button" onClick={() => void refresh()} disabled={loading} title="Refresh"><RefreshCw size={16} className={loading ? "animate-spin" : ""} /></button></div></header>
       <div className="dashboard-content"><div className="dashboard-heading"><div><div className="dashboard-kicker">Preproduction / testing period</div><h1>{viewTitle(activeView)}</h1><p>{viewSubtitle(activeView)}</p></div><div className="dashboard-heading-actions"><select value={days} onChange={e => setDays(Number(e.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="dashboard-secondary-button" onClick={() => exportCsv(data.events)}><Download size={15} />Export</button></div></div>
       {notice && <div className="dashboard-notice"><CircleAlert size={16} />{notice}<button onClick={() => setNotice("")}><X size={14} /></button></div>}
-      {activeView === "plans" && <BillingPanel live={data.live} />}
+      {activeView === "plans" && <><BillingPanel live={data.live} /><AiGatewayPanel live={data.live} /></>}
       {activeView === "creators" && <FlousyCreatorsPanel live={data.live} />}
       {activeView === "overview" && <><div className="dashboard-stat-grid"><StatCard label="People reached" value={formatCompact(uniqueUsers)} change="+18.4% vs prior period" icon={Users} /><StatCard label="Store visits" value={formatCompact(data.events.filter(e => e.name === "store_visit").length)} change="+12.1% vs prior period" icon={Eye} tone="violet" /><StatCard label="Install → signup" value={`${installs ? Math.round((completed / installs) * 100) : 0}%`} change="Activation checkpoint" icon={Smartphone} tone="orange" /><StatCard label="Plans generated" value={formatCompact(plans)} change="The value moment" icon={Sparkles} tone="cyan" /><StatCard label="Insight viewers (7 days)" value={pct(star.active ? star.rate : null)} change={`${star.viewers} of ${star.active} active · AI only ${pct(star.active ? star.aiRate : null)}`} icon={Eye} tone="violet" /></div><div className="dashboard-grid dashboard-grid-main"><ChartCard title="Acquisition pulse" eyebrow="Daily movement" className="dashboard-chart-large"><ResponsiveContainer width="100%" height={250}><AreaChart data={trend}><defs><linearGradient id="visits" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={accent} stopOpacity={.3}/><stop offset="100%" stopColor={accent} stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8, color: "#f4f7f6" }}/><Area type="monotone" dataKey="visits" stroke={accent} fill="url(#visits)" strokeWidth={2}/><Area type="monotone" dataKey="installs" stroke={violet} fill="none" strokeWidth={2}/></AreaChart></ResponsiveContainer><div className="dashboard-chart-legend"><span><i style={{ background: accent }} />Store visits</span><span><i style={{ background: violet }} />Installs</span></div></ChartCard><ChartCard title="Where it runs" eyebrow="Platform mix" className="dashboard-chart-small"><div className="dashboard-donut-wrap"><ResponsiveContainer width="100%" height={190}><PieChart><Pie data={platformData} innerRadius={57} outerRadius={78} paddingAngle={4} dataKey="value"><Cell fill={accent}/><Cell fill={violet}/><Cell fill={orange}/></Pie><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/></PieChart></ResponsiveContainer><div className="dashboard-donut-center"><strong>{formatCompact(data.events.length)}</strong><span>events</span></div></div><div className="dashboard-platform-list">{platformData.map((item, index) => <div key={item.name}><span><i style={{ background: [accent, violet, orange][index] }} />{item.name}</span><b>{item.value}%</b></div>)}</div></ChartCard></div><div className="dashboard-grid dashboard-grid-bottom"><ChartCard title="Event stream" eyebrow="Latest product signals" className="dashboard-table-card"><EventTable events={eventRows} /></ChartCard><ChartCard title="At a glance" eyebrow="Quality of signal"><div className="dashboard-signal-stack"><div><span>Portfolio visits</span><strong>{formatCompact(portfolioVisits)}</strong></div><div><span>Portfolio sessions</span><strong>{formatCompact(portfolioSessions)}</strong></div><div><span>Feedback waiting</span><strong>{feedback.filter(item => item.status === "new").length}</strong></div><div><span>Returning on day 1</span><strong>{pct(returns.d1.rate)}</strong></div><div><span>Arabic audience</span><strong>{data.events.length ? Math.round((data.events.filter(e => e.locale === "ar").length / data.events.length) * 100) : 0}%</strong></div><div><span>Data freshness</span><strong>{data.live ? "Live" : "Preview"}</strong></div></div></ChartCard></div></>}
       {activeView === "funnel" && <><div className="dashboard-grid dashboard-grid-funnel"><ChartCard title="Activation funnel" eyebrow="The first successful loop" className="dashboard-chart-large"><div className="dashboard-funnel">{funnel.map((step, index) => <div className="dashboard-funnel-row" key={step.name}><div className="dashboard-funnel-label"><span>{String(index + 1).padStart(2, "0")}</span><b>{step.label}</b><small>{step.rate}% of visits</small></div><div className="dashboard-funnel-track"><div style={{ width: `${Math.max(7, step.rate)}%` }} /></div><strong>{step.count}</strong></div>)}</div></ChartCard><ChartCard title="Return behavior" eyebrow="Retention moments"><ResponsiveContainer width="100%" height={300}><LineChart data={trend}><CartesianGrid stroke="#25303a" vertical={false}/><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><YAxis axisLine={false} tickLine={false} tick={{ fill: "#75818c", fontSize: 11 }}/><Tooltip contentStyle={{ background: "#10161c", border: "1px solid #2b3740", borderRadius: 8 }}/><Line type="monotone" dataKey="active" stroke={cyan} strokeWidth={2} dot={false}/></LineChart></ResponsiveContainer><div className="dashboard-retention-callout"><span className="dashboard-live-dot" /><div><strong>{pct(returns.d7.rate)} week-one return</strong><small>Keep watching this as onboarding changes ship.</small></div></div></ChartCard></div><ChartCard title="Event conversion map" eyebrow="Compare any event"><div className="dashboard-event-controls"><div className="dashboard-search"><Search size={15}/><select value={selectedEvent} onChange={e => setSelectedEvent(e.target.value)}><option value="all">All events</option><option value="portfolio_visit">portfolio_visit</option>{FUNNEL_EVENTS.map(name => <option key={name} value={name}>{name}</option>)}</select></div><span>{events.length} matching events</span></div><EventTable events={eventRows} /></ChartCard></>}
